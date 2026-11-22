@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>第13章 PPO与TRPO</title>
     <link rel="stylesheet" href="theme.css">
     <style>
@@ -29,12 +30,21 @@
         .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
         .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
         .highlight { background: #fef9c3; border: 1px solid #facc15; }
+        h1 { color: #4c1d95; border-left: 6px solid #06b6d4; padding-left: 15px; margin: 20px 0 15px; font-size: 1.9rem; line-height: 1.35; }
+        figure { margin: 24px 0; padding: 16px; background: #faf8ff; border: 1px solid #ddd6fe; border-radius: 16px; }
+        figure svg { width: 100%; height: auto; display: block; }
+        figcaption { margin-top: 10px; font-size: 0.9rem; color: #5b21b6; line-height: 1.65; }
+        .source-note { font-size: 0.85rem; color: #64748b; border-top: 1px dashed #ddd6fe; margin-top: 28px; padding-top: 12px; line-height: 1.7; }
+        .math-scroll { max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 6px 2px; }
+        .math-scroll:focus-visible { outline: 3px solid #7c3aed; outline-offset: 2px; }
+        .math-scroll math[display="block"] { width: max-content; min-width: 100%; font-size: 1.15rem; }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
     </style>
 </head>
 <body>
 <div class="double-border">
 <div class="container">
-    <div class="sidebar">
+    <nav class="sidebar" aria-label="课程目录">
         <h3>课程目录</h3>
         <ul class="chapter-list">
             <li><a href="01.html">第1章 强化学习是什么</a></li>
@@ -66,15 +76,15 @@
             <li><a href="27.html">第27章 从零实现DQN</a></li>
             <li><a href="28.html">第28章 综合实战：Atari智能体</a></li>
         </ul>
-    </div>
-    <div class="main-content">
-        <h2>第十三章：PPO与TRPO</h2>
+    </nav>
+    <main class="main-content">
+        <h1>第十三章：PPO与TRPO</h1>
 
         <p>同学们好，欢迎来到第十三章。上一章我们学习了Actor-Critic方法，大家应该已经体会到了"演员-评委"这个框架的优雅之处。但不知道你们有没有注意到一个问题：<strong>策略梯度方法的更新步长非常难调</strong>。步长太小，学得比乌龟还慢；步长太大，策略直接崩掉。这一章要讲的PPO和TRPO，就是专门解决这个问题的两大杀器。</p>
 
         <p>先抛一个结论：<strong>PPO是当今RL领域应用最广泛的算法</strong>，没有之一。从Atari游戏到MuJoCo机器人，从Dota 2到ChatGPT的RLHF训练，PPO都是默认首选。它凭什么这么火？读完这章你就知道了。</p>
 
-        <h3>13.1 策略崩溃问题</h3>
+        <h2>13.1 策略崩溃问题</h2>
 
         <p>咱们先回忆一下策略梯度方法的更新公式：</p>
 
@@ -90,7 +100,7 @@
             <p><strong>核心洞察</strong>：策略梯度的问题不在于"梯度方向不对"，而在于"走多远没谱"。步长需要根据策略变化的剧烈程度来动态调整——这就是TRPO和PPO的出发点了。</p>
         </div>
 
-        <h3>13.2 信任域方法 TRPO</h3>
+        <h2>13.2 信任域方法 TRPO</h2>
 
         <p>2015年，John Schulman提出了TRPO（Trust Region Policy Optimization），给了策略更新一个"安全带"。</p>
 
@@ -98,10 +108,33 @@
 
         <p>形式化地说，TRPO要解决这样一个约束优化问题：</p>
 
-        <p style="text-align:center; font-size:1.05rem; margin:10px 0; background:#f5f3ff; padding:12px; border-radius:12px;">
-            <strong>max<sub>&theta;</sub></strong> &ensp; E[ <strong>&pi;<sub>&theta;</sub>(a|s) / &pi;<sub>old</sub>(a|s)</strong> &middot; A(s,a) ]<br>
-            <strong>s.t.</strong> &ensp; KL( &pi;<sub>old</sub>(&middot;|s) || &pi;<sub>&theta;</sub>(&middot;|s) ) &le; &delta;
-        </p>
+        <div class="math-equation" role="group" aria-label="TRPO 约束优化问题">
+            <div style="font-size:0.85rem;color:#64748b;margin-bottom:4px;">式 (13.2) TRPO：带 KL 约束的策略优化</div>
+            <div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="TRPO 目标函数，可横向滚动">
+                <math display="block" aria-label="目标为最大化新老策略概率比乘优势函数的期望">
+                    <mrow>
+                        <munder><mo>max</mo><mi>θ</mi></munder>
+                        <mi>E</mi><mo>[</mo>
+                        <mfrac>
+                            <mrow><msub><mi>π</mi><mi>θ</mi></msub><mo>(</mo><mi>a</mi><mo>|</mo><mi>s</mi><mo>)</mo></mrow>
+                            <mrow><msub><mi>π</mi><mtext>old</mtext></msub><mo>(</mo><mi>a</mi><mo>|</mo><mi>s</mi><mo>)</mo></mrow>
+                        </mfrac>
+                        <mi>A</mi><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>)</mo><mo>]</mo>
+                    </mrow>
+                </math>
+            </div>
+            <div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="TRPO 约束条件，可横向滚动">
+                <math display="block" aria-label="约束为旧策略到新策略的 KL 散度不大于 delta">
+                    <mrow>
+                        <mtext>s.t.</mtext>
+                        <msub><mi>D</mi><mtext>KL</mtext></msub>
+                        <mo>(</mo><msub><mi>π</mi><mtext>old</mtext></msub><mo>(</mo><mo>·</mo><mo>|</mo><mi>s</mi><mo>)</mo><mo>‖</mo>
+                        <msub><mi>π</mi><mi>θ</mi></msub><mo>(</mo><mo>·</mo><mo>|</mo><mi>s</mi><mo>)</mo><mo>)</mo>
+                        <mo>≤</mo><mi>δ</mi>
+                    </mrow>
+                </math>
+            </div>
+        </div>
 
         <p>这个约束条件是什么意思呢？直白点说：<strong>你可以更新策略，但不能"变得太离谱"</strong>。KL散度这个小阀门，控制了每次更新的剧烈程度。</p>
 
@@ -113,15 +146,48 @@
 
         <p>TRPO在理论上非常漂亮——它保证了策略更新单调不减（至少是近似单调）。但实际落地时，绝大多数团队很快就放弃了它的完整实现，转而使用PPO。原因很简单：PPO更简单，效果一样好。</p>
 
-        <h3>13.3 PPO-Clip</h3>
+        <h2>13.3 PPO-Clip</h2>
 
         <p>还是John Schulman，2017年，提出了PPO（Proximal Policy Optimization）。如果说TRPO是用"安全带"绑着策略，那PPO就是用"限速器"——不需要复杂的二阶优化，只需要一个巧妙的截断（Clipping）技巧。</p>
 
         <p>PPO的损失函数长这样：</p>
 
-        <p style="text-align:center; font-size:1.0rem; margin:10px 0; background:#f5f3ff; padding:12px; border-radius:12px;">
-            <strong>L<sup>CLIP</sup>(&theta;) = E[ min( r<sub>t</sub>(&theta;) &middot; A<sub>t</sub>, &ensp; clip(r<sub>t</sub>(&theta;), 1-&epsilon;, 1+&epsilon;) &middot; A<sub>t</sub> ) ]</strong>
-        </p>
+        <div class="math-equation" role="group" aria-label="PPO-Clip 目标函数">
+            <div style="font-size:0.85rem;color:#64748b;margin-bottom:4px;">式 (13.1) PPO-Clip 目标</div>
+            <div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="PPO-Clip 目标函数公式，可横向滚动">
+                <math display="block" aria-label="L clip of theta 等于 概率比乘优势 与 截断后的概率比乘优势 两者取较小值再取期望，截断区间为 1 减 epsilon 到 1 加 epsilon">
+                    <mrow>
+                        <msup><mi>L</mi><mtext>CLIP</mtext></msup><mo>(</mo><mi>θ</mi><mo>)</mo><mo>=</mo>
+                        <mi>E</mi><mo>[</mo><mi>min</mi><mo>(</mo>
+                        <msub><mi>r</mi><mi>t</mi></msub><mo>(</mo><mi>θ</mi><mo>)</mo><msub><mi>A</mi><mi>t</mi></msub><mo>,</mo>
+                        <mi>clip</mi><mo>(</mo><msub><mi>r</mi><mi>t</mi></msub><mo>(</mo><mi>θ</mi><mo>)</mo><mo>,</mo>
+                        <mn>1</mn><mo>−</mo><mi>ε</mi><mo>,</mo><mn>1</mn><mo>+</mo><mi>ε</mi><mo>)</mo><msub><mi>A</mi><mi>t</mi></msub><mo>)</mo><mo>]</mo>
+                    </mrow>
+                </math>
+            </div>
+        </div>
+
+        <figure>
+            <svg viewBox="0 0 760 420" role="img" aria-labelledby="fig-clip-title fig-clip-desc">
+                <title id="fig-clip-title">PPO-Clip 目标随概率比的变化</title>
+                <desc id="fig-clip-desc">当优势为正时，目标随概率比 r 线性增长；一旦 r 超过 1+ε，目标被截断为常数，梯度变为零。</desc>
+                <line x1="110" y1="370" x2="700" y2="370" stroke="#334155" stroke-width="2"/>
+                <line x1="110" y1="370" x2="110" y2="50" stroke="#334155" stroke-width="2"/>
+                <line x1="326.7" y1="198.6" x2="326.7" y2="370" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 5"/>
+                <line x1="503.3" y1="112.9" x2="503.3" y2="370" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 5"/>
+                <line x1="503.3" y1="112.9" x2="620" y2="56.3" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="4 5"/>
+                <polyline points="150,284.3 503.3,112.9 680,112.9" fill="none" stroke="#7c3aed" stroke-width="3.5" stroke-linejoin="round"/>
+                <circle cx="503.3" cy="112.9" r="5" fill="#7c3aed"/>
+                <g font-size="13" fill="#475569" text-anchor="middle">
+                    <text x="326.7" y="392">1−ε</text><text x="441.7" y="392">1</text><text x="503.3" y="392">1+ε</text>
+                </g>
+                <text x="420" y="413" text-anchor="middle" font-size="14" fill="#334155">概率比 r = π_θ(a|s) / π_old(a|s)</text>
+                <text x="60" y="210" font-size="14" fill="#334155" transform="rotate(-90 60 210)" text-anchor="middle">目标 L^CLIP</text>
+                <text x="250" y="188" font-size="13" fill="#5b21b6">L = r · A_t</text>
+                <text x="600" y="96" font-size="13" fill="#9f1239" text-anchor="middle">clip：梯度为 0</text>
+            </svg>
+            <figcaption>图 13-1：优势 A_t &gt; 0 时，PPO-Clip 目标 L^CLIP 随概率比 r 的变化（示意）。r 在 [1−ε, 1+ε] 内目标随 r 线性增长；一旦超出上界 1+ε，目标被 clip 截断为常数（水平段），梯度降为 0，从而限制单步更新幅度。A_t &lt; 0 的情形关于该图上下对称。ε 默认取 0.2。</figcaption>
+        </figure>
 
         <p>其中 <strong>r<sub>t</sub>(&theta;) = &pi;<sub>&theta;</sub>(a<sub>t</sub>|s<sub>t</sub>) / &pi;<sub>old</sub>(a<sub>t</sub>|s<sub>t</sub>)</strong> 是新旧策略在动作上的概率比。</p>
 
@@ -140,7 +206,7 @@
             <p><strong>踩坑实录</strong>：我第一次实现PPO的时候犯过一个极其愚蠢的错误——<strong>忘了重新计算log_probs</strong>。PPO每次更新都要计算r<sub>t</sub>，也就是新旧策略的概率比。我用的是同一个模型在更新前后的参数来算。但我在代码里直接用之前保存的log_probs当分母，没有传入新参数重新计算。结果r<sub>t</sub>永远等于1，clip永远不会触发，PPO直接退化成普通的策略梯度。整整两天查不出原因，直到我打印出r<sub>t</sub>的值才发现全是1。大家记住：<strong>一定要用当前策略重新计算动作的概率</strong>，再和旧概率做比值！</p>
         </div>
 
-        <h3>13.4 PPO实现细节</h3>
+        <h2>13.4 PPO实现细节</h2>
 
         <p>PPO虽然核心思想简单，但一个"工业级"的实现里包含了很多工程细节。我们来梳理一下完整的PPO算法流程：</p>
 
@@ -213,7 +279,7 @@ def ppo_iteration(policy, value_net, optimizer, trajectories):
             <p><strong>调参心得</strong>：&epsilon;=0.2是PPO论文给出的默认值，在大多数任务上都工作良好。如果你发现训练不稳定，试试降低到0.1或0.15。如果发现学得太慢，可以稍微提升到0.25。同理，K_epochs（每批数据的重复使用次数）默认3-10，不要贪多——同一批数据重复用太多反而会过拟合。</p>
         </div>
 
-        <h3>13.5 PPO为什么称霸</h3>
+        <h2>13.5 PPO为什么称霸</h2>
 
         <p>聊了这么多原理和细节，我们来总结一下PPO为什么能成为RL领域的"万金油"：</p>
 
@@ -300,13 +366,15 @@ def ppo_iteration(policy, value_net, optimizer, trajectories):
 
         <p>至此，我们已经讲完了离散动作空间中最主流的算法家族。下一章我们将迈入连续动作空间——机器人控制、自动驾驶等实际问题都在这个领域。我们会学习如何让策略输出连续的动作值（而不是离散的按钮），以及SAC（Soft Actor-Critic）如何将熵正则化做到极致。同学们，做好准备了吗？</p>
 
+        <p class="source-note">本章的 TRPO 目标与约束、PPO-Clip 目标函数、ε=0.2 默认值、GAE（λ=0.95）与多轮优化等实现细节参照 Schulman et al. 的 TRPO（arXiv:1502.05477）与 PPO（<a href="https://arxiv.org/abs/1707.06347">arXiv:1707.06347</a>）。图 13-1 为按目标函数形状独立绘制的示意，非论文原图。</p>
+
         <div class="footer-nav">
             <a href="12.html">&larr; 上一章</a>
             <a href="index.html">返回目录</a>
             <a href="14.html">下一章 &rarr;</a>
         </div>
 
-    </div>
+    </main>
 </div>
 </div>
 </body>
