@@ -29,12 +29,21 @@ th, td { border: 1px solid #c4b5fd; padding: 10px; text-align: left; } th { back
 .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
 .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
 .highlight { background: #fef9c3; border: 1px solid #facc15; }
+h1 { color: #4c1d95; border-left: 6px solid #06b6d4; padding-left: 15px; margin: 20px 0 15px; font-size: 1.9rem; line-height: 1.35; }
+figure { margin: 24px 0; padding: 16px; background: #faf8ff; border: 1px solid #ddd6fe; border-radius: 16px; }
+figure svg { width: 100%; height: auto; display: block; }
+figcaption { margin-top: 10px; font-size: 0.9rem; color: #5b21b6; line-height: 1.65; }
+.source-note { font-size: 0.85rem; color: #64748b; border-top: 1px dashed #ddd6fe; margin-top: 28px; padding-top: 12px; line-height: 1.7; }
+.math-scroll { max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 6px 2px; }
+.math-scroll:focus-visible { outline: 3px solid #7c3aed; outline-offset: 2px; }
+.math-scroll math[display="block"] { width: max-content; min-width: 100%; font-size: 1.15rem; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
 <div class="double-border">
 <div class="container">
-<div class="sidebar">
+<nav class="sidebar" aria-label="课程目录">
 <h3>&#x1F9E0; 课程目录</h3>
 <ul class="chapter-list">
 <li><a href="01.html">第1章 强化学习是什么</a></li>
@@ -66,14 +75,14 @@ th, td { border: 1px solid #c4b5fd; padding: 10px; text-align: left; } th { back
 <li><a href="27.html">第27章 从零实现DQN</a></li>
 <li><a href="28.html">第28章 综合实战：Atari智能体</a></li>
 </ul>
-</div>
-<div class="main-content">
+</nav>
+<main id="content" class="main-content">
 
-<h2>第十二章：Actor-Critic方法</h2>
+<h1>第十二章：Actor-Critic方法</h1>
 
 <p>同学们好！上一章我们学习了策略梯度（Policy Gradient）方法，它直接优化策略参数，但有一个显著的缺点——方差太大。你想想，用一整条轨迹的累积回报作为动作好坏的评判标准，相当于一个学生考完期末才知道自己学得怎么样，但中间没有任何反馈。那有没有办法在每一步都给出一个评判信号呢？答案是：<strong>给策略网络配一个"教练"——这就是Actor-Critic方法</strong>。</p>
 
-<h3>12.1 Actor-Critic架构</h3>
+<h2>12.1 Actor-Critic架构</h2>
 
 <p>Actor-Critic的名字很直白："Actor"是演员，负责做动作；"Critic"是评论家，负责评估动作的好坏。两者协同工作，形成一个闭环：Actor在环境中执行动作，Critic根据观察到的奖励和状态给出评价信号，Actor利用这个信号来调整自己的策略。</p>
 
@@ -95,15 +104,55 @@ Critic更新：&phi; &larr; &phi; + &beta; &times; &delta; &times; &#x2207;&#x20
 
 <p>打个比方：如果把策略梯度比作一个自学跳舞的人，每跳完一整支舞才看录像回放找问题（方差高、反馈慢），那Actor-Critic就是请了一个舞蹈教练。教练（Critic）站在旁边，每做一个动作就给出评价——"这个抬手角度不对""这一步重心偏了"。有了实时反馈，你学舞的速度自然快得多。这就是Actor-Critic的"演员-评论家二重奏"。</p>
 
+<figure>
+<svg viewBox="0 0 820 330" role="img" aria-labelledby="fig-ac-title fig-ac-desc">
+<title id="fig-ac-title">Actor-Critic 的闭环结构</title>
+<desc id="fig-ac-desc">Actor 输出动作作用于环境，环境返回奖励与下一状态；Critic 用价值函数算出 TD 误差 delta，再用 delta 同时更新 Actor 和 Critic。</desc>
+<defs><marker id="ac-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#7c3aed"/></marker></defs>
+<g stroke-linejoin="round">
+<rect x="50" y="60" width="300" height="80" rx="14" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2.5"/>
+<rect x="470" y="60" width="300" height="80" rx="14" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+<rect x="470" y="210" width="300" height="80" rx="14" fill="#ecfdf5" stroke="#0d9488" stroke-width="2.5"/>
+<rect x="50" y="210" width="300" height="80" rx="14" fill="#fff1f2" stroke="#e11d48" stroke-width="2"/>
+</g>
+<g stroke="#7c3aed" stroke-width="2" fill="none" marker-end="url(#ac-arrow)">
+<line x1="350" y1="100" x2="466" y2="100"/><line x1="620" y1="140" x2="620" y2="206"/>
+<line x1="470" y1="250" x2="354" y2="250"/><line x1="200" y1="210" x2="200" y2="144"/>
+</g>
+<g font-size="15" fill="#334155" text-anchor="middle">
+<text x="200" y="94" font-weight="700" fill="#5b21b6">Actor（策略网络）</text><text x="200" y="120" font-size="13" fill="#64748b">π_θ(a|s)，输出动作分布</text>
+<text x="620" y="94" font-weight="700" fill="#3730a3">环境</text><text x="620" y="120" font-size="13" fill="#64748b">执行 a，返回 r 与 s′</text>
+<text x="620" y="244" font-weight="700" fill="#0f766e">Critic（价值网络）</text><text x="620" y="270" font-size="13" fill="#64748b">V_φ(s)，估计状态价值</text>
+<text x="200" y="244" font-weight="700" fill="#9f1239">TD 误差</text><text x="200" y="270" font-size="13" fill="#64748b">δ = r + γV(s′) − V(s)</text>
+</g>
+<text x="408" y="90" text-anchor="middle" font-size="12" fill="#7c3aed">动作 a</text>
+<text x="660" y="178" font-size="12" fill="#7c3aed">r, s′</text>
+<text x="412" y="240" text-anchor="middle" font-size="12" fill="#e11d48">计算 δ</text>
+<text x="235" y="180" font-size="12" fill="#e11d48">θ ← θ + α·δ·∇log π</text>
+</svg>
+<figcaption>图 12-1：Actor-Critic 的闭环结构。Actor 每步与环境交互产生一个样本，Critic 只用一个价值网络 V_φ(s) 就能算出低方差的 TD 误差 δ，再用 δ 同时作为 Actor 的策略梯度权重与 Critic 自身的回归目标。相比 REINFORCE 需要整条轨迹的回报，这里的反馈是逐步、即时的。</figcaption>
+</figure>
+
 <div class="tip">
 <strong>直觉理解：</strong> 为什么Critic能降低方差？因为Critic提供的评价信号（TD误差）只依赖于单步的随机性，而REINFORCE中整条轨迹的回报累积了多步的随机性。方差与轨迹长度成正比——轨迹越长，方差爆炸得越厉害。Critic的价值函数相当于一个"平滑器"，把长程的随机性压缩到了单步的估计中。
 </div>
 
-<h3>12.2 优势函数（Advantage Function）</h3>
+<h2>12.2 优势函数（Advantage Function）</h2>
 
 <p>刚刚我们用V(s)做Critic，得到的更新权重是 &delta; = r + &gamma;V(s') - V(s)。这个 &delta; 实际上是对<strong>优势函数（Advantage Function）</strong>的无偏估计。我们先看定义：</p>
 
-<p><strong>优势函数：</strong> A(s,a) = Q(s,a) - V(s)</p>
+<div class="math-equation" role="group" aria-label="优势函数定义">
+  <div style="font-size:0.85rem;color:#64748b;margin-bottom:4px;">式 (12.1) 优势函数</div>
+  <div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="优势函数公式，可横向滚动">
+    <math display="block" aria-label="A of s a 等于 Q of s a 减 V of s，即在某状态下某动作的期望回报减去该状态的平均回报">
+      <mrow>
+        <mi>A</mi><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>)</mo><mo>=</mo>
+        <mi>Q</mi><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>)</mo><mo>−</mo>
+        <mi>V</mi><mo>(</mo><mi>s</mi><mo>)</mo>
+      </mrow>
+    </math>
+  </div>
+</div>
 
 <p>Q(s,a) 是在状态s下采取动作a能获得的期望回报，V(s) 是在状态s下按当前策略能获得的期望回报。两者的差值A(s,a)衡量的是一个动作<strong>相对于平均水平好多少</strong>。如果A(s,a) &gt; 0，说明这个动作比平均水平好；如果A(s,a) &lt; 0，说明这个动作比平均水平差。</p>
 
@@ -121,7 +170,7 @@ Critic更新：&phi; &larr; &phi; + &beta; &times; &delta; &times; &#x2207;&#x20
 
 <p>当然，单步TD误差虽然无偏，但方差可能受环境单步随机性的影响。在下一节我们会看到更高级的优势估计方法——GAE，它在偏差和方差之间做了更精细的平衡。</p>
 
-<h3>12.3 A2C / A3C算法</h3>
+<h2>12.3 A2C / A3C算法</h2>
 
 <p>有了Actor-Critic架构和优势函数，我们就可以搭建更实用的算法了。最具代表性的是A2C（Advantage Actor-Critic）和A3C（Asynchronous Advantage Actor-Critic），它们由DeepMind在2016年提出，在深度学习框架下真正让Actor-Critic方法在大规模问题上发挥了威力。</p>
 
@@ -158,7 +207,7 @@ for 每个训练迭代 do:
     &phi; &larr; &phi; + &alpha; &middot; g&#x2091;
 返回 最优策略参数 &theta;</pre>
 
-<h3>12.4 GAE（广义优势估计）</h3>
+<h2>12.4 GAE（广义优势估计）</h2>
 
 <p>前面我们用的优势估计是单步TD误差 &delta; = r + &gamma;V(s') - V(s)。单步TD误差方差低但可能有偏——如果V(s')的估计不准，偏差就会累积。那么有没有一种方法，可以灵活地在"偏差大但方差小"和"方差大但偏差小"之间调节？有的——<strong>GAE（Generalized Advantage Estimation）</strong>，由John Schulman在2015年提出。</p>
 
@@ -177,7 +226,20 @@ for 每个训练迭代 do:
 
 <p>这个式子展开后可以化简成一个极其优雅的形式：</p>
 
-<p>&#x1d700;<sub>t</sub><sup>GAE(&lambda;)</sup> = &Sigma;<sub>l=0</sub><sup>&#8734;</sup> (&gamma;&lambda;)<sup>l</sup> &delta;<sub>t+l</sub></p>
+<div class="math-equation" role="group" aria-label="GAE 优势估计">
+  <div style="font-size:0.85rem;color:#64748b;margin-bottom:4px;">式 (12.2) GAE：TD 误差的指数加权和</div>
+  <div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="GAE 公式，可横向滚动">
+    <math display="block" aria-label="t 时刻的 GAE 优势等于从 l 等于 0 到无穷，gamma lambda 的 l 次方乘以 t 加 l 时刻 TD 误差 delta 的和">
+      <mrow>
+        <msubsup><mi>A</mi><mi>t</mi><mrow><mtext>GAE</mtext><mo>(</mo><mi>λ</mi><mo>)</mo></mrow></msubsup>
+        <mo>=</mo>
+        <munderover><mo>∑</mo><mrow><mi>l</mi><mo>=</mo><mn>0</mn></mrow><mi>∞</mi></munderover>
+        <msup><mrow><mo>(</mo><mi>γ</mi><mi>λ</mi><mo>)</mo></mrow><mi>l</mi></msup>
+        <msub><mi>δ</mi><mrow><mi>t</mi><mo>+</mo><mi>l</mi></mrow></msub>
+      </mrow>
+    </math>
+  </div>
+</div>
 
 <p>也就是说，GAE就是对一串TD误差进行<strong>指数衰减的加权求和</strong>！这个形式非常容易递归计算，实际实现中只需要前向算一步存一个变量：</p>
 
@@ -208,7 +270,7 @@ for t = T-1 到 0:
 
 <p><strong>GAE为什么重要？</strong> 因为它是现代深度RL算法的标配。PPO、TRPO、SAC等主流算法都使用GAE作为优势估计器。它用一个参数 &lambda; 优雅地统一了TD学习和蒙特卡洛方法。你在实现PPO的时候会发现，核心代码很大一部分就是GAE的计算——它直接决定了策略更新的质量。</p>
 
-<h3>12.5 Actor-Critic vs 策略梯度 vs 值函数方法</h3>
+<h2>12.5 Actor-Critic vs 策略梯度 vs 值函数方法</h2>
 
 <p>学到现在，我们经历了三种主流RL方法：值函数方法（DQN族）、策略梯度方法（REINFORCE）、以及Actor-Critic方法（本章）。什么时候该用哪种？我们来一个全面对比：</p>
 
@@ -291,7 +353,7 @@ for t = T-1 到 0:
 <strong>一个重要的观察：</strong> 现在业界和学术界的主流，几乎全是Actor-Critic系算法。纯值函数方法（DQN）只在特定离散场景下还有竞争力，纯策略梯度（REINFORCE）基本上已经被淘汰。所以，掌握了Actor-Critic的思想，你就拿到了通往现代深度强化学习大门的钥匙。
 </div>
 
-<h3>本章小结</h3>
+<h2>本章小结</h2>
 
 <ul>
 <li><strong>Actor-Critic架构</strong>将策略网络（Actor）和价值网络（Critic）结合使用，Actor负责决策，Critic负责评价，两者通过TD误差协同更新。</li>
@@ -303,12 +365,14 @@ for t = T-1 到 0:
 
 <p>同学们，学完本章，你们已经理解了深度强化学习中最核心的算法框架。下一章我们将学习<strong>PPO（Proximal Policy Optimization）</strong>——它可以说是目前应用最广泛的强化学习算法，没有之一。PPO直接在Actor-Critic的框架下解决了"更新步长到底该迈多大"这个关键问题，用一个裁剪的替代目标函数让策略更新既快又稳。可以说，PPO是Actor-Critic思想的集大成者，也是你开始动手做RL项目的最佳起点。咱们下章见！</p>
 
+<p class="source-note">本章的 Actor-Critic 架构、优势函数与 A2C/A3C 内容参照 Sutton &amp; Barto《<a href="http://incompleteideas.net/book/the-book-2nd.html">Reinforcement Learning: An Introduction</a>》(第 2 版, 2018) 第 13 章；A3C 见 Mnih et al. (arXiv:1602.01783)，GAE 与 &lambda;=0.95 默认值见 Schulman et al. <a href="https://arxiv.org/abs/1506.02438">arXiv:1506.02438</a>。文中 A2C 伪代码为教学重写。</p>
+
 <div class="footer-nav">
 <a href="11.html">&larr; 上一章：策略梯度方法</a>
 <a href="13.html">下一章：PPO与TRPO &rarr;</a>
 </div>
 
-</div>
+</main>
 </div>
 </div>
 </body>
