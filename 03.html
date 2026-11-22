@@ -55,6 +55,16 @@ th { background: #ede9fe; }
 .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
 .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
 .highlight { background: #fef9c3; border: 1px solid #facc15; }
+h1 { color: #4c1d95; border-left: 6px solid #06b6d4; padding-left: 15px; margin: 20px 0 15px; font-size: 1.9rem; line-height: 1.35; }
+figure { margin: 24px 0; padding: 16px; background: #faf8ff; border: 1px solid #ddd6fe; border-radius: 16px; }
+figure svg { width: 100%; height: auto; display: block; }
+figcaption { margin-top: 10px; font-size: 0.9rem; color: #5b21b6; line-height: 1.65; }
+.source-note { font-size: 0.85rem; color: #64748b; border-top: 1px dashed #ddd6fe; margin-top: 28px; padding-top: 12px; line-height: 1.7; }
+.math-inline { font-family: 'Cambria Math', 'STIX Two Math', serif; }
+.math-scroll { max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 6px 2px; }
+.math-scroll:focus-visible { outline: 3px solid #7c3aed; outline-offset: 2px; }
+.math-scroll math[display="block"] { width: max-content; min-width: 100%; font-size: 1.15rem; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
@@ -63,7 +73,7 @@ th { background: #ede9fe; }
 <div class="container">
 
 <!-- ==================== 侧边栏 ==================== -->
-<div class="sidebar">
+<nav class="sidebar" aria-label="课程目录">
 <h3>目录</h3>
 <ul class="chapter-list">
 <li><a href="index.html">前言</a></li>
@@ -96,19 +106,19 @@ th { background: #ede9fe; }
 <li><a href="27.html">第27章 表示学习与RL</a></li>
 <li><a href="28.html">第28章 前沿专题</a></li>
 </ul>
-</div>
+</nav>
 
 <!-- ==================== 主内容 ==================== -->
-<div class="main-content">
+<main id="content" class="main-content">
 
-<h2>第三章：马尔可夫决策过程</h2>
+<h1>第三章：马尔可夫决策过程</h1>
 
 <p>大家好，我是你们的讲师。上一章我们聊了强化学习的基本框架——agent 和环境不断交互，agent 采取动作，环境反馈状态与奖励。但你有没有想过：这个交互过程到底能不能用数学严格地描述？agent 在每一步到底需要知道多少历史信息才能做出好的决策？</p>
 
 <p>这一章我们就来回答这些问题。我们将引入强化学习中最核心的数学模型——<strong>马尔可夫决策过程（Markov Decision Process，MDP）</strong>。可以说，95% 以上的强化学习问题最终都会被建模成一个 MDP。理解了 MDP，你就掌握了强化学习的"通用语言"。</p>
 
 <!-- ============ 3.1 ============ -->
-<h3>3.1 MDP 的形式化定义</h3>
+<h2>3.1 MDP 的形式化定义</h2>
 
 <p>一个马尔可夫决策过程由五个元素构成，通常记作一个五元组 <strong>(S, A, P, R, γ)</strong>。让我们一个一个来看。</p>
 
@@ -132,7 +142,7 @@ th { background: #ede9fe; }
 </div>
 
 <!-- ============ 3.2 ============ -->
-<h3>3.2 马尔可夫性质</h3>
+<h2>3.2 马尔可夫性质</h2>
 
 <p>MDP 名字中的"马尔可夫"来源于一个关键假设——<strong>马尔可夫性质（Markov Property）</strong>：</p>
 
@@ -158,7 +168,7 @@ P(s<sub>t+1</sub> | s<sub>t</sub>, a<sub>t</sub>) = P(s<sub>t+1</sub> | s<sub>t<
 <p>在这些情况下，我们需要引入更复杂的模型（如 POMDP、RNN 策略、或者使用 frame stacking），但这超出了本章的范围。好消息是：大量实际 RL 问题可以被巧妙地设计成满足马尔可夫性质，这正是 MDP 如此强大的原因。</p>
 
 <!-- ============ 3.3 ============ -->
-<h3>3.3 转移概率与奖励函数</h3>
+<h2>3.3 转移概率与奖励函数</h2>
 
 <p>转移概率 P(s' | s, a) 描述了环境的"物理规则"：从状态 s 出发执行动作 a 后，世界会变成什么样子。这里有两种情况：</p>
 
@@ -177,11 +187,35 @@ R(s, a) = E[ r<sub>t</sub> | s<sub>t</sub> = s, a<sub>t</sub> = a ]
 <p>在随机性环境中，即使 (s, a) 相同，实际获得的即时奖励也可能不同。公式中的期望就是在这些随机性上取平均。</p>
 
 <!-- ============ 3.4 ============ -->
-<h3>3.4 用 MDP 建模现实问题：GridWorld 实例</h3>
+<h2>3.4 用 MDP 建模现实问题：GridWorld 实例</h2>
 
 <p>没有什么比一个具体的例子更能说明问题了。我们来看经典的 <strong>GridWorld</strong>（网格世界）问题。</p>
 
 <p><strong>场景描述：</strong> 一个 5×5 的网格，agent 从左上角 (0,0) 出发，目标是到达右下角 (4,4) 的宝藏格子。某些格子是障碍物（墙），agent 不能穿过。每走一步消耗 1 点能量（reward = -1），到达宝藏获得 +50。</p>
+
+<figure>
+  <svg viewBox="0 0 380 380" role="img" aria-labelledby="fig-grid-title fig-grid-desc">
+    <title id="fig-grid-title">GridWorld 网格世界示意</title>
+    <desc id="fig-grid-desc">5×5 网格，起点 S 在左上角，宝藏 G 在右下角，深紫色格为障碍墙，青色折线是一条可行的最短路径。</desc>
+    <rect x="24" y="24" width="320" height="320" fill="#fffdf9" stroke="#8b5cf6" stroke-width="2"/>
+    <g stroke="#ddd6fe" stroke-width="1">
+      <line x1="88" y1="24" x2="88" y2="344"/><line x1="152" y1="24" x2="152" y2="344"/>
+      <line x1="216" y1="24" x2="216" y2="344"/><line x1="280" y1="24" x2="280" y2="344"/>
+      <line x1="24" y1="88" x2="344" y2="88"/><line x1="24" y1="152" x2="344" y2="152"/>
+      <line x1="24" y1="216" x2="344" y2="216"/><line x1="24" y1="280" x2="344" y2="280"/>
+    </g>
+    <g fill="#c4b5fd" stroke="#8b5cf6">
+      <rect x="88" y="88" width="64" height="64"/><rect x="152" y="152" width="64" height="64"/><rect x="216" y="88" width="64" height="64"/>
+    </g>
+    <polyline points="56,56 56,312 312,312" fill="none" stroke="#0d9488" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="56" cy="56" r="13" fill="#2563eb"/>
+    <text x="56" y="61" text-anchor="middle" font-size="15" font-weight="700" fill="#ffffff">S</text>
+    <circle cx="312" cy="312" r="15" fill="#16a34a"/>
+    <text x="312" y="318" text-anchor="middle" font-size="15" font-weight="700" fill="#ffffff">G</text>
+    <text x="190" y="368" text-anchor="middle" font-size="13" fill="#5b21b6">障碍墙（不可穿越）· 箭头折线为一条最优路径</text>
+  </svg>
+  <figcaption>图 3-1：5×5 GridWorld 的状态空间与一条最优路径。每格为离散状态，{上,下,左,右} 为动作；深紫色格是障碍墙，撞墙后 agent 停留原地。该网格布局为教学示意，非某个具体环境的官方地图。</figcaption>
+</figure>
 
 <p>这个简单的问题可以完美映射到 MDP 的五元组：</p>
 
@@ -250,7 +284,7 @@ R(s, a) = E[ r<sub>t</sub> | s<sub>t</sub> = s, a<sub>t</sub> = a ]
 <p>在这个 MDP 的基础上，一个最优策略（optimal policy）会告诉 agent：在每个格子应该往哪个方向走，才能最大化累积折扣奖励。对于这个简单的 GridWorld，最优策略几乎就是"朝着宝藏方向的最短路径"。但在更复杂的问题中，策略可能非常反直觉——这正是 RL 算法的用武之地。</p>
 
 <!-- ============ 3.5 ============ -->
-<h3>3.5 策略与值函数初步</h3>
+<h2>3.5 策略与值函数初步</h2>
 
 <p>有了 MDP 的定义，我们就可以精确地描述 agent 的行为和"好坏了"。这里引入两个关键概念：<strong>策略（Policy）</strong>和<strong>值函数（Value Function）</strong>。</p>
 
@@ -265,15 +299,48 @@ R(s, a) = E[ r<sub>t</sub> | s<sub>t</sub> = s, a<sub>t</sub> = a ]
 
 <p><strong>状态值函数 V<sup>π</sup>(s)</strong> 表示在策略 π 下，从状态 s 出发所能获得的期望累积折扣奖励：</p>
 
-<p style="margin:10px 0; text-align:center;">
-V<sup>π</sup>(s) = E<sub>π</sub> [ ∑<sub>k=0</sub><sup>∞</sup> γ<sup>k</sup> r<sub>t+k</sub> | s<sub>t</sub> = s ]
-</p>
+<div class="math-equation" role="group" aria-label="状态值函数定义">
+  <div style="font-size:0.85rem;color:#64748b;margin-bottom:4px;">式 (3.1) 状态值函数</div>
+  <div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="状态值函数公式，可横向滚动">
+    <math display="block" aria-label="V pi of s 等于在策略 pi 下、条件 s t 等于 s 时无穷折扣回报的期望">
+      <mrow>
+        <msup><mi>V</mi><mi>π</mi></msup><mo>(</mo><mi>s</mi><mo>)</mo>
+        <mo>=</mo>
+        <msub><mi>E</mi><mi>π</mi></msub>
+        <mrow><mo>[</mo>
+          <munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>0</mn></mrow><mi>∞</mi></munderover>
+          <msup><mi>γ</mi><mi>k</mi></msup>
+          <msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mi>k</mi></mrow></msub>
+          <mo>|</mo>
+          <msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi>
+        <mo>]</mo></mrow>
+      </mrow>
+    </math>
+  </div>
+</div>
 
 <p><strong>动作值函数 Q<sup>π</sup>(s, a)</strong> 则更进一步：它表示在状态 s 先执行动作 a，之后遵循策略 π，所能获得的期望累积折扣奖励：</p>
 
-<p style="margin:10px 0; text-align:center;">
-Q<sup>π</sup>(s, a) = E<sub>π</sub> [ ∑<sub>k=0</sub><sup>∞</sup> γ<sup>k</sup> r<sub>t+k</sub> | s<sub>t</sub> = s, a<sub>t</sub> = a ]
-</p>
+<div class="math-equation" role="group" aria-label="动作值函数定义">
+  <div style="font-size:0.85rem;color:#64748b;margin-bottom:4px;">式 (3.2) 动作值函数</div>
+  <div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="动作值函数公式，可横向滚动">
+    <math display="block" aria-label="Q pi of s a 等于先执行动作 a、再遵循策略 pi 时无穷折扣回报的期望">
+      <mrow>
+        <msup><mi>Q</mi><mi>π</mi></msup><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>)</mo>
+        <mo>=</mo>
+        <msub><mi>E</mi><mi>π</mi></msub>
+        <mrow><mo>[</mo>
+          <munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>0</mn></mrow><mi>∞</mi></munderover>
+          <msup><mi>γ</mi><mi>k</mi></msup>
+          <msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mi>k</mi></mrow></msub>
+          <mo>|</mo>
+          <msub><mi>s</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo>,</mo>
+          <msub><mi>a</mi><mi>t</mi></msub><mo>=</mo><mi>a</mi>
+        <mo>]</mo></mrow>
+      </mrow>
+    </math>
+  </div>
+</div>
 
 <p>这两个"值函数"是强化学习的核心。如果你只能掌握两个概念，那就是 policy 和 value function。几乎所有 RL 算法都可以归为三类：基于值函数的（value-based，学 Q 函数）、基于策略的（policy-based，直接学 π）、以及二者结合的 actor-critic。</p>
 
@@ -284,7 +351,7 @@ Q<sup>π</sup>(s, a) = E<sub>π</sub> [ ∑<sub>k=0</sub><sup>∞</sup> γ<sup>k
 <p>这里我们只是初步认识这两个概念。下一章我们将深入探讨它们之间最深刻的关系——<strong>贝尔曼方程（Bellman Equation）</strong>。这个方程将 V 和 Q 与 MDP 的 P、R 联系在一起，构成了几乎所有后续 RL 算法的理论基础。</p>
 
 <!-- ============ 本章小结 ============ -->
-<h3>本章小结</h3>
+<h2>本章小结</h2>
 
 <p>让我们回顾一下这一章的核心要点：</p>
 
@@ -298,13 +365,15 @@ Q<sup>π</sup>(s, a) = E<sub>π</sub> [ ∑<sub>k=0</sub><sup>∞</sup> γ<sup>k
 
 <p>下一章，我们将进入强化学习最优雅的数学结果之一——<strong>贝尔曼方程</strong>。这个方程揭示了 V、Q 与 P、R 之间的递归关系，它将为后续所有算法（从动态规划到深度 Q 网络）提供统一的数学基础。敬请期待！</p>
 
+<p class="source-note">本章的 MDP 五元组、马尔可夫性质与值函数定义参照 Sutton &amp; Barto《<a href="http://incompleteideas.net/book/the-book-2nd.html">Reinforcement Learning: An Introduction</a>》(第 2 版, 2018, MIT Press) 第 3 章。GridWorld 的 5×5 网格布局与奖励数值（到达 +50、每步 -1、γ = 0.9）为本教程为教学自设的示意参数，不是某个标准环境的官方配置。</p>
+
 <!-- ==================== 页脚导航 ==================== -->
 <div class="footer-nav">
 <a href="02.html">&larr; 上一章：基础概念</a>
 <a href="04.html">下一章：贝尔曼方程 &rarr;</a>
 </div>
 
-</div><!-- /main-content -->
+</main><!-- /main-content -->
 </div><!-- /container -->
 </div><!-- /double-border -->
 
