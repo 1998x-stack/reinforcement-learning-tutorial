@@ -41,13 +41,22 @@
         .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
         .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
         .highlight { background: #fef9c3; border: 1px solid #facc15; }
+        h1 { color: #4c1d95; border-left: 6px solid #06b6d4; padding-left: 15px; margin: 20px 0 15px; font-size: 1.9rem; line-height: 1.35; }
+        figure { margin: 24px 0; padding: 16px; background: #faf8ff; border: 1px solid #ddd6fe; border-radius: 16px; }
+        figure svg { width: 100%; height: auto; display: block; }
+        figcaption { margin-top: 10px; font-size: 0.9rem; color: #5b21b6; line-height: 1.65; }
+        .source-note { font-size: 0.85rem; color: #64748b; border-top: 1px dashed #ddd6fe; margin-top: 28px; padding-top: 12px; line-height: 1.7; }
+        .math-scroll { max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 6px 2px; }
+        .math-scroll:focus-visible { outline: 3px solid #7c3aed; outline-offset: 2px; }
+        .math-scroll math[display="block"] { width: max-content; min-width: 100%; font-size: 1.15rem; }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
     </style>
 </head>
 <body>
 
 <div class="double-border">
     <div class="container">
-        <aside class="sidebar">
+        <nav class="sidebar" aria-label="教程目录">
             <h3>📚 教程目录</h3>
             <ul class="chapter-list">
                 <li><a href="01.html">第1章 引言</a></li>
@@ -79,9 +88,9 @@
                 <li><a href="27.html">第27章 多智能体RL</a></li>
                 <li><a href="28.html">第28章 前沿主题</a></li>
             </ul>
-        </aside>
+        </nav>
         <main class="main-content">
-            <h2>第五章：动态规划</h2>
+            <h1>第五章：动态规划</h1>
 
             <p>大家好，我是你们的讲师。在前两章中，我们学习了马尔可夫决策过程（MDP）和贝尔曼方程——它们是理解强化学习问题的数学语言。从这一章开始，我们将真正动手"求解"MDP，也就是找出最优策略。</p>
 
@@ -92,7 +101,7 @@
             <!-- ============================================ -->
             <!-- 5.1 -->
             <!-- ============================================ -->
-            <h3>5.1 动态规划的核心前提 —— 已知模型</h3>
+            <h2>5.1 动态规划的核心前提 —— 已知模型</h2>
 
             <p>在强化学习的语境下，动态规划指的是一类在已知 MDP 模型的前提下求解最优策略的方法。这里的"已知模型"具体指：</p>
 
@@ -121,7 +130,7 @@
             <!-- ============================================ -->
             <!-- 5.2 -->
             <!-- ============================================ -->
-            <h3>5.2 策略评估（Policy Evaluation）</h3>
+            <h2>5.2 策略评估（Policy Evaluation）</h2>
 
             <p>策略评估的任务是：<strong>给定一个策略 π，计算它的状态价值函数 V<sup>π</sup></strong>。</p>
 
@@ -191,12 +200,14 @@
                 </tr>
             </table>
 
+            <p><em>上表的数值为教学示意：用于展示价值随迭代轮次逐层扩散的趋势，并非某个具体实验或论文的测量结果。</em></p>
+
             <p>可以看到，价值信息从目标状态开始"反向传播"，逐渐扩散到整个状态空间。这其实就是动态规划的核心直觉——<strong>利用后继状态的价值来更新当前状态的价值</strong>。</p>
 
             <!-- ============================================ -->
             <!-- 5.3 -->
             <!-- ============================================ -->
-            <h3>5.3 策略改进（Policy Improvement）</h3>
+            <h2>5.3 策略改进（Policy Improvement）</h2>
 
             <p>策略评估告诉我们一个策略有多好，但它没有告诉我们如何变得更好。这就是策略改进要做的事情。</p>
 
@@ -221,7 +232,7 @@
             <!-- ============================================ -->
             <!-- 5.4 -->
             <!-- ============================================ -->
-            <h3>5.4 策略迭代（Policy Iteration）</h3>
+            <h2>5.4 策略迭代（Policy Iteration）</h2>
 
             <p>策略迭代把评估和改进组合成一个完整的控制算法：</p>
 
@@ -233,6 +244,27 @@
             </ol>
 
             <p>这个过程就像爬山：每一步都爬到一个更高的点（更好的策略），直到到达山顶（最优策略）。因为有限 MDP 中只有有限个确定性策略，策略迭代保证在有限步内收敛到最优策略。</p>
+
+            <figure>
+                <svg viewBox="0 0 820 320" role="img" aria-labelledby="fig-pi-title fig-pi-desc">
+                    <title id="fig-pi-title">策略迭代的评估—改进循环</title>
+                    <desc id="fig-pi-desc">策略评估把当前策略的价值算到收敛，策略改进再对每个状态取贪心动作；两者交替进行，直到策略不再变化得到最优策略。</desc>
+                    <defs><marker id="pi-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#7c3aed"/></marker></defs>
+                    <rect x="40" y="70" width="300" height="96" rx="14" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2.5"/>
+                    <rect x="480" y="70" width="300" height="96" rx="14" fill="#ecfdf5" stroke="#0d9488" stroke-width="2.5"/>
+                    <text x="190" y="108" text-anchor="middle" font-size="16" font-weight="700" fill="#5b21b6">① 策略评估</text>
+                    <text x="190" y="140" text-anchor="middle" font-size="13" fill="#475569">把 V 迭代到收敛</text>
+                    <text x="630" y="108" text-anchor="middle" font-size="16" font-weight="700" fill="#0f766e">② 策略改进</text>
+                    <text x="630" y="140" text-anchor="middle" font-size="13" fill="#475569">π(s) ← argmax_a Q(s,a)</text>
+                    <path d="M340 96 Q410 56 478 96" fill="none" stroke="#7c3aed" stroke-width="2" marker-end="url(#pi-arrow)"/>
+                    <text x="409" y="50" text-anchor="middle" font-size="13" fill="#5b21b6">得到价值 V^π</text>
+                    <path d="M480 140 Q410 184 342 140" fill="none" stroke="#0d9488" stroke-width="2" marker-end="url(#pi-arrow)"/>
+                    <text x="409" y="202" text-anchor="middle" font-size="13" fill="#0f766e">贪心改进后的新策略</text>
+                    <rect x="220" y="235" width="380" height="58" rx="14" fill="#fef9c3" stroke="#facc15" stroke-width="2"/>
+                    <text x="410" y="270" text-anchor="middle" font-size="14" fill="#92400e">策略不再变化？　否 → 回到 ①　　是 → 输出 π*</text>
+                </svg>
+                <figcaption>图 5-1：策略迭代的两个交替步骤。策略评估负责把当前策略的价值算准，策略改进负责把策略变好；两者反复迭代，直到策略稳定即得到最优策略。价值迭代可视为把“评估到收敛”截断为一次扫描的近似版本。</figcaption>
+            </figure>
 
             <p><strong>算法伪代码：</strong></p>
 
@@ -259,7 +291,7 @@
             <!-- ============================================ -->
             <!-- 5.5 -->
             <!-- ============================================ -->
-            <h3>5.5 价值迭代（Value Iteration）</h3>
+            <h2>5.5 价值迭代（Value Iteration）</h2>
 
             <p>策略迭代的一个明显问题是：每次策略改进前，我们都需要把策略评估做"完全收敛"。这有必要吗？</p>
 
@@ -267,11 +299,37 @@
 
             <p>价值迭代的更新规则非常简洁：</p>
 
-            <pre>V(s) ← max<sub>a</sub> Σ<sub>s'</sub> P(s'|s,a) [R(s,a,s') + γ V(s')]</pre>
+            <div class="math-equation" role="group" aria-label="价值迭代更新">
+                <div style="font-size:0.85rem;color:#64748b;margin-bottom:4px;">式 (5.1) 价值迭代的备份</div>
+                <div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="价值迭代更新公式，可横向滚动">
+                    <math display="block" aria-label="V of s 等于对所有动作取最大值，对后继状态按转移概率 P 加权，求和项为奖励加 gamma 乘以 V of s'">
+                        <mrow>
+                            <mi>V</mi><mo>(</mo><mi>s</mi><mo>)</mo><mo>←</mo>
+                            <munder><mo>max</mo><mi>a</mi></munder>
+                            <munder><mo>∑</mo><msup><mi>s</mi><mo>′</mo></msup></munder>
+                            <mi>P</mi><mo>(</mo><msup><mi>s</mi><mo>′</mo></msup><mo>|</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>)</mo>
+                            <mrow><mo>[</mo><mi>R</mi><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>,</mo><msup><mi>s</mi><mo>′</mo></msup><mo>)</mo><mo>+</mo><mi>γ</mi><mi>V</mi><mo>(</mo><msup><mi>s</mi><mo>′</mo></msup><mo>)</mo><mo>]</mo></mrow>
+                        </mrow>
+                    </math>
+                </div>
+            </div>
 
             <p>注意这里的区别：策略评估用的是<strong>期望</strong>（对 π 加权平均），而价值迭代用的是<strong>最大化</strong>（取所有动作中的最大值）。实际上，价值迭代直接对应贝尔曼<strong>最优</strong>方程：</p>
 
-            <pre>V*(s) = max<sub>a</sub> Σ<sub>s'</sub> P(s'|s,a) [R(s,a,s') + γ V*(s')]</pre>
+            <div class="math-equation" role="group" aria-label="贝尔曼最优方程（价值迭代固定点）">
+                <div style="font-size:0.85rem;color:#64748b;margin-bottom:4px;">式 (5.2) 贝尔曼最优方程（价值迭代的固定点）</div>
+                <div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="贝尔曼最优方程，可横向滚动">
+                    <math display="block" aria-label="V 星 of s 等于对所有动作取最大值，对后继状态按转移概率加权，求和项为奖励加 gamma 乘以 V 星 of s'">
+                        <mrow>
+                            <msup><mi>V</mi><mo>*</mo></msup><mo>(</mo><mi>s</mi><mo>)</mo><mo>=</mo>
+                            <munder><mo>max</mo><mi>a</mi></munder>
+                            <munder><mo>∑</mo><msup><mi>s</mi><mo>′</mo></msup></munder>
+                            <mi>P</mi><mo>(</mo><msup><mi>s</mi><mo>′</mo></msup><mo>|</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>)</mo>
+                            <mrow><mo>[</mo><mi>R</mi><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>,</mo><msup><mi>s</mi><mo>′</mo></msup><mo>)</mo><mo>+</mo><mi>γ</mi><msup><mi>V</mi><mo>*</mo></msup><mo>(</mo><msup><mi>s</mi><mo>′</mo></msup><mo>)</mo><mo>]</mo></mrow>
+                        </mrow>
+                    </math>
+                </div>
+            </div>
 
             <p><strong>Python 伪代码实现：</strong></p>
 
@@ -372,6 +430,8 @@
             <p>答案在下一章。<strong>蒙特卡洛方法</strong>告诉我们：即使没有模型，只要让智能体与环境交互、收集经验样本，我们依然能够评估策略、寻找最优解。蒙特卡洛方法放弃了"自举"（bootstrapping），转而使用完整的 episode 回报来估计价值。它虽然效率可能不如 DP，但它迈出了"脱离模型"的第一步——这也是通向现代深度强化学习的起点。</p>
 
             <p>第 6 章，我们一起来看：<strong>当模型消失之后，我们如何通过采样来学习。</strong></p>
+
+            <p class="source-note">本章的策略评估、策略改进、策略迭代与价值迭代的公式与伪代码参照 Sutton &amp; Barto《<a href="http://incompleteideas.net/book/the-book-2nd.html">Reinforcement Learning: An Introduction</a>》(第 2 版, 2018) 第 4 章。4×4 网格世界示例中的具体数值为教学示意，不代表任何真实实验。</p>
 
             <!-- Footer Navigation -->
             <div class="footer-nav">
