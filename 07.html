@@ -40,12 +40,21 @@ th { background: #ede9fe; }
 .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
 .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
 .highlight { background: #fef9c3; border: 1px solid #facc15; }
+h1 { color: #4c1d95; border-left: 6px solid #06b6d4; padding-left: 15px; margin: 20px 0 15px; font-size: 1.9rem; line-height: 1.35; }
+figure { margin: 24px 0; padding: 16px; background: #faf8ff; border: 1px solid #ddd6fe; border-radius: 16px; }
+figure svg { width: 100%; height: auto; display: block; }
+figcaption { margin-top: 10px; font-size: 0.9rem; color: #5b21b6; line-height: 1.65; }
+.source-note { font-size: 0.85rem; color: #64748b; border-top: 1px dashed #ddd6fe; margin-top: 28px; padding-top: 12px; line-height: 1.7; }
+.math-scroll { max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 6px 2px; }
+.math-scroll:focus-visible { outline: 3px solid #7c3aed; outline-offset: 2px; }
+.math-scroll math[display="block"] { width: max-content; min-width: 100%; font-size: 1.15rem; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
 <div class="double-border">
 <div class="container">
-<div class="sidebar">
+<nav class="sidebar" aria-label="课程目录">
 <h3>导航目录</h3>
 <ul class="chapter-list">
 <li><a href="index.html">首页</a></li>
@@ -78,14 +87,14 @@ th { background: #ede9fe; }
 <li><a href="27.html">第27章 探索与利用</a></li>
 <li><a href="28.html">第28章 前沿与展望</a></li>
 </ul>
-</div>
-<div class="main-content">
+</nav>
+<main id="content" class="main-content">
 
-<h2>第七章：时序差分学习</h2>
+<h1>第七章：时序差分学习</h1>
 
 <p>同学们好！今天我们来聊聊强化学习中一个划时代的思想——<strong>时序差分学习（Temporal Difference Learning, TD）</strong>。如果说蒙特卡洛方法教会了智能体"从经验中总结教训"，动态规划教会了它"站在未来的肩膀上回望当下"，那么TD方法则做了一件更聪明的事——<strong>它让二者合二为一</strong>。</p>
 
-<h3>7.1 TD学习的思想起源</h3>
+<h2>7.1 TD学习的思想起源</h2>
 
 <p>想象一下：你每天从家开车到公司，心里会默默估计"大概要35分钟"。结果今天开到半路遇到了堵车，实际到公司花了50分钟。请问，在什么时候你会意识到自己的估计有偏差？——显然，不是到了公司的那一刻，而是在你<strong>看到堵车的那一刻</strong>，你就已经知道"哦，今天要晚了"。</p>
 
@@ -96,9 +105,44 @@ th { background: #ede9fe; }
 <p>这个"差异"就是强化学习中最核心的公式之一——<strong>TD误差（TD Error）</strong>：</p>
 
 <div class="highlight">
-<strong>TD误差定义：</strong><br>
-&delta;<sub>t</sub> = R<sub>t+1</sub> + &gamma; V(S<sub>t+1</sub>) - V(S<sub>t</sub>)
+<strong>TD误差定义：</strong>
+<div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="TD 误差公式，可横向滚动">
+  <math display="block" aria-label="TD 误差 delta t 等于奖励 R t+1 加上 gamma 乘以后继状态价值 V(S t+1)，再减去当前价值 V(S t)">
+    <mrow>
+      <msub><mi>δ</mi><mi>t</mi></msub><mo>=</mo>
+      <msub><mi>R</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub>
+      <mo>+</mo><mi>γ</mi><mi>V</mi><mo>(</mo><msub><mi>S</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>)</mo>
+      <mo>−</mo><mi>V</mi><mo>(</mo><msub><mi>S</mi><mi>t</mi></msub><mo>)</mo>
+    </mrow>
+  </math>
 </div>
+</div>
+
+<figure>
+  <svg viewBox="0 0 820 290" role="img" aria-labelledby="fig-td-title fig-td-desc">
+    <title id="fig-td-title">MC 与 TD(0) 的备份深度对比</title>
+    <desc id="fig-td-desc">同一条状态链上，蒙特卡洛要走到终止状态才用整条轨迹的累积回报更新，时序差分只走一步就用下一状态的估值自举更新。</desc>
+    <g stroke="#94a3b8" stroke-width="2" fill="none">
+      <line x1="116" y1="100" x2="244" y2="100"/><line x1="296" y1="100" x2="424" y2="100"/><line x1="476" y1="100" x2="604" y2="100"/>
+    </g>
+    <g fill="#ffffff" stroke="#7c3aed" stroke-width="2.5">
+      <circle cx="90" cy="100" r="26"/><circle cx="270" cy="100" r="26"/>
+      <circle cx="450" cy="100" r="26"/><circle cx="630" cy="100" r="26"/>
+    </g>
+    <g text-anchor="middle" font-size="13" fill="#4c1d95">
+      <text x="90" y="105">S(k)</text><text x="270" y="105">S(k+1)</text>
+      <text x="450" y="105">S(k+2)</text><text x="630" y="105">S(T)</text>
+    </g>
+    <g text-anchor="middle" font-size="12" fill="#64748b">
+      <text x="180" y="152">r(k+1)</text><text x="360" y="152">r(k+2)</text><text x="540" y="152">r(T)</text>
+    </g>
+    <path d="M90 74 Q180 16 270 74" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+    <text x="180" y="32" text-anchor="middle" font-size="13" fill="#b45309">TD(0)：r(k+1) + γV(S(k+1))</text>
+    <path d="M90 126 Q360 240 630 126" fill="none" stroke="#0d9488" stroke-width="2.5"/>
+    <text x="360" y="266" text-anchor="middle" font-size="12.5" fill="#0f766e">MC：整条轨迹 r(k+1)+γr(k+2)+…+γ^(T−k−1)r(T)</text>
+  </svg>
+  <figcaption>图 7-1：MC 与 TD(0) 的备份深度。空心圆是状态，线上小字是即时奖励。MC（青色弧）要走到终止状态 S(T) 才用整条轨迹的累积折扣回报更新；TD(0)（橙色弧）每走一步就用 r(k+1)+γV(S(k+1)) 做自举。备份图符号惯例参照 Sutton &amp; Barto (2018) 第 6 章，本图为独立重绘。</figcaption>
+</figure>
 
 <p>这个式子看似简单，但它包含了两个深刻的思想：</p>
 <ul>
@@ -109,7 +153,7 @@ th { background: #ede9fe; }
 
 <p>可以把这个过程理解为"边走边学"。蒙特卡洛方法是"期末考完再复盘"，动态规划是"靠课本推导"（需要完整的环境模型），而TD方法是<strong>每做一道题就对一对答案</strong>——效率高，反馈快。</p>
 
-<h3>7.2 TD(0) 预测</h3>
+<h2>7.2 TD(0) 预测</h2>
 
 <p>TD(0)是最简单的TD预测算法，它的更新公式非常直观：</p>
 
@@ -142,7 +186,7 @@ V(s) &larr; V(s) + &alpha; [ R + &gamma; V(s') - V(s) ]</pre>
 
 <p>从偏差-方差的角度看：MC方法无偏但方差大（因为需要整条轨迹的累积回报，受随机性影响大），TD(0)有偏但方差小（因为只用了一步真实奖励，其余靠估计值的自举）。在实际应用中，TD(0)通常比MC收敛快得多。</p>
 
-<h3>7.3 SARSA：同策略TD控制</h3>
+<h2>7.3 SARSA：同策略TD控制</h2>
 
 <p>学会了预测（估计价值函数），我们自然要问：能不能用TD来做<strong>控制</strong>（找到最优策略）？答案是肯定的！</p>
 
@@ -173,7 +217,7 @@ V(s) &larr; V(s) + &alpha; [ R + &gamma; V(s') - V(s) ]</pre>
 
 <p>你可以看到，SARSA在每一步更新中都用到了<strong>实际执行的下一步动作A'</strong>。这也是它被称为"同策略"的原因——你学习的策略就是你在执行的策略，没有二心。</p>
 
-<h3>7.4 Q-Learning：异策略TD控制</h3>
+<h2>7.4 Q-Learning：异策略TD控制</h2>
 
 <p>接下来是强化学习中最具影响力的算法之一——<strong>Q-Learning</strong>。它由Chris Watkins在1989年提出，是异策略（off-policy）TD控制的代表。</p>
 
@@ -199,7 +243,7 @@ V(s) &larr; V(s) + &alpha; [ R + &gamma; V(s') - V(s) ]</pre>
 
 <p>悬崖行走（Cliff Walking）是理解两者差异的经典场景。一个网格世界，智能体要从起点走到终点，边缘是悬崖。SARSA由于考虑到了探索策略可能带来的风险（&epsilon;-贪婪会随机往悬崖边走），所以会学出一条<strong>远离悬崖的"安全路径"</strong>。而Q-Learning学的是最优策略，它会沿着悬崖边缘走（因为这是最短路径），但在训练过程中可能会因为探索而频繁掉下悬崖——所以实际表现反而是SARSA在训练期间的总奖励更高。这是"同策略 vs 异策略"的一个非常生动的体现。</p>
 
-<h3>7.5 TD(&lambda;) 与资格迹</h3>
+<h2>7.5 TD(&lambda;) 与资格迹</h2>
 
 <p>既然TD(0)只用一步自举，MC用完整轨迹，那有没有"介于两者之间"的方法？当然有——<strong>TD(&lambda;)和资格迹（Eligibility Traces）</strong>。</p>
 
@@ -232,7 +276,7 @@ V(s) &larr; V(s) + &alpha; &delta; e(s)    &forall;s</pre>
 
 <p>这里的直观理解是：资格迹就像"记忆的痕迹"。当你踩到一个坑，一开始记忆很清晰（e很大），但随着时间推移，记忆逐渐淡化（e衰减）。&lambda;控制衰减速度——&lambda;越大，记忆越持久，越接近MC的"全记住"方式。</p>
 
-<h3>7.6 三大阵营总结</h3>
+<h2>7.6 三大阵营总结</h2>
 
 <p>到了这里，我们已经学过了三种强化学习的核心方法：<strong>动态规划（DP）</strong>、<strong>蒙特卡洛（MC）</strong>和<strong>时序差分（TD）</strong>。让我们用一个表格来清晰地对比它们：</p>
 
@@ -301,7 +345,7 @@ V(s) &larr; V(s) + &alpha; &delta; e(s)    &forall;s</pre>
 
 <p>当然，天下没有免费的午餐。TD的代价就是引入了偏差——因为用估计值去更新估计值，初始阶段难免有偏。但好消息是，在合适的条件下（如学习率递减且满足Robbins-Monro条件），TD方法被证明是收敛的。</p>
 
-<h3>本章小结</h3>
+<h2>本章小结</h2>
 
 <ul>
 <li><strong>时序差分（TD）</strong>是蒙特卡洛思想和动态规划思想的结合，核心在于使用自举（bootstrap）和采样（sampling）。</li>
@@ -315,11 +359,13 @@ V(s) &larr; V(s) + &alpha; &delta; e(s)    &forall;s</pre>
 
 <p>掌握了时序差分学习，你已经拥有了强化学习中最核心的算法武器。从下一章开始，我们将进入一个新的世界——当状态空间太大，无法用表格存储时，我们如何用<strong>函数逼近（Function Approximation）</strong>来解决问题。深度强化学习的序幕即将拉开！</p>
 
+<p class="source-note">本章 TD 误差、SARSA、Q-Learning 与 TD(&lambda;) 的记号与算法流程参照 Sutton &amp; Barto《<a href="http://incompleteideas.net/book/the-book-2nd.html">Reinforcement Learning: An Introduction</a>》(第 2 版, 2018) 第 6 章；Q-Learning 由 Watkins 于 1989 年提出。通勤时间、悬崖行走等例子为教学示意，其中数值不代表任何真实实验。</p>
+
 <div class="footer-nav">
 <a href="06.html">&larr; 上一章：蒙特卡洛与DP</a>
 <a href="08.html">下一章：函数逼近 &rarr;</a>
 </div>
-</div>
+</main>
 </div>
 </div>
 </body>
