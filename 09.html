@@ -31,13 +31,22 @@
         .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
         .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
         .highlight { background: #fef9c3; border: 1px solid #facc15; }
+        h1 { color: #4c1d95; border-left: 6px solid #06b6d4; padding-left: 15px; margin: 20px 0 15px; font-size: 1.9rem; line-height: 1.35; }
+        figure { margin: 24px 0; padding: 16px; background: #faf8ff; border: 1px solid #ddd6fe; border-radius: 16px; }
+        figure svg { width: 100%; height: auto; display: block; }
+        figcaption { margin-top: 10px; font-size: 0.9rem; color: #5b21b6; line-height: 1.65; }
+        .source-note { font-size: 0.85rem; color: #64748b; border-top: 1px dashed #ddd6fe; margin-top: 28px; padding-top: 12px; line-height: 1.7; }
+        .math-scroll { max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 6px 2px; }
+        .math-scroll:focus-visible { outline: 3px solid #7c3aed; outline-offset: 2px; }
+        .math-scroll math[display="block"] { width: max-content; min-width: 100%; font-size: 1.15rem; }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
     </style>
 </head>
 <body>
 
 <div class="double-border">
     <div class="container">
-        <aside class="sidebar">
+        <nav class="sidebar" aria-label="教程目录">
             <h3>📚 教程目录</h3>
             <ul class="chapter-list">
                 <li><a href="01.html">第1章 引言</a></li>
@@ -69,9 +78,9 @@
                 <li><a href="27.html">第27章 安全RL</a></li>
                 <li><a href="28.html">第28章 前沿主题</a></li>
             </ul>
-        </aside>
+        </nav>
         <main class="main-content">
-            <h2>第九章：深度Q网络(DQN)</h2>
+            <h1>第九章：深度Q网络(DQN)</h1>
 
             <p>大家好，我是你们的讲师。从第7章学习时序差分学习到现在，我们已经掌握了在模型未知的情况下，通过与环境交互来学习价值函数的方法。Q-Learning 作为离策略 TD 控制的代表，理论优美且实现简洁。但是——当我们在真实世界中遇到大规模或连续的状态空间时，表格型的 Q-Learning 立刻暴露出它的致命弱点。</p>
 
@@ -80,7 +89,7 @@
             <!-- ============================================ -->
             <!-- 9.1 -->
             <!-- ============================================ -->
-            <h3>9.1 为什么需要DQN</h3>
+            <h2>9.1 为什么需要DQN</h2>
 
             <p>我们先回顾一下 Q-Learning 的更新公式：</p>
 
@@ -108,7 +117,7 @@
             <!-- ============================================ -->
             <!-- 9.2 -->
             <!-- ============================================ -->
-            <h3>9.2 DQN的三大创新</h3>
+            <h2>9.2 DQN的三大创新</h2>
 
             <p><strong>创新一：经验回放（Experience Replay）</strong></p>
 
@@ -153,11 +162,61 @@
             <!-- ============================================ -->
             <!-- 9.3 -->
             <!-- ============================================ -->
-            <h3>9.3 DQN算法流程</h3>
+            <h2>9.3 DQN算法流程</h2>
 
             <p>现在我们把三个创新组合在一起，看完整的 DQN 训练流程。核心的损失函数是：</p>
 
-            <pre>L(θ) = E[ ( r + γ max<sub>a'</sub> Q(s',a';θ⁻) - Q(s,a;θ) )² ]</pre>
+            <div class="math-equation" role="group" aria-label="DQN 损失函数">
+                <div style="font-size:0.85rem;color:#64748b;margin-bottom:4px;">式 (9.1) DQN 的均方 TD 损失</div>
+                <div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="DQN 损失函数公式，可横向滚动">
+                    <math display="block" aria-label="损失 L of theta 等于方括号内，r 加 gamma 乘以目标网络在下一状态上的最大 Q 值，再减去在线网络输出 Q(s,a;theta)，整体平方的期望">
+                        <mrow>
+                            <mi>L</mi><mo>(</mo><mi>θ</mi><mo>)</mo><mo>=</mo><mi>E</mi><mo>[</mo>
+                            <msup>
+                                <mrow><mo>(</mo>
+                                    <mi>r</mi><mo>+</mo><mi>γ</mi>
+                                    <munder><mo>max</mo><msup><mi>a</mi><mo>′</mo></msup></munder>
+                                    <mi>Q</mi><mo>(</mo><msup><mi>s</mi><mo>′</mo></msup><mo>,</mo><msup><mi>a</mi><mo>′</mo></msup><mo>;</mo><msup><mi>θ</mi><mo>−</mo></msup><mo>)</mo>
+                                    <mo>−</mo>
+                                    <mi>Q</mi><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>;</mo><mi>θ</mi><mo>)</mo>
+                                <mo>)</mo></mrow>
+                                <mn>2</mn>
+                            </msup>
+                            <mo>]</mo>
+                        </mrow>
+                    </math>
+                </div>
+            </div>
+
+            <figure>
+                <svg viewBox="0 0 820 330" role="img" aria-labelledby="fig-dqn-title fig-dqn-desc">
+                    <title id="fig-dqn-title">DQN 的双网络与经验回放数据流</title>
+                    <desc id="fig-dqn-desc">状态送入在线网络得到 Q(s,a;θ)；下一状态送入冻结的目标网络得到 max Q(s′,a′;θ⁻)，加上奖励构成目标 y，最后与在线网络的输出求均方误差。</desc>
+                    <defs><marker id="dqn-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#7c3aed"/></marker></defs>
+                    <g stroke-linejoin="round">
+                        <rect x="20" y="40" width="150" height="50" rx="12" fill="#f5f3ff" stroke="#8b5cf6"/>
+                        <rect x="235" y="40" width="190" height="50" rx="12" fill="#ffffff" stroke="#7c3aed" stroke-width="2.5"/>
+                        <rect x="490" y="40" width="300" height="50" rx="12" fill="#eef2ff" stroke="#6366f1"/>
+                        <rect x="20" y="140" width="150" height="50" rx="12" fill="#f5f3ff" stroke="#8b5cf6"/>
+                        <rect x="235" y="140" width="190" height="50" rx="12" fill="#ecfdf5" stroke="#0d9488" stroke-width="2.5"/>
+                        <rect x="490" y="140" width="300" height="50" rx="12" fill="#eff6ff" stroke="#0ea5e9"/>
+                        <rect x="235" y="245" width="555" height="56" rx="12" fill="#fff1f2" stroke="#e11d48" stroke-width="2.5"/>
+                    </g>
+                    <g stroke="#7c3aed" stroke-width="2" fill="none" marker-end="url(#dqn-arrow)">
+                        <line x1="170" y1="65" x2="232" y2="65"/><line x1="425" y1="65" x2="487" y2="65"/>
+                        <line x1="170" y1="165" x2="232" y2="165"/><line x1="425" y1="165" x2="487" y2="165"/>
+                        <line x1="640" y1="90" x2="640" y2="242"/><line x1="550" y1="90" x2="550" y2="242"/>
+                    </g>
+                    <g font-size="14" fill="#4c1d95" text-anchor="middle">
+                        <text x="95" y="70">状态 s</text><text x="330" y="70">在线网络 θ</text>
+                        <text x="640" y="70">Q(s,a;θ)</text>
+                        <text x="95" y="170">状态 s′</text><text x="330" y="170">目标网络 θ⁻（冻结）</text>
+                        <text x="640" y="170">max Q(s′,a′;θ⁻)</text>
+                    </g>
+                    <text x="512" y="278" text-anchor="middle" font-size="15" fill="#9f1239">损失 L(θ) = ( r + γ·max Q(s′,a′;θ⁻) − Q(s,a;θ) )²</text>
+                </svg>
+                <figcaption>图 9-1：DQN 的双网络数据流。同一小批经验同时送入两个网络：在线网络 θ 每步更新，为被拟合的 Q 值；冻结的目标网络 θ⁻ 每 C 步才与 θ 同步，提供相对稳定的自举目标 y = r + γ·max<sub>a′</sub> Q(s′,a′;θ⁻)。</figcaption>
+            </figure>
 
             <p>其中 θ 是在线网络的参数，θ⁻ 是目标网络的参数。这个损失函数本质上就是 Q-Learning 更新量的均方误差——用目标网络计算出一个"相对稳定"的 TD 目标，然后让在线网络去拟合这个目标。</p>
 
@@ -212,7 +271,7 @@
             <!-- ============================================ -->
             <!-- 9.4 -->
             <!-- ============================================ -->
-            <h3>9.4 Atari突破</h3>
+            <h2>9.4 Atari突破</h2>
 
             <p>2015 年 DeepMind 在 Nature 上发表的论文 <em>"Human-level control through deep reinforcement learning"</em> 是强化学习历史上的里程碑。在这项工作中，DQN 在 49 款 Atari 2600 游戏上进行了测试，使用了<strong>完全相同的网络架构和超参数</strong>，没有为任何一款游戏做特殊调优。</p>
 
@@ -240,7 +299,7 @@
             <!-- ============================================ -->
             <!-- 9.5 -->
             <!-- ============================================ -->
-            <h3>9.5 DQN的局限性</h3>
+            <h2>9.5 DQN的局限性</h2>
 
             <p>尽管 DQN 取得了巨大成功，但它远非完美。让我们用一张表来对比 DQN 和传统 Q-Learning，以及 DQN 自身的几项主要局限性：</p>
 
@@ -304,6 +363,8 @@
             <p>从本章的内容中，你应该已经体会到：<strong>深度强化学习不仅仅是把神经网络塞进 Q-Learning 公式中那么简单</strong>。经验回放、目标网络、奖励裁剪——这些看似"工程技巧"的创新，每一个都有其深刻的数学和直觉原因。理解这些"为什么"比记住算法实现步骤重要得多。</p>
 
             <p>下一章，我们将深入探讨 DQN 的各种改进与变体，看看当经典的 DQN 遇到各种实际问题时，研究者们是如何一步步修补和进化的。让我们从最直接的痛点——过估计偏差开始，进入 Double DQN 的世界。</p>
+
+            <p class="source-note">本章的 DQN 三大创新、网络结构与 Atari 实验结果参照 Mnih et al., <em>Human-level control through deep reinforcement learning</em>, Nature 518, 529–533 (2015)，DOI <a href="https://doi.org/10.1038/nature14236">10.1038/nature14236</a>；更早的 2013 NIPS 版为 <em>Playing Atari with Deep Reinforcement Learning</em>。文中“49 款游戏、29 款超越传统方法、22 款超越人类专家”均出自该 Nature 论文报告的评测结果。</p>
 
             <!-- Footer Navigation -->
             <div class="footer-nav">
