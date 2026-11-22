@@ -41,6 +41,15 @@ th { background: #ede9fe; }
 .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
 .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
 .highlight { background: #fef9c3; border: 1px solid #facc15; }
+h1 { color: #4c1d95; border-left: 6px solid #06b6d4; padding-left: 15px; margin: 20px 0 15px; font-size: 1.9rem; line-height: 1.35; }
+figure { margin: 24px 0; padding: 16px; background: #faf8ff; border: 1px solid #ddd6fe; border-radius: 16px; }
+figure svg { width: 100%; height: auto; display: block; }
+figcaption { margin-top: 10px; font-size: 0.9rem; color: #5b21b6; line-height: 1.65; }
+.source-note { font-size: 0.85rem; color: #64748b; border-top: 1px dashed #ddd6fe; margin-top: 28px; padding-top: 12px; line-height: 1.7; }
+.math-scroll { max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 6px 2px; }
+.math-scroll:focus-visible { outline: 3px solid #7c3aed; outline-offset: 2px; }
+.math-scroll math[display="block"] { width: max-content; min-width: 100%; font-size: 1.15rem; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
@@ -84,13 +93,13 @@ th { background: #ede9fe; }
 
 <main class="main-content">
 
-<h2>第四章：贝尔曼方程</h2>
+<h1>第四章：贝尔曼方程</h1>
 
 <p>同学们好！欢迎来到第四章。前两章我们认识了马尔可夫决策过程（MDP），也聊了策略迭代和价值迭代的基本思路。但有一个关键问题我们一直没深究：<strong>状态的价值到底怎么定义？怎么计算？</strong></p>
 
 <p>这一章的主角——<strong>贝尔曼方程（Bellman Equations）</strong>——就是回答这个问题的。它由数学家理查德·贝尔曼（Richard Bellman）在1950年代提出，是整个强化学习的数学基石。可以说，不理解贝尔曼方程，就不算真正理解强化学习。</p>
 
-<h3>4.1 价值函数的定义</h3>
+<h2>4.1 价值函数的定义</h2>
 
 <p>在深入方程之前，我们先明确一个核心概念：<strong>"价值"到底是什么？</strong></p>
 
@@ -98,9 +107,27 @@ th { background: #ede9fe; }
 
 <p>定义状态价值函数 <code>V<sup>π</sup>(s)</code> 为：</p>
 
-<blockquote style="margin:10px 0 10px 20px;font-style:italic;">
-V<sup>π</sup>(s) = E<sub>π</sub>[ G<sub>t</sub> | S<sub>t</sub> = s ] = E<sub>π</sub>[ R<sub>t+1</sub> + γ R<sub>t+2</sub> + γ<sup>2</sup> R<sub>t+3</sub> + ... | S<sub>t</sub> = s ]
-</blockquote>
+<div class="math-equation" role="group" aria-label="状态价值函数定义">
+  <div style="font-size:0.85rem;color:#64748b;margin-bottom:4px;">式 (4.1) 状态价值函数</div>
+  <div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="状态价值函数公式，可横向滚动">
+    <math display="block" aria-label="V pi of s 等于在策略 pi 下从状态 s 出发的期望折扣回报，即从 t+1 起各时刻奖励的折扣和">
+      <mrow>
+        <msup><mi>V</mi><mi>π</mi></msup><mo>(</mo><mi>s</mi><mo>)</mo><mo>=</mo>
+        <msub><mi>E</mi><mi>π</mi></msub>
+        <mrow><mo>[</mo><msub><mi>G</mi><mi>t</mi></msub><mo>|</mo><msub><mi>S</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi><mo>]</mo></mrow>
+        <mo>=</mo>
+        <msub><mi>E</mi><mi>π</mi></msub>
+        <mrow><mo>[</mo>
+          <msub><mi>R</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub>
+          <mo>+</mo><mi>γ</mi><msub><mi>R</mi><mrow><mi>t</mi><mo>+</mo><mn>2</mn></mrow></msub>
+          <mo>+</mo><msup><mi>γ</mi><mn>2</mn></msup><msub><mi>R</mi><mrow><mi>t</mi><mo>+</mo><mn>3</mn></mrow></msub>
+          <mo>+</mo><mo>⋯</mo>
+          <mo>|</mo><msub><mi>S</mi><mi>t</mi></msub><mo>=</mo><mi>s</mi>
+        <mo>]</mo></mrow>
+      </mrow>
+    </math>
+  </div>
+</div>
 
 <p>其中 <strong>γ ∈ [0,1]</strong> 是折扣因子（discount factor）。γ 越接近 1，智能体越"远视"；γ 越接近 0，智能体越"短视"。</p>
 
@@ -137,7 +164,7 @@ V<sup>π</sup>(s) = Σ<sub>a</sub> π(a|s) · Q<sup>π</sup>(s, a)
 </tbody>
 </table>
 
-<h3>4.2 贝尔曼期望方程</h3>
+<h2>4.2 贝尔曼期望方程</h2>
 
 <p>现在到了最核心的部分。贝尔曼方程的精髓只有一句话：<strong>一个状态的价值，等于即时奖励加上下一状态的折扣价值</strong>。这就是"递归"（recursion）的思想。</p>
 
@@ -153,9 +180,25 @@ V<sup>π</sup>(s) = E<sub>π</sub>[ R<sub>t+1</sub> + γ R<sub>t+2</sub> + γ<su
 
 <p>展开期望，写成更具体的形式就是：</p>
 
-<blockquote style="margin:15px 0 15px 20px;font-style:italic;font-size:1.05em;">
-<strong>V<sup>π</sup>(s) = Σ<sub>a</sub> π(a|s) Σ<sub>s'</sub> P(s' | s, a) [ R(s, a, s') + γ V<sup>π</sup>(s') ]</strong>
-</blockquote>
+<div class="math-equation" role="group" aria-label="贝尔曼期望方程">
+  <div style="font-size:0.85rem;color:#64748b;margin-bottom:4px;">式 (4.2) 贝尔曼期望方程</div>
+  <div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="贝尔曼期望方程，可横向滚动">
+    <math display="block" aria-label="V pi of s 等于对所有动作 a 按策略概率 π 加权，再对所有后继状态 s' 按转移概率 P 加权，求和项为奖励加 gamma 乘以 V pi of s'">
+      <mrow>
+        <msup><mi>V</mi><mi>π</mi></msup><mo>(</mo><mi>s</mi><mo>)</mo><mo>=</mo>
+        <munder><mo>∑</mo><mi>a</mi></munder>
+        <mi>π</mi><mo>(</mo><mi>a</mi><mo>|</mo><mi>s</mi><mo>)</mo>
+        <munder><mo>∑</mo><msup><mi>s</mi><mo>′</mo></msup></munder>
+        <mi>P</mi><mo>(</mo><msup><mi>s</mi><mo>′</mo></msup><mo>|</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>)</mo>
+        <mrow><mo>[</mo>
+          <mi>R</mi><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>,</mo><msup><mi>s</mi><mo>′</mo></msup><mo>)</mo>
+          <mo>+</mo><mi>γ</mi>
+          <msup><mi>V</mi><mi>π</mi></msup><mo>(</mo><msup><mi>s</mi><mo>′</mo></msup><mo>)</mo>
+        <mo>]</mo></mrow>
+      </mrow>
+    </math>
+  </div>
+</div>
 
 <p>这个式子从左往右读：</p>
 <ol style="margin-left:30px;">
@@ -175,19 +218,48 @@ V<sup>π</sup>(s) = E<sub>π</sub>[ R<sub>t+1</sub> + γ R<sub>t+2</sub> + γ<su
 <strong>直观理解：</strong>贝尔曼方程本质上是一种"自洽性条件"（consistency condition）。它说：你对当前状态的价值估计，必须和你对未来状态的价值估计保持一致。如果 V(s) 和 V(s') 不满足这个等式，那你的价值估计就是不一致的——至少有一个是错的。
 </div>
 
-<h3>4.3 贝尔曼最优方程</h3>
+<h2>4.3 贝尔曼最优方程</h2>
 
 <p>上面我们讨论的是给定策略 π 下的价值函数。但如果我们想知道<strong>最优策略</strong>对应的价值呢？换句话说，<strong>最好的状态价值</strong>是多少？</p>
 
 <p>这时，我们把策略的选择从"按概率加权平均"换成"选最好的那个动作"：</p>
 
-<blockquote style="margin:15px 0 15px 20px;font-style:italic;font-size:1.05em;">
-<strong>V<sup>*</sup>(s) = max<sub>a</sub> Σ<sub>s'</sub> P(s' | s, a) [ R(s, a, s') + γ V<sup>*</sup>(s') ]</strong>
-</blockquote>
+<div class="math-equation" role="group" aria-label="贝尔曼最优方程（状态价值）">
+  <div style="font-size:0.85rem;color:#64748b;margin-bottom:4px;">式 (4.3) 贝尔曼最优方程（状态价值）</div>
+  <div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="贝尔曼最优方程状态价值形式，可横向滚动">
+    <math display="block" aria-label="V 星 of s 等于对所有动作取最大值，对后继状态按转移概率 P 加权，求和项为奖励加 gamma 乘以 V 星 of s'">
+      <mrow>
+        <msup><mi>V</mi><mo>*</mo></msup><mo>(</mo><mi>s</mi><mo>)</mo><mo>=</mo>
+        <munder><mo>max</mo><mi>a</mi></munder>
+        <munder><mo>∑</mo><msup><mi>s</mi><mo>′</mo></msup></munder>
+        <mi>P</mi><mo>(</mo><msup><mi>s</mi><mo>′</mo></msup><mo>|</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>)</mo>
+        <mrow><mo>[</mo>
+          <mi>R</mi><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>,</mo><msup><mi>s</mi><mo>′</mo></msup><mo>)</mo>
+          <mo>+</mo><mi>γ</mi><msup><mi>V</mi><mo>*</mo></msup><mo>(</mo><msup><mi>s</mi><mo>′</mo></msup><mo>)</mo>
+        <mo>]</mo></mrow>
+      </mrow>
+    </math>
+  </div>
+</div>
 
-<blockquote style="margin:15px 0 15px 20px;font-style:italic;font-size:1.05em;">
-<strong>Q<sup>*</sup>(s, a) = Σ<sub>s'</sub> P(s' | s, a) [ R(s, a, s') + γ max<sub>a'</sub> Q<sup>*</sup>(s', a') ]</strong>
-</blockquote>
+<div class="math-equation" role="group" aria-label="贝尔曼最优方程（动作价值）">
+  <div style="font-size:0.85rem;color:#64748b;margin-bottom:4px;">式 (4.4) 贝尔曼最优方程（动作价值）</div>
+  <div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="贝尔曼最优方程动作价值形式，可横向滚动">
+    <math display="block" aria-label="Q 星 of s a 等于对后继状态按转移概率加权，求和项为奖励加 gamma 乘以后继状态上 Q 星的最大值">
+      <mrow>
+        <msup><mi>Q</mi><mo>*</mo></msup><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>)</mo><mo>=</mo>
+        <munder><mo>∑</mo><msup><mi>s</mi><mo>′</mo></msup></munder>
+        <mi>P</mi><mo>(</mo><msup><mi>s</mi><mo>′</mo></msup><mo>|</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>)</mo>
+        <mrow><mo>[</mo>
+          <mi>R</mi><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>,</mo><msup><mi>s</mi><mo>′</mo></msup><mo>)</mo>
+          <mo>+</mo><mi>γ</mi>
+          <munder><mo>max</mo><msup><mi>a</mi><mo>′</mo></msup></munder>
+          <msup><mi>Q</mi><mo>*</mo></msup><mo>(</mo><msup><mi>s</mi><mo>′</mo></msup><mo>,</mo><msup><mi>a</mi><mo>′</mo></msup><mo>)</mo>
+        <mo>]</mo></mrow>
+      </mrow>
+    </math>
+  </div>
+</div>
 
 <p>注意这里的 max 操作——这是最优方程和期望方程最根本的区别。期望方程是<strong>线性</strong>的，因为它是加权平均；而最优方程是<strong>非线性</strong>的，因为 max 是一个非线性算子。</p>
 
@@ -197,11 +269,43 @@ V<sup>π</sup>(s) = E<sub>π</sub>[ R<sub>t+1</sub> + γ R<sub>t+2</sub> + γ<su
 <strong>一个重要的区分：</strong>很多初学者会把"最优贝尔曼方程"和"贝尔曼期望方程"混为一谈。记住：期望方程描述"给定策略下的价值"，而最优方程描述"最优策略下的价值"。期望方程是线性的，可以精确求解；最优方程是非线性的，只能迭代逼近。
 </div>
 
-<h3>4.4 备份图（Backup Diagrams）</h3>
+<h2>4.4 备份图（Backup Diagrams）</h2>
 
-<p>贝尔曼方程有一个非常直观的可视化方式——备份图。虽然这里没有实际画图，但我用文字给你描述一下：</p>
+<p>贝尔曼方程有一个非常直观的可视化方式——备份图（backup diagram）。它用树形结构把“当前状态的价值如何由后继状态展开”画出来：</p>
 
-<p><strong>状态价值函数的备份图：</strong></p>
+<figure>
+  <svg viewBox="0 0 800 320" role="img" aria-labelledby="fig-backup-title fig-backup-desc">
+    <title id="fig-backup-title">状态价值函数的备份图</title>
+    <desc id="fig-backup-desc">从当前状态 s 出发，按策略概率 π 选择动作（实心节点），再按转移概率 P 到达下一状态 s'，并把 γ 折扣后的 V(s') 备份回 s。</desc>
+    <g stroke="#8b5cf6" stroke-width="1.5" fill="none">
+      <line x1="400" y1="60" x2="220" y2="138"/><line x1="400" y1="60" x2="580" y2="138"/>
+      <line x1="220" y1="162" x2="120" y2="238"/><line x1="220" y1="162" x2="320" y2="238"/>
+      <line x1="580" y1="162" x2="480" y2="238"/><line x1="580" y1="162" x2="680" y2="238"/>
+    </g>
+    <circle cx="400" cy="40" r="20" fill="#ffffff" stroke="#7c3aed" stroke-width="2.5"/>
+    <text x="400" y="45" text-anchor="middle" font-size="16" fill="#4c1d95">s</text>
+    <circle cx="220" cy="150" r="12" fill="#f59e0b"/><circle cx="580" cy="150" r="12" fill="#f59e0b"/>
+    <text x="250" y="118" font-size="13" fill="#5b21b6">π(a₁|s)</text>
+    <text x="600" y="118" font-size="13" fill="#5b21b6">π(a₂|s)</text>
+    <g font-size="12" fill="#64748b">
+      <text x="40" y="205">P(s'|s,a₁)</text><text x="330" y="205">P(s'|s,a₁)</text>
+      <text x="420" y="205">P(s'|s,a₂)</text><text x="690" y="205">P(s'|s,a₂)</text>
+    </g>
+    <g fill="#ffffff" stroke="#7c3aed" stroke-width="2.5">
+      <circle cx="120" cy="260" r="20"/><circle cx="320" cy="260" r="20"/>
+      <circle cx="480" cy="260" r="20"/><circle cx="680" cy="260" r="20"/>
+    </g>
+    <g text-anchor="middle" font-size="15" fill="#4c1d95">
+      <text x="120" y="265">s′</text><text x="320" y="265">s′</text><text x="480" y="265">s′</text><text x="680" y="265">s′</text>
+    </g>
+    <g text-anchor="middle" font-size="14" fill="#0d9488">
+      <text x="120" y="302">V(s′)</text><text x="320" y="302">V(s′)</text><text x="480" y="302">V(s′)</text><text x="680" y="302">V(s′)</text>
+    </g>
+  </svg>
+  <figcaption>图 4-1：状态价值函数的备份图。空心圆表示状态，实心节点表示“状态–动作”对；边上的 π(a|s) 是策略概率，P(s′|s,a) 是环境转移概率。贝尔曼方程把每个后继状态的价值 V(s′) 连同奖励一起“备份”回根节点 s。符号惯例参照 Sutton &amp; Barto (2018) 第 3.5 节，本图为独立重绘。</figcaption>
+</figure>
+
+<p><strong>状态价值函数的备份图：</strong>从根状态 s 向下生长，第一层是按策略展开的动作，第二层是环境转移到的后继状态。</p>
 
 <p>想象一棵倒置的树。根节点是一个空心圆圈，代表当前状态 s。从 s 分出若干分支（动作 a），每个分支上标记了策略概率 π(a|s)。每个动作分支再连接到环境——环境以概率 P(s'|s, a) 将你送到下一状态 s'（用实心圆圈表示）。每个 s' 又带有它的价值 V(s')。</p>
 
@@ -213,7 +317,7 @@ V<sup>π</sup>(s) = E<sub>π</sub>[ R<sub>t+1</sub> + γ R<sub>t+2</sub> + γ<su
 
 <p>想一下，这不就是"自洽性"吗？最初的 V(s) 是一个猜测，经过备份之后得到一个新的 V(s)。如果猜测和备份后的值不一致，说明猜测需要调整。反复调整，直到一致——这就是后面所有算法的核心思想。</p>
 
-<h3>4.5 从方程到算法</h3>
+<h2>4.5 从方程到算法</h2>
 
 <p>贝尔曼方程是数学，但我们的目标是写出能跑的程序。方程怎么变成算法？答案是：<strong>把等号变成赋值</strong>。</p>
 
@@ -261,7 +365,7 @@ until Δ < θ</code></pre>
 <strong>预告一下：</strong>下一章我们将看到，动态规划就是直接用上面的"全宽度"（full-width）备份来计算价值。而蒙特卡洛方法（第6章）是用采样代替对所有轨迹求和。时序差分学习（第7章）更进一步，只用一步转移就完成备份——它们都是在不同的"深度"和"宽度"上做同一个贝尔曼方程的近似求解。
 </div>
 
-<h3>本章小结</h3>
+<h2>本章小结</h2>
 
 <ul style="margin-left:20px;line-height:1.8;">
 <li><strong>状态价值函数 V(s)</strong> 和 <strong>动作价值函数 Q(s,a)</strong> 分别衡量"处于一个状态"和"在状态中执行一个动作"的长期期望回报。</li>
@@ -272,6 +376,8 @@ until Δ < θ</code></pre>
 </ul>
 
 <p>掌握了贝尔曼方程，你就拿到了强化学习的"钥匙"。下一章，我们将用动态规划来实际求解贝尔曼方程——看看经典的"全宽度备份"是如何运作的。</p>
+
+<p class="source-note">本章的贝尔曼期望方程与最优方程、备份图符号惯例参照 Sutton &amp; Barto《<a href="http://incompleteideas.net/book/the-book-2nd.html">Reinforcement Learning: An Introduction</a>》(第 2 版, 2018, MIT Press) 第 3 章（3.5–3.6）与第 4 章（4.1 策略评估）。备份图为按该惯例独立重绘的示意图。</p>
 
 <div class="footer-nav">
 <a href="03.html">← 上一章：动态规划与策略迭代</a>
