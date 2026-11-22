@@ -29,12 +29,21 @@ th, td { border: 1px solid #c4b5fd; padding: 10px; text-align: left; } th { back
 .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
 .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
 .highlight { background: #fef9c3; border: 1px solid #facc15; }
+h1 { color: #4c1d95; border-left: 6px solid #06b6d4; padding-left: 15px; margin: 20px 0 15px; font-size: 1.9rem; line-height: 1.35; }
+figure { margin: 24px 0; padding: 16px; background: #faf8ff; border: 1px solid #ddd6fe; border-radius: 16px; }
+figure svg { width: 100%; height: auto; display: block; }
+figcaption { margin-top: 10px; font-size: 0.9rem; color: #5b21b6; line-height: 1.65; }
+.source-note { font-size: 0.85rem; color: #64748b; border-top: 1px dashed #ddd6fe; margin-top: 28px; padding-top: 12px; line-height: 1.7; }
+.math-scroll { max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 6px 2px; }
+.math-scroll:focus-visible { outline: 3px solid #7c3aed; outline-offset: 2px; }
+.math-scroll math[display="block"] { width: max-content; min-width: 100%; font-size: 1.15rem; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
 <div class="double-border">
 <div class="container">
-<div class="sidebar">
+<nav class="sidebar" aria-label="课程目录">
 <h3>导航目录</h3>
 <ul class="chapter-list">
 <li><a href="index.html">首页</a></li>
@@ -67,16 +76,16 @@ th, td { border: 1px solid #c4b5fd; padding: 10px; text-align: left; } th { back
 <li><a href="27.html">第27章 探索与利用</a></li>
 <li><a href="28.html">第28章 前沿与展望</a></li>
 </ul>
-</div>
-<div class="main-content">
+</nav>
+<main id="content" class="main-content">
 
-<h2>第十一章：策略梯度方法</h2>
+<h1>第十一章：策略梯度方法</h1>
 
 <p>同学们好！从本章开始，我们将迈入强化学习中最具影响力的一个分支——<strong>策略梯度方法（Policy Gradient Methods）</strong>。前面几章我们花了大量篇幅讨论值函数方法：DQN学习Q值，然后用 &epsilon;-贪婪策略选择动作。这种"先学值，再导策略"的间接路线虽然有效，但有没有想过——我们能不能<strong>直接优化策略本身</strong>？</p>
 
 <p>策略梯度方法给出的回答是：<strong>能，而且应该</strong>。它在许多场景下比值函数方法更自然、更强大，也是现代强化学习算法（PPO、SAC、DDPG等）的基石。</p>
 
-<h3>11.1 为什么直接优化策略</h3>
+<h2>11.1 为什么直接优化策略</h2>
 
 <p>值函数方法（如DQN）走的是"曲线救国"路线：先估计Q值，再通过 &epsilon;-贪婪从Q值导出策略。这条路线存在几个根本性的问题：</p>
 
@@ -95,17 +104,29 @@ th, td { border: 1px solid #c4b5fd; padding: 10px; text-align: left; } th { back
 
 <p>这就像你在爬山——每一步都朝当前最陡的方向走，最终到达山顶。只不过这里的"山"是参数空间，而"坡度"需要从与环境交互的经验中估计。</p>
 
-<h3>11.2 策略梯度定理</h3>
+<h2>11.2 策略梯度定理</h2>
 
 <p>那么问题来了：J(&theta;) 涉及整个轨迹的期望，它的梯度怎么算？直接把期望求导是不行的——期望中的采样过程（智能体根据策略选择动作）本身依赖于参数 &theta;，而采样操作是不连续的。</p>
 
 <p>这就是<strong>策略梯度定理（Policy Gradient Theorem）</strong>大显身手的地方。它给出了一个令人惊讶的简洁结果：</p>
 
-<pre>策略梯度定理：
-
-&nabla;<sub>&theta;</sub>J(&theta;) = E<sub>s~d<sup>&pi;</sup>, a~&pi;</sub> [ &nabla;<sub>&theta;</sub> log &pi;<sub>&theta;</sub>(a|s) &middot; Q<sup>&pi;</sup>(s,a) ]
-
-其中 d<sup>&pi;</sup> 是在策略 &pi; 下的稳态分布。</pre>
+<div class="math-equation" role="group" aria-label="策略梯度定理">
+  <div style="font-size:0.85rem;color:#64748b;margin-bottom:4px;">式 (11.1) 策略梯度定理</div>
+  <div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="策略梯度定理公式，可横向滚动">
+    <math display="block" aria-label="J of theta 的梯度等于 在状态按稳态分布、动作按当前策略采样下，log π(a|s) 对 theta 的梯度 乘以 Q π(s,a) 的期望">
+      <mrow>
+        <msub><mi>∇</mi><mi>θ</mi></msub><mi>J</mi><mo>(</mo><mi>θ</mi><mo>)</mo><mo>=</mo>
+        <msub><mi>E</mi><mrow><mi>s</mi><mo>∼</mo><msup><mi>d</mi><mi>π</mi></msup><mo>,</mo><mi>a</mi><mo>∼</mo><mi>π</mi></mrow></msub>
+        <mrow><mo>[</mo>
+          <msub><mi>∇</mi><mi>θ</mi></msub><mi>log</mi><msub><mi>π</mi><mi>θ</mi></msub><mo>(</mo><mi>a</mi><mo>|</mo><mi>s</mi><mo>)</mo>
+          <mo>·</mo>
+          <msup><mi>Q</mi><mi>π</mi></msup><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>)</mo>
+        <mo>]</mo></mrow>
+      </mrow>
+    </math>
+  </div>
+  <div style="font-size:0.85rem;color:#64748b;margin-top:4px;">其中 <math class="math-inline" aria-label="d pi 是策略 pi 下的状态稳态分布"><msup><mi>d</mi><mi>π</mi></msup></math> 是在策略 π 下由交互得到的折扣状态分布。该式表明：无需对环境动力学求导，只需在采样上取期望即可估计梯度。</div>
+</div>
 
 <p>这个公式为什么成立？关键在于一个叫做<strong>对数导数技巧（Log-Derivative Trick）</strong>的数学变换：</p>
 
@@ -120,7 +141,7 @@ th, td { border: 1px solid #c4b5fd; padding: 10px; text-align: left; } th { back
 想象你在训练一个机器人投篮。每次投篮后，你根据结果调整姿势：投中了就记住这个姿势，下次更容易复制；没投中就调整姿势避免再犯。策略梯度定理做的正是这件事——它用 Q<sup>&pi;</sup>(s,a) 告诉每个动作"这次干得怎么样"，然后用 &nabla; log &pi; 指出"怎么调整参数能让这个动作更容易被选到"。两者相乘就是"以正确方向调整参数"。
 </div>
 
-<h3>11.3 REINFORCE算法</h3>
+<h2>11.3 REINFORCE算法</h2>
 
 <p>REINFORCE算法（Williams, 1992）是最简单、最经典的策略梯度算法。它的核心思想是：既然策略梯度定理需要 Q<sup>&pi;</sup>(s,a)，而我们没有真实的Q函数，那就用<strong>蒙特卡洛回报 G<sub>t</sub></strong> 来近似它。</p>
 
@@ -136,7 +157,31 @@ th, td { border: 1px solid #c4b5fd; padding: 10px; text-align: left; } th { back
     结束
 结束</pre>
 
-<p>每一步的意思就是：<strong>"刚才做的那个动作，看在它最终拿到了G这么多回报的份上，把它的对数概率朝G的方向调整"</strong>。</p>
+<figure>
+<svg viewBox="0 0 820 300" role="img" aria-labelledby="fig-pg-title fig-pg-desc">
+<title id="fig-pg-title">REINFORCE 的回合制训练循环</title>
+<desc id="fig-pg-desc">用当前策略采样完整轨迹，计算每步折扣回报，用回报作为权重对对数概率求梯度，再做梯度上升更新参数，循环往复。</desc>
+<defs><marker id="pg-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#7c3aed"/></marker></defs>
+<g stroke-linejoin="round">
+<rect x="40" y="40" width="340" height="72" rx="14" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+<rect x="440" y="40" width="340" height="72" rx="14" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+<rect x="440" y="180" width="340" height="72" rx="14" fill="#ecfdf5" stroke="#0d9488" stroke-width="2"/>
+<rect x="40" y="180" width="340" height="72" rx="14" fill="#fff1f2" stroke="#e11d48" stroke-width="2"/>
+</g>
+<g stroke="#7c3aed" stroke-width="2" fill="none" marker-end="url(#pg-arrow)">
+<line x1="380" y1="76" x2="436" y2="76"/><line x1="610" y1="112" x2="610" y2="176"/>
+<line x1="440" y1="216" x2="384" y2="216"/><line x1="210" y1="180" x2="210" y2="116"/>
+</g>
+<g font-size="14" fill="#334155" text-anchor="middle">
+<text x="210" y="72">① 采样：用 π_θ 跑完整个回合</text><text x="210" y="96" font-size="12" fill="#64748b">得到轨迹 (S_t, A_t, R_t)</text>
+<text x="610" y="72">② 回报：计算每步折扣回报 G_t</text>
+<text x="610" y="212">③ 梯度：∇log π_θ(A_t|S_t)·(G_t − b)</text>
+<text x="210" y="212">④ 更新：θ ← θ + α·梯度（梯度上升）</text>
+</g>
+<text x="410" y="150" text-anchor="middle" font-size="13" fill="#7c3aed">循环直到收敛</text>
+</svg>
+<figcaption>图 11-1：REINFORCE 的回合制训练循环。回合内先采集完整轨迹，回合结束后用折扣回报 G_t 作为权重对对数概率的梯度加权，再做梯度上升。因此每次参数更新都必须等一个回合结束，这也是它样本利用率低、方差大的根源。</figcaption>
+</figure>
 
 <p>在具体实现中，如果你用神经网络来表示策略，&nabla;<sub>&theta;</sub> log &pi;<sub>&theta;</sub>(A<sub>t</sub>|S<sub>t</sub>) 就是交叉熵损失函数对网络参数的梯度——你只需要在PyTorch中计算损失函数 -log &pi;(a|s) * G，然后反向传播即可。</p>
 
@@ -200,7 +245,7 @@ for episode in range(1000):
 <strong>教训：</strong>如果你在复杂环境中发现REINFORCE不收敛，不要先怀疑你的代码有bug（虽然也很有可能），先想想方差问题。下一节讲的基线技巧（Baseline）就是你最需要的解药。
 </div>
 
-<h3>11.4 基线技巧（Baseline）</h3>
+<h2>11.4 基线技巧（Baseline）</h2>
 
 <p>为了缓解REINFORCE的高方差问题，一个非常优雅的方法被提了出来：<strong>减去基线（Baseline）</strong>。</p>
 
@@ -263,7 +308,7 @@ for episode in range(1000):
 
 <p>注意第二行：没有基线时，即使智能体在好状态下选了坏动作，G仍然很高（因为状态本身就容易得高分），梯度会错误地鼓励这个坏动作。有了基线，我们才能看到"静态"——这个动作在这个状态下其实是差的选择。</p>
 
-<h3>11.5 REINFORCE的改进</h3>
+<h2>11.5 REINFORCE的改进</h2>
 
 <p>综合前面的讨论，我们可以对REINFORCE做以下改进：</p>
 
@@ -317,7 +362,7 @@ optimizer.step()</pre>
 
 <p>这些问题引出了强化学习中一个更大的框架——<strong>Actor-Critic方法</strong>。它用自举（Bootstrap）代替蒙特卡洛采样，用TD误差作为优势函数的近似，将方差降到更低的水平。我们说REINFORCE是"用整场比赛的比分来评价球员每个动作"，而Actor-Critic是"用教练的实时判断来指导球员下一步怎么走"。后者更及时、更稳定，也是现代策略梯度算法的标准范式。</p>
 
-<h3>本章小结</h3>
+<h2>本章小结</h2>
 
 <ul>
 <li><strong>策略梯度方法</strong>直接优化参数化策略 &pi;<sub>&theta;</sub>(a|s)，克服了值函数方法在连续动作空间和随机最优策略上的局限。</li>
@@ -330,11 +375,13 @@ optimizer.step()</pre>
 
 <p>策略梯度方法是强化学习中思想最深刻、应用最广泛的技术路线之一。从本章的REINFORCE出发，我们将在后续章节中看到它如何一步步进化为PPO、SAC等现代工业级算法。每一步进化都是为了解决一个问题：<strong>如何更快、更稳地找到最优策略</strong>。掌握好本章的基础，后面的路就顺畅多了！</p>
 
+<p class="source-note">本章的策略梯度定理、对数导数技巧、REINFORCE 与基线（Baseline）内容参照 Sutton &amp; Barto《<a href="http://incompleteideas.net/book/the-book-2nd.html">Reinforcement Learning: An Introduction</a>》(第 2 版, 2018) 第 13 章；REINFORCE 由 Williams 于 1992 年提出。文中 CartPole / LunarLander 的方差现象为教学示意，未给出具体实验数据。</p>
+
 <div class="footer-nav">
 <a href="10.html">&larr; 上一章：Actor-Critic</a>
 <a href="12.html">下一章：Double DQN &rarr;</a>
 </div>
-</div>
+</main>
 </div>
 </div>
 </body>
