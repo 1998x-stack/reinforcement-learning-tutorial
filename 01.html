@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>第1章 强化学习是什么</title>
     <link rel="stylesheet" href="theme.css">
     <style>
@@ -112,12 +113,21 @@
         .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
         .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
         .highlight { background: #fef9c3; border: 1px solid #facc15; }
+        h1 { color: #4c1d95; border-left: 6px solid #06b6d4; padding-left: 15px; margin: 20px 0 15px; font-size: 1.9rem; line-height: 1.35; }
+        figure { margin: 24px 0; padding: 16px; background: #faf8ff; border: 1px solid #ddd6fe; border-radius: 16px; }
+        figure svg { width: 100%; height: auto; display: block; }
+        figcaption { margin-top: 10px; font-size: 0.9rem; color: #5b21b6; line-height: 1.65; }
+        .source-note { font-size: 0.85rem; color: #64748b; border-top: 1px dashed #ddd6fe; margin-top: 28px; padding-top: 12px; line-height: 1.7; }
+        .math-scroll { max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 6px 2px; }
+        .math-scroll:focus-visible { outline: 3px solid #7c3aed; outline-offset: 2px; }
+        .math-scroll math[display="block"] { width: max-content; min-width: 100%; font-size: 1.15rem; }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
     </style>
 </head>
 <body>
 <div class="double-border">
 <div class="container">
-    <div class="sidebar">
+    <nav class="sidebar" aria-label="课程目录">
         <h3>🧠 课程目录</h3>
         <ul class="chapter-list">
             <li><a href="01.html" class="active">第1章 强化学习是什么</a></li>
@@ -149,13 +159,13 @@
 <li><a href="27.html" class="">第27章 从零实现DQN</a></li>
 <li><a href="28.html" class="">第28章 综合实战：Atari智能体</a></li>
         </ul>
-    </div>
-    <div class="main-content">
-        <h2>第一章：强化学习是什么</h2>
+    </nav>
+    <main id="content" class="main-content">
+        <h1>第一章：强化学习是什么</h1>
 
 <p>大家好，我是你们的讲师。在AI这行做了快十年，如果有人问我"什么方向最有意思"，我会毫不犹豫地说——强化学习。为什么？因为它最像人类的学习方式：尝试、犯错、调整、再尝试。今天这一章，咱们就来聊聊强化学习到底是什么，它和我们熟知的监督学习、无监督学习有什么不同。</p>
 
-<h3>1.1 强化学习的直觉理解</h3>
+<h2>1.1 强化学习的直觉理解</h2>
 
 <p>想象你在教一只小狗"坐下"。你说"坐下"，它坐下了，你给一块饼干。下次你说"坐下"，它可能更快坐下——因为它学会了"坐下→饼干"这个关联。但如果你说"坐下"而它趴下，你就不给饼干。经过几十次训练，小狗就懂得什么是"坐下"了。</p>
 
@@ -206,7 +216,53 @@
   <p><strong>核心要点</strong>：强化学习不是"教"智能体正确答案是什么，而是让智能体自己在环境中探索，通过奖励信号来发现什么动作是好的。这和监督学习中"告诉你每张图片是什么"完全不同。</p>
 </div>
 
-<h3>1.2 三种学习范式对比</h3>
+<figure>
+  <svg viewBox="0 0 560 250" role="img" aria-labelledby="fig-loop-title fig-loop-desc">
+    <title id="fig-loop-title">智能体与环境的交互回路</title>
+    <desc id="fig-loop-desc">左侧方块为智能体，右侧方块为环境。上方箭头表示智能体向环境发出动作 a，下方箭头表示环境回传下一状态 s' 与奖励 r。</desc>
+    <defs>
+      <marker id="loopArrowA" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+        <path d="M0,0 L8,3 L0,6 Z" fill="#7c3aed"/>
+      </marker>
+      <marker id="loopArrowE" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+        <path d="M0,0 L8,3 L0,6 Z" fill="#0d9488"/>
+      </marker>
+    </defs>
+    <rect x="30" y="70" width="170" height="110" rx="18" fill="#ede9fe" stroke="#7c3aed" stroke-width="2.5"/>
+    <text x="115" y="113" text-anchor="middle" font-size="19" font-weight="700" fill="#4c1d95">智能体</text>
+    <text x="115" y="138" text-anchor="middle" font-size="14" fill="#5b21b6">Agent</text>
+    <text x="115" y="160" text-anchor="middle" font-size="13" fill="#6d28d9">策略 π(a|s)</text>
+    <rect x="360" y="70" width="170" height="110" rx="18" fill="#d1fae5" stroke="#0d9488" stroke-width="2.5"/>
+    <text x="445" y="113" text-anchor="middle" font-size="19" font-weight="700" fill="#065f46">环境</text>
+    <text x="445" y="138" text-anchor="middle" font-size="14" fill="#0f766e">Environment</text>
+    <text x="445" y="160" text-anchor="middle" font-size="13" fill="#0f766e">P(s′|s,a) · R</text>
+    <line x1="205" y1="105" x2="352" y2="105" stroke="#7c3aed" stroke-width="3" marker-end="url(#loopArrowA)"/>
+    <text x="278" y="95" text-anchor="middle" font-size="14" fill="#7c3aed">动作 a</text>
+    <line x1="355" y1="150" x2="208" y2="150" stroke="#0d9488" stroke-width="3" marker-end="url(#loopArrowE)"/>
+    <text x="278" y="172" text-anchor="middle" font-size="14" fill="#0d9488">状态 s′ · 奖励 r</text>
+  </svg>
+  <figcaption>图 1-1：强化学习的智能体–环境交互回路。智能体依据策略 π(a|s) 选择动作 a 施加于环境；环境按转移概率 P(s′|s,a) 演化并给出奖励 r，两者反复循环构成学习过程。图中符号的定义在第 3 章 MDP 会严格展开。</figcaption>
+</figure>
+
+<p style="margin:10px 0 2px;color:#64748b;font-size:0.85rem;">式 (1.1) 折扣累积回报</p>
+<div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="折扣累积回报公式，可横向滚动">
+  <math display="block" aria-label="G t 等于从 t 时刻起所有未来奖励按折扣因子 gamma 加权的和">
+    <mrow>
+      <msub><mi>G</mi><mi>t</mi></msub>
+      <mo>=</mo>
+      <msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub>
+      <mo>+</mo>
+      <mi>γ</mi><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>2</mn></mrow></msub>
+      <mo>+</mo>
+      <msup><mi>γ</mi><mn>2</mn></msup><msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>3</mn></mrow></msub>
+      <mo>+</mo><mo>⋯</mo>
+    </mrow>
+  </math>
+</div>
+
+<p>式 (1.1) 把“长期回报”写成了未来奖励的加权和：折扣因子 γ 控制眼前奖励与远期奖励的相对权重（0 ≤ γ &lt; 1）。强化学习的目标就是找到能让这个回报的期望最大的策略。这个式子在后续章节会被展开成贝尔曼方程，你现在只需记住它表达了“不只看当下那一步”的意思。</p>
+
+<h2>1.2 三种学习范式对比</h2>
 
 <p>很多初学者第一件事就是问："强化学习和监督学习到底有什么区别？"这个问题问得好，我当年也困惑过。咱们来对比一下：</p>
 
@@ -259,7 +315,7 @@
   <p><strong>学习建议</strong>：如果你已经学过监督学习（比如用PyTorch训过分类器），那么强化学习的很多技巧是相通的——梯度下降、神经网络、损失函数这些概念都会继续用到。区别在于，RL中你要自己"制造"训练信号。</p>
 </div>
 
-<h3>1.3 强化学习的发展里程碑</h3>
+<h2>1.3 强化学习的发展里程碑</h2>
 
 <p>强化学习不是一夜之间冒出来的。它的历史可以追溯到上世纪50年代的行为心理学，但真正在计算机领域开花结果，是最近十几年的事。我给大家梳理几个关键节点：</p>
 
@@ -281,7 +337,7 @@
   <p><strong>一个有趣的转折</strong>：2013年DeepMind的DQN论文投到NeurIPS时，评审分数并不高。有个评审甚至写"用神经网络做RL早有人试过了，行不通"。结果这篇论文成了深度强化学习的开山之作。这说明什么？创新往往来自对旧想法的新视角。</p>
 </div>
 
-<h3>1.4 强化学习的典型应用</h3>
+<h2>1.4 强化学习的典型应用</h2>
 
 <p>很多人对RL的印象还停留在"打游戏"上。没错，游戏确实是RL最好的试验场——环境可控、奖励明确、可以无限重试。但RL的应用远不止于此：</p>
 
@@ -299,7 +355,7 @@
   <p><strong>避坑指南</strong>：很多初学者学了RL就想直接去做量化交易。我要泼盆冷水——实盘交易的风险和模拟环境完全不同，而且金融市场不是MDP（状态不完整、对手会反制）。建议先在模拟环境里跑够一万小时，再考虑实盘。</p>
 </div>
 
-<h3>1.5 强化学习的核心挑战</h3>
+<h2>1.5 强化学习的核心挑战</h2>
 
 <p>咱们不能只讲光鲜亮丽的一面。RL之所以"难"，是因为有三大核心挑战：</p>
 
@@ -319,13 +375,15 @@
 </div>
 
 <p>好了，第一章的内容就到这里。了解了RL是什么之后，下一章我们补一补数学基础——概率论、线性代数和最优化，这些是理解贝尔曼方程和后续算法必不可少的前置知识。咱们下章见！</p>
+<p class="source-note">本章的智能体–环境交互框架与三类学习范式的对比参照 Sutton &amp; Barto《<a href="http://incompleteideas.net/book/the-book-2nd.html">Reinforcement Learning: An Introduction</a>》(第 2 版, 2018, MIT Press) 第 1 章。里程碑中的 DQN 结果来自 Mnih et al., “Human-level control through deep reinforcement learning”, <a href="https://doi.org/10.1038/nature14236">Nature 518: 529–533 (2015)</a>；AlphaGo 见 Silver et al., <a href="https://doi.org/10.1038/nature16961">Nature 529: 484–489 (2016)</a>。上述年份与事件为公开论文的通行说法，本章未逐条核对原始史料；图 1-1 与式 (1.1) 为教学示意，非某篇论文的插图。</p>
+
         <div class="footer-nav">
-            <a href="javascript:void(0)">← 上一章</a>
-            <a href="index.html">📖 返回目录</a>
+            <a href="index.html">← 返回目录</a>
+            <a href="index.html">📖 课程目录</a>
             <a href="02.html">下一章 →</a>
         </div>
 
-    </div>
+</main>
 </div>
 </div>
 </body>
