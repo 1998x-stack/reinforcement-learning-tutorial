@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>第2章 必备数学工具箱</title>
     <link rel="stylesheet" href="theme.css">
     <style>
@@ -86,12 +87,21 @@
         .katex { font-size: 1.1em; }
         ul, ol { margin: 10px 0; padding-left: 25px; line-height: 1.8; color: #2d3748; }
         li { margin: 5px 0; }
+        h1 { color: #4c1d95; border-left: 6px solid #06b6d4; padding-left: 15px; margin: 20px 0 15px; font-size: 1.9rem; line-height: 1.35; }
+        figure { margin: 24px 0; padding: 16px; background: #faf8ff; border: 1px solid #ddd6fe; border-radius: 16px; }
+        figure svg { width: 100%; height: auto; display: block; }
+        figcaption { margin-top: 10px; font-size: 0.9rem; color: #5b21b6; line-height: 1.65; }
+        .source-note { font-size: 0.85rem; color: #64748b; border-top: 1px dashed #ddd6fe; margin-top: 28px; padding-top: 12px; line-height: 1.7; }
+        .math-scroll { max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 6px 2px; }
+        .math-scroll:focus-visible { outline: 3px solid #7c3aed; outline-offset: 2px; }
+        .math-scroll math[display="block"] { width: max-content; min-width: 100%; font-size: 1.15rem; }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
     </style>
 </head>
 <body>
 <div class="double-border">
 <div class="container">
-    <div class="sidebar">
+    <nav class="sidebar" aria-label="课程目录">
         <h3>🧠 课程目录</h3>
         <ul class="chapter-list">
             <li><a href="01.html" class="">第1章 强化学习是什么</a></li>
@@ -123,9 +133,9 @@
 <li><a href="27.html" class="">第27章 从零实现DQN</a></li>
 <li><a href="28.html" class="">第28章 综合实战：Atari智能体</a></li>
         </ul>
-    </div>
-    <div class="main-content">
-        <h2>第二章：必备数学工具箱</h2>
+    </nav>
+    <main id="content" class="main-content">
+        <h1>第二章：必备数学工具箱</h1>
 
         <p>大家好，我是你们的讲师。欢迎来到第二章！</p>
 
@@ -139,7 +149,7 @@
             <strong>🎯 本章路线图：</strong> 概率论 → 线性代数 → 梯度下降 → 三者在 RL 中的交汇。每学一个概念，我们就问一次："这个在强化学习里对应什么？"
         </div>
 
-        <h3>2.1 概率论基础——预测不确定的世界</h3>
+        <h2>2.1 概率论基础——预测不确定的世界</h2>
 
         <p>强化学习的核心场景是：智能体在当前状态下做一个动作，环境返回下一个状态和一个奖励。但关键问题是——<strong>环境是有随机性的</strong>。你按同一个按钮，游戏里的反应可能每次都不一样。这就是概率论要管的事。</p>
 
@@ -157,17 +167,59 @@
 
         <p>期望就是<strong>加权平均</strong>。如果考试成绩有 50% 概率是 90 分，50% 概率是 70 分，那期望就是 0.5×90 + 0.5×70 = 80 分。公式是：</p>
 
-        <pre>E[X] = Σ p(x) · x     (离散情况)
-E[X] = ∫ p(x) · x dx  (连续情况)</pre>
+        <p style="margin:10px 0 2px;color:#64748b;font-size:0.85rem;">式 (2.1) 离散与连续情形的期望</p>
+        <div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="期望公式，可横向滚动">
+          <math display="block" aria-label="离散情形 E X 等于 x 乘以 p x 的求和，连续情形 E X 等于 x 乘以 p x 的积分">
+            <mrow>
+              <mi>E</mi><mo>[</mo><mi>X</mi><mo>]</mo><mo>=</mo>
+              <munder><mo>∑</mo><mi>x</mi></munder><mi>x</mi><mi>p</mi><mo>(</mo><mi>x</mi><mo>)</mo>
+              <mo>,</mo><mspace width="1em"/>
+              <mi>E</mi><mo>[</mo><mi>X</mi><mo>]</mo><mo>=</mo>
+              <mo>∫</mo><mi>x</mi><mi>p</mi><mo>(</mo><mi>x</mi><mo>)</mo><mi>d</mi><mi>x</mi>
+            </mrow>
+          </math>
+        </div>
+
+        <figure>
+          <svg viewBox="0 0 520 240" role="img" aria-labelledby="fig-exp-title fig-exp-desc">
+            <title id="fig-exp-title">离散概率分布与期望</title>
+            <desc id="fig-exp-desc">四个取值的概率柱状图，取值 1 到 4 的概率分别为 0.1、0.2、0.3、0.4，虚线标出加权平均得到的期望 E[X] 等于 3.0。</desc>
+            <line x1="70" y1="200" x2="470" y2="200" stroke="#94a3b8" stroke-width="2"/>
+            <g fill="#a78bfa" stroke="#7c3aed" stroke-width="1.5">
+              <rect x="80" y="160" width="60" height="40"/>
+              <rect x="170" y="120" width="60" height="80"/>
+              <rect x="260" y="80" width="60" height="120"/>
+              <rect x="350" y="40" width="60" height="160"/>
+            </g>
+            <g font-size="13" fill="#4c1d95" text-anchor="middle">
+              <text x="110" y="220">1</text><text x="200" y="220">2</text>
+              <text x="290" y="220">3</text><text x="380" y="220">4</text>
+            </g>
+            <text x="270" y="236" text-anchor="middle" font-size="12" fill="#64748b">取值 x</text>
+            <line x1="290" y1="30" x2="290" y2="200" stroke="#ef4444" stroke-width="2" stroke-dasharray="5 4"/>
+            <text x="298" y="26" font-size="13" fill="#ef4444">E[X] = 3.0</text>
+          </svg>
+          <figcaption>图 2-1：离散概率分布与期望。取值 1、2、3、4 的概率分别为 0.1、0.2、0.3、0.4，期望 E[X] = Σ p(x)·x = 0.1+0.4+0.9+1.6 = 3.0。该分布与数值为教学示意。</figcaption>
+        </figure>
 
         <p>期望在 RL 中<strong>无处不在</strong>。为什么？因为 RL 的终极目标就是<strong>最大化期望累积奖励</strong>，而不是最大化某一次随机得到的奖励。你训练一个机器人走迷宫，跑一百次，有的跑完全程有的半路撞墙，我们关注的是"平均下来能拿多少奖励"。</p>
 
         <p>用数学写出来就是：</p>
 
-        <pre>目标函数: J(π) = E[ Σ γᵗ · rₜ ]   (t 从 0 到 T)
-
-含义: 在策略 π 下，把所有时间步 t 的奖励 rₜ 乘以折扣因子 γᵗ，
-     然后对整个轨迹的随机性取期望。</pre>
+        <p style="margin:10px 0 2px;color:#64748b;font-size:0.85rem;">式 (2.2) 强化学习的目标函数</p>
+        <div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="策略目标函数公式，可横向滚动">
+          <math display="block" aria-label="J pi 等于在策略 pi 下对从 0 到 T 的折扣奖励总和的期望">
+            <mrow>
+              <mi>J</mi><mo>(</mo><mi>π</mi><mo>)</mo><mo>=</mo>
+              <msub><mi>E</mi><mi>π</mi></msub>
+              <mrow><mo>[</mo>
+                <munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>0</mn></mrow><mi>T</mi></munderover>
+                <msup><mi>γ</mi><mi>t</mi></msup><msub><mi>r</mi><mi>t</mi></msub>
+              <mo>]</mo></mrow>
+            </mrow>
+          </math>
+        </div>
+        <p>含义：在策略 π 下，把每个时间步 t 的奖励 r<sub>t</sub> 乘以折扣因子 γᵗ 后求和，再对整条轨迹的随机性取期望。这里的 E<sub>π</sub> 就是上面“加权平均”在多条可能轨迹上的推广。</p>
 
         <h4>2.1.3 条件概率与贝叶斯思维</h4>
 
@@ -183,7 +235,7 @@ E[X] = ∫ p(x) · x dx  (连续情况)</pre>
             <strong>教训：</strong>期望高不等于每次表现都好。尤其是 RL 评估时要关掉探索 (epsilon=0)，用确定性策略去测。记住：你关心的应该是 <strong>E[R]</strong> 的<strong>实际表现分布</strong>，而不仅仅是它的平均值。
         </div>
 
-        <h3>2.2 线性代数核心——让计算变得高效</h3>
+        <h2>2.2 线性代数核心——让计算变得高效</h2>
 
         <p>如果说概率论是 RL 的"语义层"，那线性代数就是 RL 的"高性能引擎"。当你的状态空间有几百上千个维度、动作有几十种时，不用矩阵运算，纯 for 循环能把你的电脑跑冒烟。</p>
 
@@ -264,7 +316,7 @@ print(f"Q(s, a) = {q}")  # e.g. [0.42, -0.15]</pre>
 
         <p>你有没有发现？这个"矩阵乘法 + 非线性激活"的堆叠就是深度学习能做<strong>函数逼近 (Function Approximation)</strong> 的根本原因。而函数逼近恰是 RL 从"小规模表格方法"跨越到"大规模深度学习"的桥梁。</p>
 
-        <h3>2.3 梯度下降与最优化——让智能体学会进步</h3>
+        <h2>2.3 梯度下降与最优化——让智能体学会进步</h2>
 
         <p>有了概率论描述不确定性，有了线性代数做高效计算，怎么让智能体<strong>变强</strong>？这就是梯度下降登场的时候了。</p>
 
@@ -281,6 +333,25 @@ print(f"Q(s, a) = {q}")  # e.g. [0.42, -0.15]</pre>
         <div class="tip">
             <strong>💡 关键类比：</strong> 梯度 ∇f 告诉你"往哪个方向函数值增长最快"。你取负号 -∇f 就是往下降最快的方向走。学习率 η 就是"一步迈多大"。
         </div>
+
+        <figure>
+          <svg viewBox="0 0 520 260" role="img" aria-labelledby="fig-gd-title fig-gd-desc">
+            <title id="fig-gd-title">梯度下降在一维损失曲面上的迭代</title>
+            <desc id="fig-gd-desc">一条开口向上的抛物线代表损失函数，四个圆点沿曲面逐步向最低点移动，最低点用虚线和文字标注。</desc>
+            <line x1="60" y1="230" x2="490" y2="230" stroke="#94a3b8" stroke-width="2"/>
+            <path d="M70,60 Q340,300 470,90" fill="none" stroke="#7c3aed" stroke-width="3"/>
+            <line x1="305" y1="188" x2="305" y2="230" stroke="#ef4444" stroke-width="2" stroke-dasharray="4 4"/>
+            <text x="305" y="248" text-anchor="middle" font-size="12" fill="#ef4444">最低点</text>
+            <circle cx="123" cy="104" r="7" fill="#0ea5e9"/>
+            <circle cx="196" cy="152" r="7" fill="#0ea5e9"/>
+            <circle cx="264" cy="180" r="7" fill="#0ea5e9"/>
+            <circle cx="305" cy="188" r="7" fill="#0ea5e9"/>
+            <text x="132" y="98" font-size="12" fill="#0369a1">θ₀</text>
+            <text x="314" y="184" font-size="12" fill="#0369a1">θ*</text>
+            <text x="250" y="40" text-anchor="middle" font-size="13" fill="#5b21b6">J(θ) 损失曲面</text>
+          </svg>
+          <figcaption>图 2-2：梯度下降的迭代轨迹。每一步沿负梯度方向 θ ← θ − η∇J(θ) 移动，学习率 η 决定步长；过大将震荡发散，过小则收敛缓慢。曲面形状与步长为教学示意，未对应具体实验数据。</figcaption>
+        </figure>
 
         <h4>2.3.2 学习率 (Learning Rate)</h4>
 
@@ -331,7 +402,7 @@ loss = MSE(Q_predicted, Q_target.detach())
             <strong>📌 重要结论：</strong> 无论 RL 算法看起来多复杂（PPO、SAC、TD3 等等），它们的核心都在做同一件事：<strong>定义一个损失函数，然后用梯度下降优化它</strong>。理解了这个，你就抓住了 90% 深度强化学习的本质。
         </div>
 
-        <h3>2.4 数学通向强化学习的桥梁</h3>
+        <h2>2.4 数学通向强化学习的桥梁</h2>
 
         <p>现在我们把三样工具串起来，看看它们如何共同支撑起 RL 的大厦。</p>
 
@@ -374,12 +445,14 @@ loss = MSE(Q_predicted, Q_target.detach())
 
         <p><strong>下一章预告：</strong> 有了数学工具箱，我们就可以正式搭建 RL 的核心理论框架了——<strong>马尔可夫决策过程 (Markov Decision Process, MDP)</strong>。它把"智能体在环境中做决策"这件事变成了一个严谨的数学模型。你将会看到，概率论、线性代数和梯度下降如何在一个统一的框架里协同工作。准备好了吗？我们第 3 章见！</p>
 
+        <p class="source-note">本章的概率与期望、线性代数与梯度下降叙述参照 Sutton &amp; Barto《<a href="http://incompleteideas.net/book/the-book-2nd.html">Reinforcement Learning: An Introduction</a>》(第 2 版, 2018, MIT Press) 第 2 章（多臂老虎机中的期望与值估计）。目标函数 J(π) 与“值迭代为矩阵–向量运算”的说法属 RL 教科书通用结论，本章未引用具体论文；图 2-1、图 2-2 与公式均为教学示意，其中 84×84 灰度图展平为 7056 维只是 Atari 预处理的常见做法之一。</p>
+
         <div class="footer-nav">
             <a href="01.html">← 上一章</a>
             <a href="index.html">📖 返回目录</a>
             <a href="03.html">下一章 →</a>
         </div>
-    </div>
+    </main>
 </div>
 </div>
 </body>
