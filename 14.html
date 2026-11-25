@@ -40,12 +40,21 @@ th { background: #ede9fe; }
 .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
 .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
 .highlight { background: #fef9c3; border: 1px solid #facc15; }
+h1 { color: #4c1d95; border-left: 6px solid #06b6d4; padding-left: 15px; margin: 20px 0 15px; font-size: 1.9rem; line-height: 1.35; }
+figure { margin: 24px 0; padding: 16px; background: #faf8ff; border: 1px solid #ddd6fe; border-radius: 16px; }
+figure svg { width: 100%; height: auto; display: block; }
+figcaption { margin-top: 10px; font-size: 0.9rem; color: #5b21b6; line-height: 1.65; }
+.source-note { font-size: 0.85rem; color: #64748b; border-top: 1px dashed #ddd6fe; margin-top: 28px; padding-top: 12px; line-height: 1.7; }
+.math-scroll { max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 6px 2px; }
+.math-scroll:focus-visible { outline: 3px solid #7c3aed; outline-offset: 2px; }
+.math-scroll math[display="block"] { width: max-content; min-width: 100%; font-size: 1.15rem; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
 <div class="double-border">
 <div class="container">
-<div class="sidebar">
+<nav class="sidebar" aria-label="课程目录">
 <h3>导航目录</h3>
 <ul class="chapter-list">
 <li><a href="index.html">首页</a></li>
@@ -76,16 +85,16 @@ th { background: #ede9fe; }
 <li><a href="25.html">第25章 探索与利用</a></li>
 <li><a href="26.html">第26章 前沿与展望</a></li>
 </ul>
-</div>
-<div class="main-content">
+</nav>
+<main id="content" class="main-content">
 
-<h2>第十四章：连续动作空间算法</h2>
+<h1>第十四章：连续动作空间算法</h1>
 
 <p>同学们好！上一章我们讲了Dueling DQN，它把Q函数拆成价值流和优势流，在离散动作上表现亮眼。但细心的人可能已经注意到了——从DQN到Double DQN再到Dueling DQN，所有这些算法都有一个共同的隐含假设：<strong>动作空间是离散且有限的</strong>。它们依靠 <code>argmax<sub>a</sub> Q(s,a)</code> 来选择动作，这在围棋（19&times;19个落子点）或Atari游戏（几个到几十个按键组合）上没有问题。但如果动作本身就是连续的实数向量呢？</p>
 
 <p>这就引出了本章的主题——<strong>连续动作空间算法</strong>。我们会深入讲解三个里程碑式的方法：DDPG、TD3和SAC。</p>
 
-<h3>14.1 连续控制的挑战</h3>
+<h2>14.1 连续控制的挑战</h2>
 
 <p>先来看一个具体的场景。假设你要控制一个机械臂抓取物体——你需要同时设定六个关节的旋转角度。每个关节的角度是一个连续值，通常在 -180&deg; 到 +180&deg; 之间。在强化学习的术语里，你的动作就是 <strong>a &isin; [-1, 1]<sup>6</sup></strong> 这样一个六维实数向量。如果离散化每个维度到100个值，那么动作总数是 100<sup>6</sup> = 10<sup>12</sup>——一千万个动作！DQN的 argmax 根本不可能处理。</p>
 
@@ -105,7 +114,7 @@ th { background: #ede9fe; }
 
 <p>具体来说，我们需要让智能体输出一个确定性的或者随机性的连续值。这就引出了三种主流算法：<strong>DDPG</strong>（确定性策略梯度）、<strong>TD3</strong>（它的改进版）和 <strong>SAC</strong>（随机策略的集大成者）。</p>
 
-<h3>14.2 DDPG：Deep Deterministic Policy Gradient</h3>
+<h2>14.2 DDPG：Deep Deterministic Policy Gradient</h2>
 
 <p>DDPG 由 Lillicrap 等人在 2015 年提出，可以理解为<strong>"DQN 在连续动作空间上的推广"</strong>。它的核心思想是：用一个确定性策略网络（Actor）直接输出动作，再用另一个网络（Critic）来评估这个动作的好坏。</p>
 
@@ -114,6 +123,33 @@ th { background: #ede9fe; }
 <li><strong>Actor</strong>（策略网络）&mu;<sub>&theta;</sub>(s)：输入状态 s，输出一个确定性动作 a = &mu;<sub>&theta;</sub>(s)。</li>
 <li><strong>Critic</strong>（价值网络）Q<sub>&phi;</sub>(s, a)：输入状态 s 和动作 a，输出 Q 值估计。</li>
 </ul>
+
+<figure>
+  <svg viewBox="0 0 620 300" role="img" aria-labelledby="fig-ac-title fig-ac-desc">
+    <title id="fig-ac-title">DDPG 的 Actor-Critic 结构</title>
+    <desc id="fig-ac-desc">状态 s 同时送入 Actor 与 Critic；Actor 输出确定性动作 a，Critic 结合 s 与 a 输出 Q 值并给出梯度，Actor 依此更新。</desc>
+    <defs><marker id="acArrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#7c3aed"/></marker></defs>
+    <rect x="25" y="125" width="95" height="55" rx="12" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+    <text x="72" y="158" text-anchor="middle" font-size="14" font-weight="700" fill="#4c1d95">状态 s</text>
+    <rect x="200" y="45" width="170" height="60" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+    <text x="285" y="72" text-anchor="middle" font-size="14" font-weight="700" fill="#1e40af">Actor μ_θ(s)</text>
+    <text x="285" y="92" text-anchor="middle" font-size="12" fill="#1e40af">确定性策略网络</text>
+    <rect x="200" y="200" width="170" height="60" rx="12" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+    <text x="285" y="227" text-anchor="middle" font-size="14" font-weight="700" fill="#166534">Critic Q_φ(s, a)</text>
+    <text x="285" y="247" text-anchor="middle" font-size="12" fill="#166534">价值网络</text>
+    <rect x="450" y="45" width="150" height="60" rx="12" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"/>
+    <text x="525" y="80" text-anchor="middle" font-size="14" font-weight="700" fill="#854d0e">动作 a</text>
+    <g stroke="#7c3aed" stroke-width="2.5" fill="none">
+      <path d="M120,145 L160,145 L160,80 L196,80" marker-end="url(#acArrow)"/>
+      <path d="M120,160 L160,160 L160,230 L196,230" marker-end="url(#acArrow)"/>
+      <line x1="370" y1="75" x2="446" y2="75" marker-end="url(#acArrow)"/>
+      <path d="M525,105 L525,230 L376,230" marker-end="url(#acArrow)" stroke="#16a34a"/>
+    </g>
+    <text x="410" y="65" text-anchor="middle" font-size="12" fill="#7c3aed">输出动作</text>
+    <text x="450" y="218" text-anchor="middle" font-size="12" fill="#16a34a">评估 Q，回传梯度</text>
+  </svg>
+  <figcaption>图 14-1：DDPG 的 Actor-Critic 结构。Actor 把状态映射为确定性动作 a = μ_θ(s)；Critic 评估 Q_φ(s,a)，并沿 ∇_a Q 回传梯度指导 Actor 更新。Actor 与 Critic 各自配有目标网络以保证 TD 目标稳定。示意图。</figcaption>
+</figure>
 
 <p>DDPG 从 DQN 那里借用了三个关键技巧：<strong>经验回放缓冲区（Replay Buffer）</strong>、<strong>目标网络（Target Networks）</strong>和 <strong>软更新（Soft Update）</strong>。经验回放打破数据相关性，目标网络让 TD 目标更稳定，软更新让目标网络平滑地追随在线网络。</p>
 
@@ -131,7 +167,20 @@ th { background: #ede9fe; }
 
 <p>Actor 的更新更加巧妙——它利用<strong>确定性策略梯度定理（Deterministic Policy Gradient Theorem）</strong>，直接对 Q 值求动作的梯度：</p>
 
-<pre>Actor 更新：&nabla;<sub>&theta;</sub> J &asymp; E[ &nabla;<sub>a</sub> Q<sub>&phi;</sub>(s, a) |<sub>a=&mu;<sub>&theta;</sub>(s)</sub> &middot; &nabla;<sub>&theta;</sub> &mu;<sub>&theta;</sub>(s) ]</pre>
+<p style="margin:10px 0 2px;color:#64748b;font-size:0.85rem;">式 (14.1) 确定性策略梯度定理</p>
+<div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="确定性策略梯度公式，可横向滚动">
+  <math display="block" aria-label="参数 theta 的策略梯度约等于 Q 对动作的梯度与 actor 对参数的梯度的乘积的期望">
+    <mrow>
+      <msub><mo>∇</mo><mi>θ</mi></msub><mi>J</mi><mo>≈</mo>
+      <mi>E</mi><mrow><mo>[</mo>
+        <msub><mo>∇</mo><mi>a</mi></msub><mi>Q</mi><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>)</mo>
+        <msub><mo>|</mo><mrow><mi>a</mi><mo>=</mo><mi>μ</mi><mo>(</mo><mi>s</mi><mo>)</mo></mrow></msub>
+        <mo>·</mo>
+        <msub><mo>∇</mo><mi>θ</mi></msub><mi>μ</mi><mo>(</mo><mi>s</mi><mo>)</mo>
+      <mo>]</mo></mrow>
+    </mrow>
+  </math>
+</div>
 
 <p>翻译成人话就是：Actor 想知道"怎么调整参数能让 Q 值变大"，它通过链式法则——先看"动作怎么变才能让 Q 增大"（&nabla;<sub>a</sub> Q），再看"参数怎么变才能让动作朝这个方向走"（&nabla;<sub>&theta;</sub> &mu;），两者相乘就得到了策略梯度。</p>
 
@@ -167,7 +216,7 @@ th { background: #ede9fe; }
 <strong>教训：</strong> DDPG 对超参数极度敏感！建议从以下配置起步：Actor 学习率 1e-4，Critic 学习率 1e-3（用较小学习率），&tau;=0.005 或更小，噪声方差 0.1~0.2 并逐步衰减。如果你发现 DDPG 不收敛，先别急着改网络结构——检查超参数，九成的坑在这里。
 </div>
 
-<h3>14.3 TD3：Twin Delayed DDPG</h3>
+<h2>14.3 TD3：Twin Delayed DDPG</h2>
 
 <p>DDPG 虽然有开创性意义，但它有两个臭名昭著的毛病：<strong>Q 值过估计</strong>和 <strong>对超参数过于敏感</strong>。2018 年 Fujimoto 等人提出的 <strong>TD3（Twin Delayed DDPG）</strong> 用三个精巧的改进解决了这些问题。</p>
 
@@ -176,7 +225,20 @@ th { background: #ede9fe; }
 
 <p>TD3 的解决方法是：<strong>同时维护两个 Critic</strong>，在计算 TD 目标时取两个 Q 值中较小的那个：</p>
 
-<pre>y = r + &gamma; min(Q<sub>&phi;1-</sub>(s', a'), Q<sub>&phi;2-</sub>(s', a'))</pre>
+<p style="margin:10px 0 2px;color:#64748b;font-size:0.85rem;">式 (14.2) TD3 的裁剪双 Q 目标</p>
+<div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="TD3 双 Q 目标公式，可横向滚动">
+  <math display="block" aria-label="y 等于 r 加上 gamma 乘两个目标 Q 网络取值中的较小者">
+    <mrow>
+      <mi>y</mi><mo>=</mo><mi>r</mi><mo>+</mo><mi>γ</mi>
+      <mi>min</mi><mo>(</mo>
+      <msub><mi>Q</mi><msub><mi>φ</mi><mn>1</mn></msub></msub>
+      <mo>(</mo><msup><mi>s</mi><mo>′</mo></msup><mo>,</mo><msup><mi>a</mi><mo>′</mo></msup><mo>)</mo><mo>,</mo>
+      <msub><mi>Q</mi><msub><mi>φ</mi><mn>2</mn></msub></msub>
+      <mo>(</mo><msup><mi>s</mi><mo>′</mo></msup><mo>,</mo><msup><mi>a</mi><mo>′</mo></msup><mo>)</mo>
+      <mo>)</mo>
+    </mrow>
+  </math>
+</div>
 
 <p>取 min 操作会引入<strong>低估偏向（underestimation bias）</strong>——而低估比高估好，因为低估的策略至少不会因为追逐虚高的 Q 值而彻底崩溃。这有点像"悲观的决策者"：宁可低估前景，也不盲目乐观。</p>
 
@@ -194,16 +256,28 @@ th { background: #ede9fe; }
 <strong>老师划重点：</strong> TD3 的三个改进可以被概括为"<strong>两个 Q，慢策略，动作加噪声</strong>"。这三个技巧都不是什么惊天动地的全新理论，但它们组合在一起产生的效果远超 DDPG。这也体现了一个重要的工程哲学：在深度强化学习中，<strong>稳定性的提升往往来自多个小改进的积累</strong>，而不是一个单一的大发现。
 </div>
 
-<h3>14.4 SAC：Soft Actor-Critic</h3>
+<h2>14.4 SAC：Soft Actor-Critic</h2>
 
 <p>如果说 TD3 是对 DDPG 的"修补式"改进，那么 Haarnoja 等人在 2018 年提出的 <strong>SAC（Soft Actor-Critic）</strong> 则是一种从根本上重新设计的算法。它的核心思想引入了一个全新的优化目标——<strong>熵正则化（Entropy Regularization）</strong>。</p>
 
 <p><strong>最大熵强化学习</strong></p>
 <p>传统的强化学习目标只是最大化累积奖励：J = &Sigma; E[r]。SAC 说：不够！我们希望智能体在获得高奖励的同时，<strong>行为还要尽可能多样化</strong>。于是目标变成了：</p>
 
-<p style="text-align:center; font-size:1.1rem; margin:15px 0;">
-J = &Sigma; E[ r<sub>t</sub> + &alpha; H(&pi;( &middot; | s<sub>t</sub> )) ]
-</p>
+<p style="margin:10px 0 2px;color:#64748b;font-size:0.85rem;">式 (14.3) SAC 的最大熵目标</p>
+<div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="最大熵目标公式，可横向滚动">
+  <math display="block" aria-label="J 等于对奖励 r t 加上温度 alpha 乘策略熵 H 的期望求和">
+    <mrow>
+      <mi>J</mi><mo>=</mo>
+      <munder><mo>∑</mo><mi>t</mi></munder>
+      <msub><mi>E</mi><mi>π</mi></msub>
+      <mrow><mo>[</mo>
+        <msub><mi>r</mi><mi>t</mi></msub>
+        <mo>+</mo><mi>α</mi><mi>H</mi>
+        <mo>(</mo><mi>π</mi><mo>(</mo><mo>·</mo><mo>|</mo><msub><mi>s</mi><mi>t</mi></msub><mo>)</mo><mo>)</mo>
+      <mo>]</mo></mrow>
+    </mrow>
+  </math>
+</div>
 
 <p>其中 H(&pi;(&middot;|s)) = -&Sigma; &pi;(a|s) log &pi;(a|s) 是策略在状态 s 下的<strong>熵</strong>（entropy），衡量策略的随机程度。&alpha; &gt; 0 是<strong>温度系数（temperature）</strong>，控制熵的重要性。</p>
 
@@ -214,6 +288,25 @@ J = &Sigma; E[ r<sub>t</sub> + &alpha; H(&pi;( &middot; | s<sub>t</sub> )) ]
 <li><strong>多模态</strong>：在很多真实场景中，多个不同的动作序列都能达到同样好的效果。熵正则化允许策略覆盖这些多模态的最优行为，而不是只锁定其中一个。</li>
 <li><strong>收敛稳定性</strong>：最大熵框架下的策略优化有更好的凸性，训练过程更平滑。</li>
 </ul>
+
+<figure>
+  <svg viewBox="0 0 560 240" role="img" aria-labelledby="fig-ent-title fig-ent-desc">
+    <title id="fig-ent-title">确定性策略与最大熵随机策略的动作分布</title>
+    <desc id="fig-ent-desc">左图确定性策略把几乎所有概率集中在单个动作上，熵很低；右图随机策略在多个动作上分布概率，熵更高，天然带有探索。</desc>
+    <text x="145" y="35" text-anchor="middle" font-size="13" font-weight="700" fill="#4c1d95">确定性策略（低熵）</text>
+    <line x1="40" y1="180" x2="250" y2="180" stroke="#94a3b8" stroke-width="2"/>
+    <path d="M60,180 Q135,180 140,60 Q145,180 250,180" fill="#a78bfa" opacity="0.6"/>
+    <line x1="140" y1="60" x2="140" y2="180" stroke="#7c3aed" stroke-width="2"/>
+    <text x="145" y="205" text-anchor="middle" font-size="12" fill="#64748b">动作 a</text>
+    <text x="145" y="222" text-anchor="middle" font-size="12" fill="#7c3aed">几乎只选一个动作</text>
+    <text x="415" y="35" text-anchor="middle" font-size="13" font-weight="700" fill="#065f46">最大熵随机策略（高熵）</text>
+    <line x1="310" y1="180" x2="520" y2="180" stroke="#94a3b8" stroke-width="2"/>
+    <path d="M320,178 Q390,178 400,70 Q415,120 430,90 Q470,178 510,178" fill="#6ee7b7" opacity="0.55" stroke="#0d9488" stroke-width="1.5"/>
+    <text x="415" y="205" text-anchor="middle" font-size="12" fill="#64748b">动作 a</text>
+    <text x="415" y="222" text-anchor="middle" font-size="12" fill="#0d9488">多个动作都有概率（带探索）</text>
+  </svg>
+  <figcaption>图 14-2：确定性策略与最大熵随机策略的动作分布对比。确定性策略把概率集中在一个动作上，熵很低；最大熵策略在多个动作间分配概率，天然带有探索，对扰动也更鲁棒。曲线为教学示意。</figcaption>
+</figure>
 
 <p><strong>SAC 的实践细节</strong>：</p>
 <ul>
@@ -247,7 +340,7 @@ J = &Sigma; E[ r<sub>t</sub> + &alpha; H(&pi;( &middot; | s<sub>t</sub> )) ]
 手动调 &alpha; 非常痛苦——设大了策略太随机（只探索不利用），设小了又退化成确定性策略。SAC 的自动调温把 &alpha; 当作一个 Lagrange 乘子来优化，约束是策略的熵不低于某个目标值 H&#773;（通常设为动作维度的负数）。这样训练过程中 &alpha; 会自动调整：需要更多探索时 &alpha; 变大，策略已经够随机时 &alpha; 变小。这大大减少了超参数调优工作量。
 </div>
 
-<h3>14.5 DDPG vs TD3 vs SAC 对比</h3>
+<h2>14.5 DDPG vs TD3 vs SAC 对比</h2>
 
 <p>三种连续动作空间算法的核心差异，我们用一个表格来对比：</p>
 
@@ -338,11 +431,13 @@ J = &Sigma; E[ r<sub>t</sub> + &alpha; H(&pi;( &middot; | s<sub>t</sub> )) ]
 
 <p>连续动作空间是深度强化学习走向实际应用的关键一步。到此为止，我们已经覆盖了从离散到连续、从值函数到策略梯度的主流方法。下一章我们将讨论一个不同的方向——当环境中存在大量干扰和不确定性时，智能体如何通过<strong>显式探索（Exploration）</strong>来高效地收集信息，而不是像本章算法那样依赖隐式的噪声或熵。探索与利用的权衡，是强化学习中一个永恒的话题，也是通往通用人工智能道路上绕不开的关卡。</p>
 
+<p class="source-note">本章 DDPG、TD3、SAC 的方法陈述参照 Lillicrap et al., “Continuous control with deep reinforcement learning” <a href="https://arxiv.org/abs/1509.02971">arXiv:1509.02971</a>（DDPG, 2015）；Fujimoto et al., “Addressing Function Approximation Error in Actor-Critic Methods” <a href="https://arxiv.org/abs/1802.09477">arXiv:1802.09477</a>（TD3, 2018）；Haarnoja et al., “Soft Actor-Critic: Off-Policy Maximum Entropy Deep RL with a Stochastic Actor” <a href="https://arxiv.org/abs/1801.01290">arXiv:1801.01290</a>（SAC, 2018）。表中“训练稳定性 / 样本效率 / SOTA 地位”的排序为教科书经验性概括，非单一实验指标；DDPG 超参数踩坑故事与图 14-1、图 14-2 均为教学示意。</p>
+
 <div class="footer-nav">
 <a href="13.html">&larr; 上一章：Dueling DQN</a>
 <a href="15.html">下一章：PER &rarr;</a>
 </div>
-</div>
+</main>
 </div>
 </div>
 </body>
