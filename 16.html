@@ -29,12 +29,21 @@
         .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
         .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
         .highlight { background: #fef9c3; border: 1px solid #facc15; }
+        h1 { color: #4c1d95; border-left: 6px solid #06b6d4; padding-left: 15px; margin: 20px 0 15px; font-size: 1.9rem; line-height: 1.35; }
+        figure { margin: 24px 0; padding: 16px; background: #faf8ff; border: 1px solid #ddd6fe; border-radius: 16px; }
+        figure svg { width: 100%; height: auto; display: block; }
+        figcaption { margin-top: 10px; font-size: 0.9rem; color: #5b21b6; line-height: 1.65; }
+        .source-note { font-size: 0.85rem; color: #64748b; border-top: 1px dashed #ddd6fe; margin-top: 28px; padding-top: 12px; line-height: 1.7; }
+        .math-scroll { max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 6px 2px; }
+        .math-scroll:focus-visible { outline: 3px solid #7c3aed; outline-offset: 2px; }
+        .math-scroll math[display="block"] { width: max-content; min-width: 100%; font-size: 1.15rem; }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
     </style>
 </head>
 <body>
 <div class="double-border">
 <div class="container">
-    <div class="sidebar">
+    <nav class="sidebar" aria-label="课程目录">
         <h3>🧠 课程目录</h3>
         <ul class="chapter-list">
             <li><a href="01.html">第1章 强化学习是什么</a></li>
@@ -66,15 +75,15 @@
             <li><a href="27.html">第27章 从零实现DQN</a></li>
             <li><a href="28.html">第28章 综合实战：Atari智能体</a></li>
         </ul>
-    </div>
-    <div class="main-content">
-        <h2>第十六章：奖励设计与塑形</h2>
+    </nav>
+    <main id="content" class="main-content">
+        <h1>第十六章：奖励设计与塑形</h1>
 
         <p>同学们好！讲完了探索与利用策略，从这一章开始，我们要聊一个非常微妙的话题——<strong>奖励设计</strong>。你可能会觉得："奖励不就是给分数吗？这有什么好设计的？"别急，让我告诉你：奖励函数是RL的"宪法"，它决定了智能体<strong>最终会学到什么行为</strong>——未必是你想要的，但一定是能最大化奖励的。资深的RL工程师都知道一句话：<strong>"Show me your reward function, and I'll show you the emergent behavior you didn't expect."</strong></p>
 
         <p>今天这一章，我们系统梳理奖励设计的原理、常见陷阱，以及最实用的两个技术：<strong>奖励塑形（Reward Shaping）</strong>和<strong>课程学习（Curriculum Learning）</strong>。</p>
 
-        <h3>16.1 奖励函数决定行为</h3>
+        <h2>16.1 奖励函数决定行为</h2>
 
         <p>在进入技术细节之前，我们先夯实一个基本前提。Rich Sutton在他那本经典的RL教材里提出了一条<strong>"奖励假说"（Reward Hypothesis）</strong>：</p>
 
@@ -93,7 +102,29 @@
             <li>训练一个游戏AI打"打砖块"，奖励是"击碎砖块数"，结果AI学会了让球在角落反弹好几个回合，因为这样能多打碎几块砖。</li>
         </ul>
 
-        <p>这些例子的共性是什么？<strong>奖励函数不是目标本身，只是目标的代理（proxy）</strong>。任何代理都会与真实目标之间存在偏差，而智能体一定会发现并利用这个偏差。这就是<strong>奖励黑客（Reward Hacking）</strong>，也可以叫"钻空子"。</p>
+        <p>这些例子的共性是什么？<strong>奖励函数不是目标本身，只是目标的代理（proxy）</strong>。任何代理都会与真实目标之间存在偏差，而智能体一定会发现并利用这个偏差。这就是<strong>奖励黑客（Reward Hacking）</strong>，也可以叫“钻空子”。</p>
+
+        <figure>
+          <svg viewBox="0 0 560 240" role="img" aria-labelledby="fig-hack-title fig-hack-desc">
+            <title id="fig-hack-title">奖励黑客：赛艇刷检查点</title>
+            <desc id="fig-hack-desc">一条从左到右的赛道，沿途有若干检查点；小艇没有前进，而是在第一个检查点附近转圈反复触发得分。</desc>
+            <defs><marker id="hackArrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#7c3aed"/></marker></defs>
+            <rect x="30" y="70" width="500" height="100" rx="50" fill="#e0f2fe" stroke="#38bdf8" stroke-width="2"/>
+            <g stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 6">
+              <line x1="105" y1="70" x2="105" y2="170"/><line x1="280" y1="70" x2="280" y2="170"/><line x1="455" y1="70" x2="455" y2="170"/>
+            </g>
+            <g font-size="12" fill="#0369a1" text-anchor="middle">
+              <text x="105" y="60">检查点1</text><text x="280" y="60">检查点2</text><text x="455" y="60">检查点3</text>
+            </g>
+            <path d="M90,120 a28,28 0 1,1 56,0 a28,28 0 1,1 -56,0" fill="none" stroke="#ef4444" stroke-width="3"/>
+            <path d="M146,120 l-10,-6 l0,12 z" fill="#ef4444"/>
+            <circle cx="118" cy="120" r="6" fill="#7c3aed"/>
+            <text x="120" y="205" text-anchor="middle" font-size="12" fill="#ef4444">原地转圈 → 无限刷分</text>
+            <line x1="185" y1="120" x2="500" y2="120" stroke="#7c3aed" stroke-width="2" stroke-dasharray="8 6" marker-end="url(#hackArrow)"/>
+            <text x="400" y="140" text-anchor="middle" font-size="12" fill="#7c3aed">本应前进的方向</text>
+          </svg>
+          <figcaption>图 16-1：奖励黑客示意——赛艇“绕圈刷检查点”。奖励只统计“经过检查点”的次数，智能体就在第一个检查点附近反复转圈拿分，却永远不驶向终点。示意图。</figcaption>
+        </figure>
 
         <div class="warning">
             <strong>踩坑故事：一次"过于聪明"的捡球机器人</strong><br><br>
@@ -103,7 +134,7 @@
             <strong>教训：</strong> 千万不要只定义"最终状态"的奖励！如果你的任务涉及过程，一定要把过程中的"好的行为模式"也编码进奖励里——或者至少加入对"暴力操作"的惩罚。我们后来加了一项"关节力矩的平方和"作为惩罚项，智能体才学会乖乖地用夹爪捡球。这件事让我明白了一个道理：<strong>奖励函数里少写一行，智能体就可能多出一条你想不到的歪路</strong>。
         </div>
 
-        <h3>16.2 稀疏奖励问题</h3>
+        <h2>16.2 稀疏奖励问题</h2>
 
         <p>上一节说的是"有奖励但设计得不好"的问题。现在我们来看另一个更普遍的问题——<strong>根本没奖励</strong>。</p>
 
@@ -118,7 +149,7 @@
 
         <p>这就像你在一个巨大的迷宫里蒙着眼睛走路，只有走出迷宫的那一刻才有人告诉你"恭喜"。如果迷宫很大，你走一辈子也出不去。你需要的是什么呢？<strong>中途有人告诉你"你离出口更近了"</strong>——这就是奖励塑形的直觉。</p>
 
-        <h3>16.3 奖励塑形（Reward Shaping）</h3>
+        <h2>16.3 奖励塑形（Reward Shaping）</h2>
 
         <p><strong>奖励塑形</strong>的核心思想是：给稀疏的原始奖励补充一些<strong>中间过程的辅助奖励</strong>，引导智能体朝正确的方向探索。比如在迷宫例子中，如果每靠近出口一步就给一个小的正奖励，智能体就知道"往这个方向走是对的"。</p>
 
@@ -128,9 +159,16 @@
 
         <p>Ng, Harada 和 Russell 在1999年证明：</p>
 
-        <p style="text-align:center; font-size:1.15rem; margin:15px 0;">
-            F(s, s') = &gamma; &Phi;(s') - &Phi;(s)
-        </p>
+        <p style="margin:10px 0 2px;color:#64748b;font-size:0.85rem;">式 (16.1) 基于势能的塑形奖励</p>
+        <div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="势能塑形奖励公式，可横向滚动">
+          <math display="block" aria-label="塑形奖励 F s s' 等于 gamma 乘 Phi s' 减 Phi s">
+            <mrow>
+              <mi>F</mi><mo>(</mo><mi>s</mi><mo>,</mo><msup><mi>s</mi><mo>′</mo></msup><mo>)</mo><mo>=</mo>
+              <mi>γ</mi><mi>Φ</mi><mo>(</mo><msup><mi>s</mi><mo>′</mo></msup><mo>)</mo>
+              <mo>−</mo><mi>Φ</mi><mo>(</mo><mi>s</mi><mo>)</mo>
+            </mrow>
+          </math>
+        </div>
 
         <p>其中 &Phi;: S &rarr; R 是任意一个<strong>势能函数（potential function）</strong>，&gamma; 是折扣因子。把 F(s, s') 作为额外奖励加到原始奖励 r 上，得到新的奖励 r' = r + F，那么<strong>新奖励函数下的最优策略和原始奖励函数下的最优策略完全相同</strong>。</p>
 
@@ -144,12 +182,51 @@
             V'<sub>&pi;</sub>(s) = E[ &Sigma;<sub>t=0</sub><sup>&infin;</sup> &gamma;<sup>t</sup> (r<sub>t</sub> + &gamma;&Phi;(s<sub>t+1</sub>) - &Phi;(s<sub>t</sub>)) ]
         </p>
         <p>展开求和，我们得到一个漂亮的结果（中间的势能项相互抵消）：</p>
-        <p style="text-align:center; margin:10px 0;">
-            V'<sub>&pi;</sub>(s) = V<sub>&pi;</sub>(s) - &Phi;(s) + lim<sub>T&rarr;&infin;</sub> E[ &gamma;<sup>T+1</sup> &Phi;(s<sub>T+1</sub>) ]
-        </p>
+        <p style="margin:10px 0 2px;color:#64748b;font-size:0.85rem;">式 (16.2) 加入塑形后的回报（势能项逐项抵消）</p>
+        <div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="加入塑形后的回报公式，可横向滚动">
+          <math display="block" aria-label="V' pi s 等于 V pi s 减 Phi s 加上 T 趋于无穷时 gamma 的 T+1 次方乘 Phi s T+1 的极限">
+            <mrow>
+              <msub><msup><mi>V</mi><mo>′</mo></msup><mi>π</mi></msub>
+              <mo>(</mo><mi>s</mi><mo>)</mo><mo>=</mo>
+              <msub><mi>V</mi><mi>π</mi></msub><mo>(</mo><mi>s</mi><mo>)</mo>
+              <mo>−</mo><mi>Φ</mi><mo>(</mo><mi>s</mi><mo>)</mo><mo>+</mo>
+              <munder><mo>lim</mo><mrow><mi>T</mi><mo>→</mo><mi>∞</mi></mrow></munder>
+              <mi>E</mi><mrow><mo>[</mo>
+                <msup><mi>γ</mi><mrow><mi>T</mi><mo>+</mo><mn>1</mn></mrow></msup>
+                <mi>Φ</mi><mo>(</mo><msub><mi>s</mi><mrow><mi>T</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>)</mo>
+              <mo>]</mo></mrow>
+            </mrow>
+          </math>
+        </div>
         <p>对于终止状态，&Phi;(s<sub>terminal</sub>) = 0（势能函数在终止态为零）；对非终止态，最后一项随着 T 增大趋于零。因此 V'<sub>&pi;</sub>(s) 与 V<sub>&pi;</sub>(s) 只差一个与策略无关的常数项 -&Phi;(s)。既然所有策略的价值都被平移了相同的常数，<strong>策略的排序不变，最优策略也就不变</strong>。</p>
 
-        <p>这个结论非常优雅——只要你把塑形奖励写成"势能差"的形式，就不会干扰最终结果。它等于说：你可以免费添加引导信号，前提是你用一个<strong>保守的、可撤回的</strong>方式来添加。</p>
+        <p>这个结论非常优雅——只要你把塑形奖励写成“势能差”的形式，就不会干扰最终结果。它等于说：你可以免费添加引导信号，前提是你用一个<strong>保守的、可撤回的</strong>方式来添加。</p>
+
+        <figure>
+          <svg viewBox="0 0 560 240" role="img" aria-labelledby="fig-pot-title fig-pot-desc">
+            <title id="fig-pot-title">基于势能的塑形奖励沿轨迹抵消</title>
+            <desc id="fig-pot-desc">状态 s0 到 s3 的势能分别为 0、1、2、3；每步塑形奖励为势能差 +1，累加后恰好等于终点与起点势能之差，与路径无关。</desc>
+            <defs><marker id="potArrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#7c3aed"/></marker></defs>
+            <line x1="60" y1="110" x2="500" y2="110" stroke="#94a3b8" stroke-width="2"/>
+            <g font-size="13" text-anchor="middle">
+              <circle cx="90" cy="110" r="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/><text x="90" y="145" fill="#4c1d95">s₀</text><text x="90" y="90" fill="#6d28d9">Φ=0</text>
+              <circle cx="210" cy="110" r="10" fill="#ddd6fe" stroke="#7c3aed" stroke-width="2"/><text x="210" y="145" fill="#4c1d95">s₁</text><text x="210" y="90" fill="#6d28d9">Φ=1</text>
+              <circle cx="330" cy="110" r="10" fill="#c4b5fd" stroke="#7c3aed" stroke-width="2"/><text x="330" y="145" fill="#4c1d95">s₂</text><text x="330" y="90" fill="#6d28d9">Φ=2</text>
+              <circle cx="450" cy="110" r="10" fill="#a78bfa" stroke="#7c3aed" stroke-width="2"/><text x="450" y="145" fill="#4c1d95">s₃</text><text x="450" y="90" fill="#6d28d9">Φ=3</text>
+            </g>
+            <g stroke="#7c3aed" stroke-width="2.5">
+              <line x1="100" y1="110" x2="196" y2="110" marker-end="url(#potArrow)"/>
+              <line x1="220" y1="110" x2="316" y2="110" marker-end="url(#potArrow)"/>
+              <line x1="340" y1="110" x2="436" y2="110" marker-end="url(#potArrow)"/>
+            </g>
+            <g font-size="12" fill="#0d9488" text-anchor="middle">
+              <text x="150" y="100">F=+1</text><text x="270" y="100">F=+1</text><text x="390" y="100">F=+1</text>
+            </g>
+            <text x="280" y="195" text-anchor="middle" font-size="13" fill="#5b21b6">Σ F = Φ(s₃) − Φ(s₀) = 3（与路径无关）</text>
+            <text x="280" y="220" text-anchor="middle" font-size="12" fill="#64748b">绕回去一步再前进，塑形奖励会相应地互相抵消</text>
+          </svg>
+          <figcaption>图 16-2：基于势能的塑形奖励沿轨迹“望远镜式”抵消。每步 F(s,s') = γΦ(s') − Φ(s)（此处取 γ=1），整条轨迹的塑形奖励之和只等于终点与起点的势能之差，与中间路径无关——因此不改变最优策略。数值为教学示意。</figcaption>
+        </figure>
 
         <p><strong>如何设计势能函数</strong>？</p>
 
@@ -222,7 +299,7 @@ for step in range(max_steps):
             <strong>实用建议：</strong> 虽然基于势能的塑形理论上不改变最优策略，但在实践中你需要注意两点：(1) 势能函数的量级不要超过原始奖励太多——否则梯度信号几乎完全来自塑形，原始目标会被淹没；(2) 势能函数最好在终止态为零，否则会影响收敛后的价值估计。常见的实践是设定 &Phi; = 0 在终止态，并用一个缩放系数 &alpha; 来控制塑形奖励的强度（通常 &alpha; = 0.1 ~ 0.5）。
         </div>
 
-        <h3>16.4 课程学习（Curriculum Learning）</h3>
+        <h2>16.4 课程学习（Curriculum Learning）</h2>
 
         <p>奖励塑形从奖励函数的角度解决了引导问题。但还有另一种思路——<strong>从任务本身的难度入手</strong>。</p>
 
@@ -281,7 +358,7 @@ for step in range(max_steps):
             <p><strong>一个关键洞察：</strong> 课程学习的本质是<strong>引导探索</strong>。简单的任务版本让智能体更容易获得正反馈，从而建立起"好的行为模式"；这些模式随后在更困难的版本中被复用和精炼。比起直接从稀疏奖励的困难版本起步，课程学习让探索从"大海捞针"变成了"逐步缩小搜索范围"。</p>
         </div>
 
-        <h3>16.5 逆课程与自动课程</h3>
+        <h2>16.5 逆课程与自动课程</h2>
 
         <p>手动课程需要人类专家来设计难度阶梯，这在很多场景下是不现实的。于是研究者提出了<strong>自动课程学习（Automatic Curriculum Learning）</strong>——让算法自己决定"当前该练什么"。</p>
 
@@ -323,12 +400,14 @@ for step in range(max_steps):
 
         <p>下一章，我们将讨论一个更加"务实"的话题——<strong>训练稳定性与调参</strong>。你会发现，即使奖励函数设计得天衣无缝，训练过程中的超参数选择、随机种子、网络初始化等细节仍然能让你的模型"翻车"。如何诊断训练中的不稳定现象？如何系统地调试超参数？如何让训练过程可重复、可复现？下一章我们逐一攻破。</p>
 
+        <p class="source-note">本章的奖励假说（Reward Hypothesis）参照 Sutton &amp; Barto《<a href="http://incompleteideas.net/book/the-book-2nd.html">Reinforcement Learning: An Introduction</a>》(第 2 版, 2018, MIT Press)；基于势能的奖励塑形及最优策略不变性定理见 Ng, Harada &amp; Russell (1999), “Policy Invariance Under Reward Transformations: Theory and Application to Reward Shaping”, ICML（<a href="https://people.eecs.berkeley.edu/~pabbeel/cs287-fa09/readings/NgHaradaRussell-shaping-ICML1999.pdf">论文 PDF</a>）；赛艇“绕圈刷检查点”与“清洁机器人打翻垃圾桶”等奖励黑客案例转述自 Amodei et al., “Concrete Problems in AI Safety” <a href="https://arxiv.org/abs/1606.06565">arXiv:1606.06565</a>（2016）；POET 见 Wang et al., “Paired Open-Ended Trailblazer (POET)” <a href="https://arxiv.org/abs/1901.01753">arXiv:1901.01753</a>（2019）。无文献对应的场景与“拍球机器人”踩坑故事、图 16-1、图 16-2 均为教学示意。</p>
+
         <div class="footer-nav">
             <a href="15.html">&larr; 上一章</a>
             <a href="index.html">📖 返回目录</a>
             <a href="17.html">下一章 &rarr;</a>
         </div>
-    </div>
+    </main>
 </div>
 </div>
 </body>
