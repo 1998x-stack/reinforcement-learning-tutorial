@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>第6章 蒙特卡洛方法</title>
     <link rel="stylesheet" href="theme.css">
     <style>
@@ -40,12 +41,21 @@
         .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
         .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
         .highlight { background: #fef9c3; border: 1px solid #facc15; }
+        h1 { color: #4c1d95; border-left: 6px solid #06b6d4; padding-left: 15px; margin: 20px 0 15px; font-size: 1.9rem; line-height: 1.35; }
+        figure { margin: 24px 0; padding: 16px; background: #faf8ff; border: 1px solid #ddd6fe; border-radius: 16px; }
+        figure svg { width: 100%; height: auto; display: block; }
+        figcaption { margin-top: 10px; font-size: 0.9rem; color: #5b21b6; line-height: 1.65; }
+        .source-note { font-size: 0.85rem; color: #64748b; border-top: 1px dashed #ddd6fe; margin-top: 28px; padding-top: 12px; line-height: 1.7; }
+        .math-scroll { max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 6px 2px; }
+        .math-scroll:focus-visible { outline: 3px solid #7c3aed; outline-offset: 2px; }
+        .math-scroll math[display="block"] { width: max-content; min-width: 100%; font-size: 1.15rem; }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
     </style>
 </head>
 <body>
 <div class="double-border">
 <div class="container">
-    <div class="sidebar">
+    <nav class="sidebar" aria-label="课程目录">
         <h3>🧠 课程目录</h3>
         <ul class="chapter-list">
             <li><a href="01.html">第1章 强化学习是什么</a></li>
@@ -77,15 +87,15 @@
             <li><a href="27.html">第27章 从零实现DQN</a></li>
             <li><a href="28.html">第28章 综合实战：Atari智能体</a></li>
         </ul>
-    </div>
-    <div class="main-content">
-        <h2>第六章：蒙特卡洛方法</h2>
+    </nav>
+    <main id="content" class="main-content">
+        <h1>第六章：蒙特卡洛方法</h1>
 
         <p>同学们好，欢迎来到第六章。前几章我们学了马尔可夫决策过程和贝尔曼方程，然后用动态规划求解了已知模型的MDP。但现实世界有个残酷的问题——<strong>大多数情况下你不知道环境的转移概率和奖励函数</strong>。你转硬币就知道正反面的概率？你下围棋就知道对手每一步的策略分布？不知道。</p>
 
         <p>这一章讲的方法叫<strong>蒙特卡洛（Monte Carlo）方法</strong>，简称MC方法。蒙特卡洛是摩纳哥的一个赌城——这个命名暗示了什么？没错，<strong>随机采样</strong>。MC方法的核心思想是：既然我不知道环境模型，那我就直接和环境交互，拿到完整的一局（episode）数据，然后从这些经验中学习。</p>
 
-        <h3>6.1 从经验中学习</h3>
+        <h2>6.1 从经验中学习</h2>
 
         <p>动态规划（DP）有一个要命的先决条件：你必须知道完整的MDP模型——即状态转移概率 <code>P(s'|s,a)</code> 和奖励函数 <code>R(s,a)</code>。这在很多实际场景中根本不现实。比如你在设计一个机器人走路的控制器，你能精确写出每一步的转移概率吗？几乎不可能。</p>
 
@@ -101,9 +111,51 @@
 
         <p>在每个时间步 <code>t</code>，我们可以计算从这个时间步开始的<strong>累积折扣回报</strong>：</p>
 
-        <p style="text-align:center; font-size:1.1rem; margin:10px 0;">
-            <code>G_t = R_{t+1} + γR_{t+2} + γ²R_{t+3} + … + γ^{T-t-1}R_T</code>
-        </p>
+        <p style="margin:10px 0 2px;color:#64748b;font-size:0.85rem;">式 (6.1) 折扣累积回报</p>
+        <div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="折扣累积回报公式，可横向滚动">
+          <math display="block" aria-label="G t 等于 R t+1 加 gamma R t+2 一直加到 gamma 的 T-t-1 次方乘 R T">
+            <mrow>
+              <msub><mi>G</mi><mi>t</mi></msub><mo>=</mo>
+              <msub><mi>R</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub>
+              <mo>+</mo><mi>γ</mi><msub><mi>R</mi><mrow><mi>t</mi><mo>+</mo><mn>2</mn></mrow></msub>
+              <mo>+</mo><msup><mi>γ</mi><mn>2</mn></msup><msub><mi>R</mi><mrow><mi>t</mi><mo>+</mo><mn>3</mn></mrow></msub>
+              <mo>+</mo><mo>⋯</mo><mo>+</mo>
+              <msup><mi>γ</mi><mrow><mi>T</mi><mo>−</mo><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msup>
+              <msub><mi>R</mi><mi>T</mi></msub>
+            </mrow>
+          </math>
+        </div>
+
+        <figure>
+          <svg viewBox="0 0 640 220" role="img" aria-labelledby="fig-mc-title fig-mc-desc">
+            <title id="fig-mc-title">一个 episode 轨迹与折扣回报</title>
+            <desc id="fig-mc-desc">从左到右依次为状态 S1 到终止状态 T，状态之间的箭头标注即时奖励 R2 到 R5；下方给出从 S1 出发的折扣回报 G1 的表达式。</desc>
+            <defs>
+              <marker id="mcArrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+                <path d="M0,0 L7,3 L0,6 Z" fill="#7c3aed"/>
+              </marker>
+            </defs>
+            <g stroke="#7c3aed" stroke-width="2.5">
+              <line x1="96" y1="90" x2="160" y2="90" marker-end="url(#mcArrow)"/>
+              <line x1="216" y1="90" x2="280" y2="90" marker-end="url(#mcArrow)"/>
+              <line x1="336" y1="90" x2="400" y2="90" marker-end="url(#mcArrow)"/>
+              <line x1="456" y1="90" x2="520" y2="90" marker-end="url(#mcArrow)"/>
+            </g>
+            <g font-size="13" fill="#0d9488" text-anchor="middle">
+              <text x="128" y="80">R₂</text><text x="248" y="80">R₃</text>
+              <text x="368" y="80">R₄</text><text x="488" y="80">R₅</text>
+            </g>
+            <g font-size="15" font-weight="700" text-anchor="middle">
+              <circle cx="70" cy="90" r="26" fill="#ede9fe" stroke="#7c3aed" stroke-width="2.5"/><text x="70" y="96" fill="#4c1d95">S₁</text>
+              <circle cx="190" cy="90" r="26" fill="#ede9fe" stroke="#7c3aed" stroke-width="2.5"/><text x="190" y="96" fill="#4c1d95">S₂</text>
+              <circle cx="310" cy="90" r="26" fill="#ede9fe" stroke="#7c3aed" stroke-width="2.5"/><text x="310" y="96" fill="#4c1d95">S₃</text>
+              <circle cx="430" cy="90" r="26" fill="#ede9fe" stroke="#7c3aed" stroke-width="2.5"/><text x="430" y="96" fill="#4c1d95">S₄</text>
+              <circle cx="550" cy="90" r="26" fill="#d1fae5" stroke="#0d9488" stroke-width="2.5"/><text x="550" y="96" fill="#065f46">T</text>
+            </g>
+            <text x="320" y="180" text-anchor="middle" font-size="15" fill="#5b21b6">G₁ = R₂ + γR₃ + γ²R₄ + γ³R₅</text>
+          </svg>
+          <figcaption>图 6-1：一个 episode 轨迹。MC 用整条轨迹上与状态 S₁ 相关的折扣回报 G₁ 来更新 V(S₁)；每次访问 S₁ 得到一个新的 G，取它们的平均。轨迹长度与奖励值均为教学示意。</figcaption>
+        </figure>
 
         <p>然后，状态 <code>s</code> 的价值 <code>V(s)</code> 就是所有访问过 <code>s</code> 的episode中 <code>G_t</code> 的平均值。就是这么简单。</p>
 
@@ -146,7 +198,7 @@
             <p><strong>MC的核心理念</strong>：蒙特卡洛 = 完整episode + 平均回报。不需要推断，不需要模型，只需要"跑一遍、记下来、算平均"。这种"从经验中学习"的思路，是强化学习走向实用的第一步。</p>
         </div>
 
-        <h3>6.2 MC预测 (MC Prediction)</h3>
+        <h2>6.2 MC预测 (MC Prediction)</h2>
 
         <p>先讲最简单的任务：给定一个固定的策略 <code>π</code>，用MC方法来估计它的状态值函数 <code>V_π(s)</code>。这个任务叫做"预测"（prediction），也叫"策略评估"（policy evaluation）。</p>
 
@@ -181,9 +233,19 @@
 
         <p>这段代码可以原地增量更新，不必真的把所有 <code>G</code> 存下来再求平均。只要维护一个计数器 <code>N(s)</code>，每来一个新回报 <code>G</code>，就做：</p>
 
-        <p style="text-align:center; font-size:1.1rem; margin:10px 0;">
-            <code>V(s) ← V(s) + (G - V(s)) / N(s)</code>
-        </p>
+        <p style="margin:10px 0 2px;color:#64748b;font-size:0.85rem;">式 (6.2) 增量式均值更新</p>
+        <div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="增量式均值更新公式，可横向滚动">
+          <math display="block" aria-label="V s 更新为 V s 加上 G 减 V s 除以 N s">
+            <mrow>
+              <mi>V</mi><mo>(</mo><mi>s</mi><mo>)</mo><mo>←</mo>
+              <mi>V</mi><mo>(</mo><mi>s</mi><mo>)</mo><mo>+</mo>
+              <mfrac>
+                <mrow><mi>G</mi><mo>−</mo><mi>V</mi><mo>(</mo><mi>s</mi><mo>)</mo></mrow>
+                <mrow><mi>N</mi><mo>(</mo><mi>s</mi><mo>)</mo></mrow>
+              </mfrac>
+            </mrow>
+          </math>
+        </div>
 
         <p>这和"每次去新的自助餐厅吃到饱，然后更新你对这家餐厅的评价"是同一个逻辑——第一次去的新体验权重高，去了很多次之后一次体验的影响就变小了。</p>
 
@@ -191,7 +253,7 @@
             <p><strong>关键概念澄清</strong>：MC不使用自举（bootstrapping）。这是什么意思呢？看看DP的更新公式 <code>V(s) ← Σ π(a|s)[R + γV(s')]</code>——我更新 <code>V(s)</code> 的时候用到了 <code>V(s')</code> 的当前估计值，这叫"用自己的估计来更新自己"。而MC更新 <code>V(s)</code> 时用的是 <code>G_t</code>，这个 <code>G_t</code> 是真实奖励的加总，不依赖于任何其他状态的估计。所以MC是无偏的，换来的代价就是方差大。</p>
         </div>
 
-        <h3>6.3 MC控制 (MC Control)</h3>
+        <h2>6.3 MC控制 (MC Control)</h2>
 
         <p>预测是基础，但我们的终极目标是<strong>控制</strong>——找到最优策略。MC做控制的基本思路和DP的"策略迭代"类似，但有一个关键差异。</p>
 
@@ -211,6 +273,27 @@
             <li>以概率 <code>1 - ε</code> 选择当前 <code>Q</code> 值最大的动作（利用 exploitation）</li>
             <li>以概率 <code>ε</code> 在所有动作中随机选择（探索 exploration）</li>
         </ul>
+
+        <figure>
+          <svg viewBox="0 0 520 250" role="img" aria-labelledby="fig-eg-title fig-eg-desc">
+            <title id="fig-eg-title">ε-贪心的动作选择概率</title>
+            <desc id="fig-eg-desc">四个动作的选择概率柱状图：贪心动作 a 星的概率为 1-ε+ε/|A| 约等于 0.775，其余三个动作各为 ε/|A| 约等于 0.075。</desc>
+            <line x1="70" y1="200" x2="470" y2="200" stroke="#94a3b8" stroke-width="2"/>
+            <rect x="90" y="40" width="60" height="160" fill="#a78bfa" stroke="#7c3aed" stroke-width="1.5"/>
+            <g fill="#c4b5fd" stroke="#7c3aed" stroke-width="1.5">
+              <rect x="180" y="185" width="60" height="15"/>
+              <rect x="270" y="185" width="60" height="15"/>
+              <rect x="360" y="185" width="60" height="15"/>
+            </g>
+            <g font-size="13" fill="#4c1d95" text-anchor="middle">
+              <text x="120" y="220">a*</text><text x="210" y="220">a₂</text>
+              <text x="300" y="220">a₃</text><text x="390" y="220">a₄</text>
+            </g>
+            <text x="140" y="30" text-anchor="middle" font-size="12" fill="#7c3aed">1−ε+ε/|A| ≈ 0.775</text>
+            <text x="300" y="176" text-anchor="middle" font-size="12" fill="#7c3aed">ε/|A| ≈ 0.075</text>
+          </svg>
+          <figcaption>图 6-2：ε-贪心策略下的动作选择概率（以 ε = 0.3、|A| = 4 为例）。贪心动作 a* 以 1−ε+ε/|A| 的概率被选中，其余动作各分得 ε/|A|，从而保证所有动作都有机会被采样。数值为教学示意。</figcaption>
+        </figure>
 
         <p>这保证了两件事：一是每个状态-动作对都有无限次被采样的机会（保证收敛），二是最终策略可以趋向于最优（不会永远随机乱走）。</p>
 
@@ -253,7 +336,7 @@
             <p><strong>踩坑故事</strong>：MC方差的教训。我之前带过一个学生做"21点"的黑杰克游戏AI。他用MC方法，跑了5000个episode后得到了一个策略，看起来很不错——胜率接近42%。他兴奋地直接部署到一个在线模拟器里，结果胜率掉到了35%。为什么？因为5000个episode看起来很多，但在某些边缘状态下（比如手牌15，庄家明牌A），实际只被采样了十几次，Q值的方差极大，估计完全不可靠。这就是MC方法的"阿喀琉斯之踵"——方差。如果你的任务中episode很长（比如1000步），或者奖励稀疏（只有最后一步有奖励），MC的方差会变得非常大。我在实际项目中见过有人用MC做机器人控制，跑了10万个episode，值函数还在剧烈震荡——最后只能换成TD方法。记住：MC用完整收益换来了无偏性，代价就是方差大，数据利用率低。</p>
         </div>
 
-        <h3>6.4 MC方法的优缺点</h3>
+        <h2>6.4 MC方法的优缺点</h2>
 
         <p>咱们来客观地总结一下MC方法的长处和短处。理解这些，你才能在实际问题中判断"这里该不该用MC"。</p>
 
@@ -278,7 +361,7 @@
             <p><strong>什么时候用MC？</strong> 四个条件供你判断：(1) 任务是回合制的，有明确终止点；(2) 环境模型未知或极难建模；(3) episode长度适中（几十到几百步）；(4) 你能接受较慢的收敛速度。如果你的任务满足这四点，MC是一个很好的起点。</p>
         </div>
 
-        <h3>6.5 MC vs DP vs TD 对比预览</h3>
+        <h2>6.5 MC vs DP vs TD 对比预览</h2>
 
         <p>到这里，我们已经学了两大类方法：DP（动态规划）和MC（蒙特卡洛）。下一章我们会学习第三类——TD（时序差分学习）。这三者的关系，构成了整个强化学习算法设计的底层思想框架。这里先做一个总结性的预览：</p>
 
@@ -345,13 +428,15 @@
 
         <p>下一章我们将正式进入TD学习（时序差分学习）。TD方法结合了MC的"从经验学习"和DP的"自举"优势，是当前强化学习实践中最广泛使用的方法族。你会发现，Q-Learning、SARSA、甚至是Deep Q-Network（DQN）的根基都在TD学习里。好了，本章的蒙特卡洛方法就到这里，咱们第七章再见！</p>
 
+        <p class="source-note">本章的 MC 预测 / MC 控制、首次访问与每次访问 MC、ε-贪心与 GLIE 条件，均参照 Sutton &amp; Barto《<a href="http://incompleteideas.net/book/the-book-2nd.html">Reinforcement Learning: An Introduction</a>》(第 2 版, 2018, MIT Press) 第 5 章 “Monte Carlo Methods”。“阿喀琉斯之踵——方差”一段（5000 episode、42% vs 35%）为教学叙述，未对应已发表的公开实验；图 6-1、图 6-2 与式 (6.1)(6.2) 为教学示意。</p>
+
         <div class="footer-nav">
             <a href="05.html">← 上一章</a>
             <a href="index.html">📖 返回目录</a>
             <a href="07.html">下一章 →</a>
         </div>
 
-    </div>
+    </main>
 </div>
 </div>
 <footer>© 2026 强化学习教程 — 从蒙特卡洛到时序差分，让机器学会决策</footer>
