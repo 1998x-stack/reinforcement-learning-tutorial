@@ -29,48 +29,56 @@ th, td { border: 1px solid #c4b5fd; padding: 10px; text-align: left; } th { back
 .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
 .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
 .highlight { background: #fef9c3; border: 1px solid #facc15; }
+h1 { color: #4c1d95; border-left: 6px solid #06b6d4; padding-left: 15px; margin: 20px 0 15px; font-size: 1.9rem; line-height: 1.35; }
+figure { margin: 24px 0; padding: 16px; background: #faf8ff; border: 1px solid #ddd6fe; border-radius: 16px; }
+figure svg { width: 100%; height: auto; display: block; }
+figcaption { margin-top: 10px; font-size: 0.9rem; color: #5b21b6; line-height: 1.65; }
+.source-note { font-size: 0.85rem; color: #64748b; border-top: 1px dashed #ddd6fe; margin-top: 28px; padding-top: 12px; line-height: 1.7; }
+.math-scroll { max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 6px 2px; }
+.math-scroll:focus-visible { outline: 3px solid #7c3aed; outline-offset: 2px; }
+.math-scroll math[display="block"] { width: max-content; min-width: 100%; font-size: 1.15rem; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
 <div class="double-border">
 <div class="container">
-<div class="sidebar">
-<h3>导航目录</h3>
+<nav class="sidebar" aria-label="课程目录">
+<h3>🧠 课程目录</h3>
 <ul class="chapter-list">
-<li><a href="index.html">首页</a></li>
-<li><a href="01.html">第1章 引言</a></li>
-<li><a href="02.html">第2章 多臂赌博机</a></li>
+<li><a href="01.html">第1章 强化学习是什么</a></li>
+<li><a href="02.html">第2章 必备数学工具箱</a></li>
 <li><a href="03.html">第3章 马尔可夫决策过程</a></li>
-<li><a href="04.html">第4章 动态规划</a></li>
-<li><a href="05.html">第5章 蒙特卡洛方法</a></li>
-<li><a href="06.html">第6章 蒙特卡洛与动态规划</a></li>
+<li><a href="04.html">第4章 贝尔曼方程</a></li>
+<li><a href="05.html">第5章 动态规划</a></li>
+<li><a href="06.html">第6章 蒙特卡洛方法</a></li>
 <li><a href="07.html">第7章 时序差分学习</a></li>
-<li><a href="08.html">第8章 函数逼近</a></li>
-<li><a href="09.html">第9章 策略梯度</a></li>
-<li><a href="10.html">第10章 Actor-Critic</a></li>
-<li><a href="11.html">第11章 DQN</a></li>
-<li><a href="12.html">第12章 Double DQN</a></li>
-<li><a href="13.html">第13章 Dueling DQN</a></li>
+<li><a href="08.html">第8章 值函数逼近</a></li>
+<li><a href="09.html">第9章 深度Q网络(DQN)</a></li>
+<li><a href="10.html">第10章 DQN改进家族</a></li>
+<li><a href="11.html">第11章 策略梯度方法</a></li>
+<li><a href="12.html">第12章 Actor-Critic方法</a></li>
+<li><a href="13.html">第13章 PPO与TRPO</a></li>
 <li><a href="14.html">第14章 连续动作空间算法</a></li>
-<li><a href="15.html">第15章 PER</a></li>
-<li><a href="16.html">第16章 NoisyNet</a></li>
+<li><a href="15.html">第15章 探索与利用策略</a></li>
+<li><a href="16.html">第16章 奖励设计与塑形</a></li>
 <li><a href="17.html" class="active">第17章 训练稳定性与调参</a></li>
-<li><a href="18.html">第18章 Rainbow</a></li>
-<li><a href="19.html">第19章 PPO</a></li>
-<li><a href="20.html">第20章 模仿学习</a></li>
-<li><a href="21.html">第21章 逆强化学习</a></li>
-<li><a href="22.html">第22章 分层强化学习</a></li>
-<li><a href="23.html">第23章 多智能体强化学习</a></li>
-<li><a href="24.html">第24章 分布式强化学习</a></li>
-<li><a href="25.html">第25章 基于模型的强化学习</a></li>
-<li><a href="26.html">第26章 探索与利用</a></li>
-<li><a href="27.html">第27章 安全强化学习</a></li>
-<li><a href="28.html">第28章 前沿与展望</a></li>
+<li><a href="18.html">第18章 安全强化学习</a></li>
+<li><a href="19.html">第19章 基于模型的强化学习</a></li>
+<li><a href="20.html">第20章 离线强化学习</a></li>
+<li><a href="21.html">第21章 多智能体强化学习</a></li>
+<li><a href="22.html">第22章 逆强化学习与模仿学习</a></li>
+<li><a href="23.html">第23章 Gymnasium环境实战</a></li>
+<li><a href="24.html">第24章 Stable-Baselines3入门</a></li>
+<li><a href="25.html">第25章 调试与可视化</a></li>
+<li><a href="26.html">第26章 强化学习前沿方向</a></li>
+<li><a href="27.html">第27章 从零实现DQN</a></li>
+<li><a href="28.html">第28章 综合实战：Atari智能体</a></li>
 </ul>
-</div>
-<div class="main-content">
+</nav>
+<main id="content" class="main-content">
 
-<h2>第十七章：训练稳定性与调参</h2>
+<h1>第十七章：训练稳定性与调参</h1>
 
 <p>同学们好！走到这里，我们已经学了DQN、DDPG、PPO、SAC等一系列强化学习算法。你可能已经发现了一个令人沮丧的事实：即使你把算法论文里的伪代码一字不差地实现出来，你的智能体也大概率不会收敛。更气人的是——同样的代码、同样的环境，别人跑出来状态爆炸，你跑出来纹丝不动。</p>
 
@@ -82,7 +90,7 @@ th, td { border: 1px solid #c4b5fd; padding: 10px; text-align: left; } th { back
 
 <p>本章我们就来系统地探讨<strong>训练稳定性与调参</strong>这个"RL工程师的必修课"。这可能是整本教程里最"不性感"但却最实用的一章——掌握它，你的实验时间可以减少一半以上。</p>
 
-<h3>17.1 RL为什么不稳定</h3>
+<h2>17.1 RL为什么不稳定</h2>
 
 <p>要解决不稳定问题，首先需要理解不稳定的根源。强化学习的训练不稳定并非偶然，而是由其内在结构决定的。Sutton在2015年提出了著名的<strong>"致命三要素（Deadly Triad）"</strong>理论：当以下三个条件同时满足时，训练发散几乎是不可能避免的：</p>
 
@@ -92,7 +100,39 @@ th, td { border: 1px solid #c4b5fd; padding: 10px; text-align: left; } th { back
 <li><strong>异策略学习（Off-Policy Learning）</strong>：我们用过去的数据来更新当前的策略。数据分布与当前策略的分布不一致，导致更新方向可能存在偏差。</li>
 </ul>
 
+<p style="margin:10px 0 2px;color:#64748b;font-size:0.85rem;">式 (17.1) Q-Learning / DQN 的 TD 更新目标</p>
+<div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="TD 更新公式，可横向滚动">
+  <math display="block" aria-label="Q s a 更新为 Q s a 加上 alpha 乘 奖励加 gamma 乘下一状态最大 Q 值 减 Q s a 的差">
+    <mrow>
+      <mi>Q</mi><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>)</mo>
+      <mo>←</mo>
+      <mi>Q</mi><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>)</mo><mo>+</mo><mi>α</mi>
+      <mrow><mo>[</mo>
+        <mi>r</mi><mo>+</mo><mi>γ</mi>
+        <munder><mo>max</mo><msup><mi>a</mi><mo>′</mo></msup></munder>
+        <mi>Q</mi><mo>(</mo><msup><mi>s</mi><mo>′</mo></msup><mo>,</mo><msup><mi>a</mi><mo>′</mo></msup><mo>)</mo>
+        <mo>−</mo><mi>Q</mi><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>)</mo>
+      <mo>]</mo></mrow>
+    </mrow>
+  </math>
+</div>
+
 <p>几乎所有主流的深度RL算法（DQN、DDPG、SAC、TD3）都同时满足这三个条件，因此它们本质上都是不稳定的。即使像PPO这样的同策略算法，因为使用了函数逼近和自举，也依然存在稳定性问题。</p>
+
+<figure>
+  <svg viewBox="0 0 560 300" role="img" aria-labelledby="fig-triad-title fig-triad-desc">
+    <title id="fig-triad-title">致命三要素（Deadly Triad）</title>
+    <desc id="fig-triad-desc">函数逼近、自举与异策略学习三个条件同时满足时训练容易发散，三者交叠处标注“训练发散”。</desc>
+    <circle cx="235" cy="120" r="95" fill="#dbeafe" fill-opacity="0.65" stroke="#3b82f6" stroke-width="2"/>
+    <circle cx="325" cy="120" r="95" fill="#fce7f3" fill-opacity="0.65" stroke="#ec4899" stroke-width="2"/>
+    <circle cx="280" cy="190" r="95" fill="#fef9c3" fill-opacity="0.65" stroke="#eab308" stroke-width="2"/>
+    <text x="150" y="70" font-size="14" fill="#1e40af">函数逼近</text>
+    <text x="360" y="70" font-size="14" fill="#9d174d">自举</text>
+    <text x="280" y="285" font-size="14" fill="#854d0e" text-anchor="middle">异策略学习</text>
+    <text x="280" y="150" font-size="13" fill="#7c3aed" text-anchor="middle" font-weight="bold">训练发散</text>
+  </svg>
+  <figcaption>图 17-1：致命三要素（Deadly Triad）。函数逼近、自举、异策略学习三者任缺其一通常仍可收敛；三者同时出现时（如 DQN、DDPG、SAC），值估计的偏差会相互放大，训练容易发散。概念示意图。</figcaption>
+</figure>
 
 <p>除此之外，RL还面临两个独特的挑战：</p>
 <ul>
@@ -104,11 +144,25 @@ th, td { border: 1px solid #c4b5fd; padding: 10px; text-align: left; } th { back
 <strong>直观理解：</strong>想象你一边在跑步机上跑步，一边有人不断调整跑步机的速度和坡度。你既要保持平衡（策略优化），又要适应不断变化的环境（数据分布）。这就是RL训练的本质困境。
 </div>
 
-<h3>17.2 稳定性技巧</h3>
+<h2>17.2 稳定性技巧</h2>
 
 <p>既然不稳定是RL的内在属性，那我们能做什么？好消息是，经过多年实践，社区积累了一套行之有效的稳定性技巧。下面列出最重要的几个：</p>
 
 <p><strong>梯度裁剪（Gradient Clipping）</strong>：这是最基础也是最有效的技巧。当梯度过大时，参数更新会"一步迈过头"，导致策略瞬间崩溃。梯度裁剪将梯度的范数限制在一个合理范围内（通常max_norm=0.5或1.0）。实践中几乎所有RL实现都应该加上梯度裁剪。</p>
+
+<p style="margin:10px 0 2px;color:#64748b;font-size:0.85rem;">式 (17.2) 按范数全局裁剪梯度</p>
+<div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="梯度裁剪公式，可横向滚动">
+  <math display="block" aria-label="梯度 g 被裁剪为 g 乘以 1 和 c 除以 g 的范数 两者中的较小值">
+    <mrow>
+      <mi>g</mi><mo>←</mo><mi>g</mi><mo>·</mo>
+      <mi>min</mi>
+      <mrow><mo>(</mo><mn>1</mn><mo>,</mo>
+        <mfrac><mi>c</mi><mrow><mo>‖</mo><mi>g</mi><mo>‖</mo></mrow></mfrac>
+      <mo>)</mo></mrow>
+    </mrow>
+  </math>
+</div>
+<p>当梯度范数 &Vert;g&Vert; 不超过阈值 c 时保持原样；超过时按比例缩小到 c，从而避免“一步迈过头”。</p>
 
 <p><strong>奖励归一化（Reward Normalization）</strong>：不同环境的奖励尺度可以相差巨大——CartPole的奖励大约是1/tick，而MuJoCo的奖励可能是几千。如果不做归一化，Q值的尺度就会爆炸。常用做法是维护一个running mean和running std，将奖励除以标准差（或者使用Reward Scaling，将奖励缩放到[-1, 1]区间）。</p>
 
@@ -116,11 +170,49 @@ th, td { border: 1px solid #c4b5fd; padding: 10px; text-align: left; } th { back
 
 <p><strong>目标网络更新率（Target Network Update Rate）</strong>：对于使用目标网络的算法（DQN、DDPG、SAC），tau值（软更新系数）是一个关键参数。tau太小（如0.0001），目标网络变化太慢，学习速度受影响；tau太大（如0.01），目标网络变化太快，近似于没有目标网络。常用的tau值是0.005（SAC/DDPG）或周期性硬更新（DQN每1000步更新一次）。</p>
 
+<p style="margin:10px 0 2px;color:#64748b;font-size:0.85rem;">式 (17.3) 目标网络软更新（Polyak 平均）</p>
+<div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="目标网络软更新公式，可横向滚动">
+  <math display="block" aria-label="目标参数 theta- 更新为 tau 乘在线参数 theta 加上 1 减 tau 乘 theta-">
+    <mrow>
+      <msup><mi>θ</mi><mo>−</mo></msup><mo>←</mo>
+      <mi>τ</mi><mi>θ</mi><mo>+</mo>
+      <mrow><mo>(</mo><mn>1</mn><mo>−</mo><mi>τ</mi><mo>)</mo></mrow>
+      <msup><mi>θ</mi><mo>−</mo></msup>
+    </mrow>
+  </math>
+</div>
+
 <p><strong>经验回放缓冲区（Replay Buffer）</strong>：缓冲区大小对训练有显著影响。太小的缓冲区（如1000条）会导致样本多样性不足，模型过拟合近期经验；太大的缓冲区（如10^7条）会包含太多过时的数据，降低学习效率。经验法则：简单环境用10^4~10^5，复杂环境用10^5~10^6。采样策略也很关键——优先采样近期经验的策略有时效果更好。</p>
 
 <p><strong>观测预处理（Observation Preprocessing）</strong>：对于Atari游戏，标准的预处理流程是：将RGB图像缩放到84x84的灰度图，然后堆叠最近4帧作为状态输入。这4帧堆叠为智能体提供了运动信息（如球的方向和速度）。对于MuJoCo等连续控制任务，通常将观测归一化到零均值和单位方差。</p>
 
-<h3>17.3 学习率与优化器</h3>
+<figure>
+  <svg viewBox="0 0 660 190" role="img" aria-labelledby="fig-stab-title fig-stab-desc">
+    <title id="fig-stab-title">稳定性防线的训练回路</title>
+    <desc id="fig-stab-desc">观测预处理、奖励与优势归一化、梯度裁剪、软更新目标网络四道防线串联在一次参数更新回路上。</desc>
+    <defs><marker id="stabArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#7c3aed"/></marker></defs>
+    <g font-size="12" text-anchor="middle">
+      <rect x="15" y="65" width="135" height="60" rx="12" fill="#e0f2fe" stroke="#38bdf8" stroke-width="2"/>
+      <text x="82" y="90" fill="#0369a1">观测预处理</text><text x="82" y="110" fill="#0369a1">归一化/堆帧</text>
+      <rect x="180" y="65" width="135" height="60" rx="12" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/>
+      <text x="247" y="90" fill="#5b21b6">奖励归一化</text><text x="247" y="110" fill="#5b21b6">优势 z-score</text>
+      <rect x="345" y="65" width="135" height="60" rx="12" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+      <text x="412" y="90" fill="#b91c1c">梯度裁剪</text><text x="412" y="110" fill="#b91c1c">max_norm</text>
+      <rect x="510" y="65" width="135" height="60" rx="12" fill="#fef9c3" stroke="#eab308" stroke-width="2"/>
+      <text x="577" y="90" fill="#854d0e">软更新目标网络</text><text x="577" y="110" fill="#854d0e">tau 平滑</text>
+    </g>
+    <g stroke="#7c3aed" stroke-width="2.5" marker-end="url(#stabArrow)">
+      <line x1="150" y1="95" x2="176" y2="95"/>
+      <line x1="315" y1="95" x2="341" y2="95"/>
+      <line x1="480" y1="95" x2="506" y2="95"/>
+    </g>
+    <text x="330" y="35" text-anchor="middle" font-size="13" fill="#4c1d95">一次参数更新经过的稳定性防线（顺序可调）</text>
+    <text x="330" y="165" text-anchor="middle" font-size="12" fill="#64748b">每一步都有明确的数值目的，而非“调参玄学”</text>
+  </svg>
+  <figcaption>图 17-2：稳定性防线的训练回路。四类措施依次约束“怎么办才不炸”的数值尺度：观测先归一化，再归一化奖励/优势，用梯度裁剪限制单步步长，用软更新让目标网络平滑漂移。示意图。图 17-1、17-2 与本章所有无文献对应的数值描述均为教学示意。</figcaption>
+</figure>
+
+<h2>17.3 学习率与优化器</h2>
 
 <p>学习率可能是RL中<strong>最敏感</strong>的超参数。选对学习率，你的算法就成功了80%。</p>
 
@@ -146,7 +238,7 @@ th, td { border: 1px solid #c4b5fd; padding: 10px; text-align: left; } th { back
 <strong>黄金法则：</strong>如果你不确定从哪里开始，对于大多数RL算法，使用Adam优化器 + 3e-4的学习率 + 256的batch size。这个配置在大量环境和算法上都有不错的表现。从"安全起点"出发再逐个调整，比从"激进参数"出发去debug NaN要好得多。
 </div>
 
-<h3>17.4 调参方法论</h3>
+<h2>17.4 调参方法论</h2>
 
 <p>调参不是玄学，而是一个<strong>系统性的实验过程</strong>。以下是经过多年实践验证的调参方法论：</p>
 
@@ -243,7 +335,7 @@ th, td { border: 1px solid #c4b5fd; padding: 10px; text-align: left; } th { back
 </tbody>
 </table>
 
-<h3>17.5 网络架构与初始化</h3>
+<h2>17.5 网络架构与初始化</h2>
 
 <p>网络架构和初始化方法对训练的稳定性和收敛速度有显著影响。虽然"网络越深越好"在CV和NLP中成立，但在RL中并非如此——过深的网络反而容易导致训练不稳定。</p>
 
@@ -341,7 +433,9 @@ def update_critic(critic, target_critic, actor, replay_buffer,
 
 <p>从下一章开始，我们将进入RL中更前沿的话题。首先登场的是<strong>Rainbow</strong>——它将DQN的六大改进融为一体，展示了如何通过系统性工程优化获得SOTA性能。再之后，我们会讨论<strong>安全强化学习（Safe RL）</strong>，探讨如何在保证智能体行为安全的前提下进行策略优化——这在实际部署中至关重要，也是近年来RL研究最活跃的方向之一。</p>
 
-</div>
+<p class="source-note">本章的“致命三要素”（Deadly Triad）与值函数发散的经典分析参照 Sutton &amp; Barto《<a href="http://incompleteideas.net/book/the-book-2nd.html">Reinforcement Learning: An Introduction</a>》(第 2 版, 2018, MIT Press) 以及 Tsitsiklis &amp; Van Roy, “An Analysis of Temporal-Difference Learning with Function Approximation”, IEEE Transactions on Automatic Control (1997)；目标网络与 Atari DQN 配置见 Mnih et al., “Human-level control through deep reinforcement learning”, <a href="https://www.nature.com/articles/nature14236">Nature 518</a> (2015)；GAE 见 Schulman et al., <a href="https://arxiv.org/abs/1506.02438">arXiv:1506.02438</a> (2015)；PPO 见 Schulman et al., <a href="https://arxiv.org/abs/1707.06347">arXiv:1707.06347</a> (2017)；SAC 见 Haarnoja et al., <a href="https://arxiv.org/abs/1801.01290">arXiv:1801.01290</a> (2018)；TD3 见 Fujimoto et al., <a href="https://arxiv.org/abs/1802.09477">arXiv:1802.09477</a> (2018)；正交初始化见 Saxe et al., <a href="https://arxiv.org/abs/1312.6120">arXiv:1312.6120</a> (2014)；LayerNorm 见 Ba et al., <a href="https://arxiv.org/abs/1607.06450">arXiv:1607.06450</a> (2016)。文中超参数表与“学习率设成 0.01”“Ant-v2 早期终止”等经验片段为教学示意/经验转述，非逐字引自上述文献。</p>
+
+</main>
 </div>
 <div class="footer-nav">
 <a href="16.html">&laquo; 上一章：NoisyNet</a>
