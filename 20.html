@@ -29,6 +29,15 @@ th, td { border: 1px solid #c4b5fd; padding: 10px; text-align: left; } th { back
 .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
 .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
 .highlight { background: #fef9c3; border: 1px solid #facc15; }
+h1 { color: #4c1d95; border-left: 6px solid #06b6d4; padding-left: 15px; margin: 20px 0 15px; font-size: 1.9rem; line-height: 1.35; }
+figure { margin: 24px 0; padding: 16px; background: #faf8ff; border: 1px solid #ddd6fe; border-radius: 16px; }
+figure svg { width: 100%; height: auto; display: block; }
+figcaption { margin-top: 10px; font-size: 0.9rem; color: #5b21b6; line-height: 1.65; }
+.source-note { font-size: 0.85rem; color: #64748b; border-top: 1px dashed #ddd6fe; margin-top: 28px; padding-top: 12px; line-height: 1.7; }
+.math-scroll { max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 6px 2px; }
+.math-scroll:focus-visible { outline: 3px solid #7c3aed; outline-offset: 2px; }
+.math-scroll math[display="block"] { width: max-content; min-width: 100%; font-size: 1.15rem; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
@@ -37,52 +46,51 @@ th, td { border: 1px solid #c4b5fd; padding: 10px; text-align: left; } th { back
 <div class="container">
 
 <!-- ==================== 侧边栏 ==================== -->
-<div class="sidebar">
-<h3>目录</h3>
+<nav class="sidebar" aria-label="课程目录">
+<h3>🧠 课程目录</h3>
 <ul class="chapter-list">
-<li><a href="index.html">前言</a></li>
-<li><a href="01.html">第1章 概述</a></li>
-<li><a href="02.html">第2章 基础概念</a></li>
+<li><a href="01.html">第1章 强化学习是什么</a></li>
+<li><a href="02.html">第2章 必备数学工具箱</a></li>
 <li><a href="03.html">第3章 马尔可夫决策过程</a></li>
 <li><a href="04.html">第4章 贝尔曼方程</a></li>
 <li><a href="05.html">第5章 动态规划</a></li>
 <li><a href="06.html">第6章 蒙特卡洛方法</a></li>
 <li><a href="07.html">第7章 时序差分学习</a></li>
-<li><a href="08.html">第8章 SARSA算法</a></li>
-<li><a href="09.html">第9章 Q-Learning</a></li>
+<li><a href="08.html">第8章 值函数逼近</a></li>
+<li><a href="09.html">第9章 深度Q网络(DQN)</a></li>
 <li><a href="10.html">第10章 DQN改进家族</a></li>
-<li><a href="11.html">第11章 策略梯度</a></li>
-<li><a href="12.html">第12章 Actor-Critic</a></li>
-<li><a href="13.html">第13章 PPO</a></li>
-<li><a href="14.html">第14章 DDPG</a></li>
-<li><a href="15.html">第15章 SAC</a></li>
-<li><a href="16.html">第16章 探索与利用</a></li>
-<li><a href="17.html">第17章 多臂老虎机</a></li>
-<li><a href="18.html">第18章 模仿学习</a></li>
-<li><a href="19.html">第19章 逆向强化学习</a></li>
+<li><a href="11.html">第11章 策略梯度方法</a></li>
+<li><a href="12.html">第12章 Actor-Critic方法</a></li>
+<li><a href="13.html">第13章 PPO与TRPO</a></li>
+<li><a href="14.html">第14章 连续动作空间算法</a></li>
+<li><a href="15.html">第15章 探索与利用策略</a></li>
+<li><a href="16.html">第16章 奖励设计与塑形</a></li>
+<li><a href="17.html">第17章 训练稳定性与调参</a></li>
+<li><a href="18.html">第18章 安全强化学习</a></li>
+<li><a href="19.html">第19章 基于模型的强化学习</a></li>
 <li><a href="20.html" class="active">第20章 离线强化学习</a></li>
 <li><a href="21.html">第21章 多智能体强化学习</a></li>
-<li><a href="22.html">第22章 模型基方法</a></li>
-<li><a href="23.html">第23章 世界模型</a></li>
-<li><a href="24.html">第24章 基于模型的RL进阶</a></li>
-<li><a href="25.html">第25章 分布强化学习</a></li>
-<li><a href="26.html">第26章 Offline RL</a></li>
-<li><a href="27.html">第27章 表示学习与RL</a></li>
-<li><a href="28.html">第28章 前沿专题</a></li>
+<li><a href="22.html">第22章 逆强化学习与模仿学习</a></li>
+<li><a href="23.html">第23章 Gymnasium环境实战</a></li>
+<li><a href="24.html">第24章 Stable-Baselines3入门</a></li>
+<li><a href="25.html">第25章 调试与可视化</a></li>
+<li><a href="26.html">第26章 强化学习前沿方向</a></li>
+<li><a href="27.html">第27章 从零实现DQN</a></li>
+<li><a href="28.html">第28章 综合实战：Atari智能体</a></li>
 </ul>
-</div>
+</nav>
 
 <!-- ==================== 主内容 ==================== -->
-<div class="main-content">
+<main id="content" class="main-content">
 
-<h2>第二十章：离线强化学习</h2>
+<h1>第二十章：离线强化学习</h1>
 
 <p>同学们好，欢迎来到第二十章。在之前的课程中，我们学过的所有强化学习算法都有一个共同的前提：agent 必须与环境在线交互，通过试错来收集数据、更新策略。无论是 Q-Learning、SAC 还是 PPO，都默认 agent 可以随时随地与环境互动。但在现实世界中，这个前提往往不成立。</p>
 
 <p>想象一下：你是一个医疗 AI 工程师，想训练一个策略来优化病人的呼吸机参数设置。你能让 agent 在真实病人身上"试错"吗？绝对不能。或者你在做自动驾驶，你想让车在高速公路上通过随机探索来学习怎么开车——这同样离谱。这些场景需要的是一种全新的范式：<strong>离线强化学习（Offline Reinforcement Learning）</strong>，也叫 Batch RL。它的核心设定是：给你一个固定的数据集，里面是别人已经收集好的 (s, a, r, s') 四元组，你要从这个数据集中直接学出一个策略，<strong>完全不再需要与环境交互</strong>。</p>
 
 <!-- ============ 20.1 ============ -->
-<h3>20.1 在线 vs 离线：根本性的范式转变</h3>
+<h2>20.1 在线 vs 离线：根本性的范式转变</h2>
 
 <p>我们先来理清这两个概念的本质区别。</p>
 
@@ -106,7 +114,7 @@ th, td { border: 1px solid #c4b5fd; padding: 10px; text-align: left; } th { back
 <p>离线 RL 面临的最大挑战，也是这一章的核心问题，叫做<strong>分布偏移（Distributional Shift）</strong>。我们接下来就深入分析这个问题。</p>
 
 <!-- ============ 20.2 ============ -->
-<h3>20.2 分布偏移问题：为什么标准算法会失败</h3>
+<h2>20.2 分布偏移问题：为什么标准算法会失败</h2>
 
 <p>假设你有一个数据集 D，里面记录了状态 s 下的各种动作。当你用这个数据集来训练 Q 函数时，一个严重的问题出现了：<strong>你学到的策略 &pi; 会选择那些在数据集中从未出现过的动作</strong>。</p>
 
@@ -118,6 +126,26 @@ th, td { border: 1px solid #c4b5fd; padding: 10px; text-align: left; } th { back
 
 <p>举个简单的例子：假设你在一个二维导航任务中收集了数据，agent 只在四个方向（上、下、左、右）上移动。数据集里干净整洁。现在你用 SAC 的离线版本去训练——SAC 的策略 &pi; 会输出一个高斯分布，它可能采样出一个从未出现过的动作，比如"右上45度"。Q 网络从未见过这个动作，胡乱给了一个很高的估值。策略看到"哦，原来右上45度 Q 值这么高"，于是加大了这个方向的概率。下一次更新，Q 为了匹配策略的选择又进一步推高估值。这是一个灾难性的正反馈循环。</p>
 
+<figure>
+  <svg viewBox="0 0 600 250" role="img" aria-labelledby="fig-ood-title fig-ood-desc">
+    <title id="fig-ood-title">外推误差与 max 导致的 Q 值虚高</title>
+    <desc id="fig-ood-desc">横轴为动作，纵轴为 Q 值。数据集覆盖区域 Q 值适中；越出数据集的 OOD 动作上 Q 网络外推并给出虚高值，max 操作选中这个虚假高点。</desc>
+    <rect x="60" y="40" width="240" height="170" fill="#dcfce7" fill-opacity="0.5"/>
+    <rect x="300" y="40" width="260" height="170" fill="#fee2e2" fill-opacity="0.5"/>
+    <line x1="60" y1="210" x2="560" y2="210" stroke="#94a3b8" stroke-width="2"/>
+    <line x1="60" y1="40" x2="60" y2="210" stroke="#94a3b8" stroke-width="2"/>
+    <line x1="300" y1="40" x2="300" y2="210" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 5"/>
+    <polyline fill="none" stroke="#7c3aed" stroke-width="3" points="70,170 140,162 220,150 290,140 330,120 370,85 410,58 450,48 490,52 540,75"/>
+    <circle cx="450" cy="48" r="7" fill="#ef4444"/>
+    <text x="450" y="32" text-anchor="middle" font-size="11" fill="#b91c1c">max 选中（虚高）</text>
+    <text x="180" y="230" text-anchor="middle" font-size="11" fill="#15803d">数据集覆盖区域</text>
+    <text x="430" y="230" text-anchor="middle" font-size="11" fill="#b91c1c">OOD 区域（外推）</text>
+    <text x="30" y="120" font-size="11" fill="#64748b" transform="rotate(-90 30 120)">Q(s,a)</text>
+    <text x="320" y="22" text-anchor="middle" font-size="13" fill="#4c1d95">越出数据集的动作越被高估</text>
+  </svg>
+  <figcaption>图 20-1：外推误差（Extrapolation Error）。Q 网络在数据未覆盖的 OOD 动作上没有训练信号，输出完全靠外推，往往异常偏高；max<sub>a′</sub>Q 会选中这个虚假高点，再经 Bellman 自举放大，形成“Q 自我抬高 → 策略更倾向 OOD 动作”的正反馈。曲线为教学示意。</figcaption>
+</figure>
+
 <div class="warning">
 <strong>踩坑故事：</strong> 我在一次研究项目中试图用标准的 SAC 在离线数据上训练一个机器人开门策略。数据集是专家演示的，质量很高。我满怀信心地跑了训练，结果策略的回报曲线是这样的：前 10 轮一切正常，第 15 轮突然崩塌，第 20 轮之后完全无法恢复。我检查了 Q 值，发现从第 12 轮开始 Q 值开始异常飙升——从正常的 50 左右一路冲到 5000 多。这就是典型的外推误差失控。后来我才意识到，是策略开始采样到 OOD 动作后，Q 函数进入了一个"自欺欺人"的循环：Q 自我抬高 -> 策略相信 Q 并选择更极端的动作 -> Q 继续抬高。这个教训让我深刻理解了：<strong>在离线 RL 中，算法的失败不是缓慢退化，而是瞬间崩塌</strong>。解决办法就是接下来要讲的 CQL。
 </div>
@@ -127,21 +155,60 @@ th, td { border: 1px solid #c4b5fd; padding: 10px; text-align: left; } th { back
 </div>
 
 <!-- ============ 20.3 ============ -->
-<h3>20.3 保守Q学习（CQL）</h3>
+<h2>20.3 保守Q学习（CQL）</h2>
 
 <p>CQL（Conservative Q-Learning）是离线 RL 领域最经典、最实用的算法之一，由 Sergey Levine 团队在 2020 年提出。它的核心思想极其简洁有力：<strong>压低 OOD 动作的 Q 值，同时抬升数据集中动作的 Q 值</strong>。</p>
 
 <p>标准 Q-Learning 的损失函数是 TD 误差：</p>
 
-<p style="margin:10px 0; text-align:center;">
-L<sub>TD</sub> = E<sub>(s,a,r,s')~D</sub>[(r + &gamma; max<sub>a'</sub> Q(s', a') &minus; Q(s, a))<sup>2</sup>]
-</p>
+<p style="margin:10px 0 2px;color:#64748b;font-size:0.85rem;">式 (20.1) 标准 Q-Learning / TD 回归损失</p>
+<div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="TD 损失公式，可横向滚动">
+  <math display="block" aria-label="TD 损失等于对 r 加 gamma 乘下一状态最大 Q 值 减 Q s a 的平方取期望">
+    <mrow>
+      <msub><mi>L</mi><mtext>TD</mtext></msub><mo>=</mo>
+      <munder><mi>E</mi><mrow><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>,</mo><mi>r</mi><mo>,</mo><msup><mi>s</mi><mo>′</mo></msup><mo>)</mo><mo>∼</mo><mi>D</mi></mrow></munder>
+      <mrow><mo>[</mo><msup><mrow><mo>(</mo><mi>r</mi><mo>+</mo><mi>γ</mi><munder><mo>max</mo><msup><mi>a</mi><mo>′</mo></msup></munder><mi>Q</mi><mo>(</mo><msup><mi>s</mi><mo>′</mo></msup><mo>,</mo><msup><mi>a</mi><mo>′</mo></msup><mo>)</mo><mo>−</mo><mi>Q</mi><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>)</mo><mo>)</mo></mrow><mn>2</mn></msup><mo>]</mo></mrow>
+    </mrow>
+  </math>
+</div>
 
 <p>CQL 在这个基础上增加了一个正则化项：</p>
 
-<p style="margin:10px 0; text-align:center;">
-L<sub>CQL</sub> = L<sub>TD</sub> + &alpha; (E<sub>s~D, a~&mu;</sub>[Q(s, a)] &minus; E<sub>s,a~D</sub>[Q(s, a)])
-</p>
+<p style="margin:10px 0 2px;color:#64748b;font-size:0.85rem;">式 (20.2) CQL 的保守正则化损失</p>
+<div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="CQL 损失公式，可横向滚动">
+  <math display="block" aria-label="CQL 损失等于 TD 损失加上 alpha 乘括号 在 μ 下 Q 的期望 减去 在数据集下 Q 的期望">
+    <mrow>
+      <msub><mi>L</mi><mtext>CQL</mtext></msub><mo>=</mo><msub><mi>L</mi><mtext>TD</mtext></msub><mo>+</mo>
+      <mi>α</mi><mrow><mo>(</mo>
+        <munder><mi>E</mi><mrow><mi>s</mi><mo>∼</mo><mi>D</mi><mo>,</mo><mi>a</mi><mo>∼</mo><mi>μ</mi></mrow></munder>
+        <mrow><mo>[</mo><mi>Q</mi><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>)</mo><mo>]</mo></mrow>
+        <mo>−</mo>
+        <munder><mi>E</mi><mrow><mi>s</mi><mo>,</mo><mi>a</mi><mo>∼</mo><mi>D</mi></mrow></munder>
+        <mrow><mo>[</mo><mi>Q</mi><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>)</mo><mo>]</mo></mrow>
+      <mo>)</mo></mrow>
+    </mrow>
+  </math>
+</div>
+
+<figure>
+  <svg viewBox="0 0 600 230" role="img" aria-labelledby="fig-cql-title fig-cql-desc">
+    <title id="fig-cql-title">CQL 把 OOD 估值压低、数据内估值抬高</title>
+    <desc id="fig-cql-desc">左为数据集中动作的 Q 值被正则项向上抬；右为宽动作分布下的 Q 值被向下压。两者对抗的结果是策略倾向数据集内的动作。</desc>
+    <line x1="40" y1="190" x2="560" y2="190" stroke="#94a3b8" stroke-width="2"/>
+    <defs><marker id="cqlUp" markerWidth="10" markerHeight="10" refX="5" refY="0" orient="auto"><path d="M0,7 L5,0 L10,7 Z" fill="#7c3aed"/></marker><marker id="cqlDown" markerWidth="10" markerHeight="10" refX="5" refY="10" orient="auto"><path d="M0,0 L5,10 L10,0 Z" fill="#ef4444"/></marker></defs>
+    <rect x="80" y="130" width="45" height="60" fill="#ddd6fe" stroke="#7c3aed" stroke-width="2"/>
+    <rect x="135" y="90" width="45" height="100" fill="#8b5cf6" stroke="#7c3aed" stroke-width="2"/>
+    <line x1="157" y1="135" x2="157" y2="80" stroke="#7c3aed" stroke-width="3" marker-end="url(#cqlUp)"/>
+    <rect x="380" y="80" width="45" height="110" fill="#fecaca" stroke="#ef4444" stroke-width="2"/>
+    <rect x="435" y="130" width="45" height="60" fill="#f87171" stroke="#ef4444" stroke-width="2"/>
+    <line x1="457" y1="80" x2="457" y2="140" stroke="#ef4444" stroke-width="3" marker-end="url(#cqlDown)"/>
+    <text x="130" y="212" text-anchor="middle" font-size="12" fill="#5b21b6">数据内动作 (s,a)~D：抬升 ↑</text>
+    <text x="430" y="212" text-anchor="middle" font-size="12" fill="#b91c1c">宽分布动作 a~μ（含 OOD）：压低 ↓</text>
+    <text x="130" y="70" text-anchor="middle" font-size="11" fill="#64748b">浅=正则前 深=正则后</text>
+    <text x="300" y="30" text-anchor="middle" font-size="13" fill="#4c1d95">CQL：抬升 in-distribution、压低 OOD</text>
+  </svg>
+  <figcaption>图 20-2：CQL 正则项的作用方向。第一项在宽动作分布 μ（含 OOD）上压低 Q 值，第二项在数据集动作上抬升 Q 值；两者对抗后，策略的最优动作落回数据集覆盖范围。柱形仅示意方向，非实测值。</figcaption>
+</figure>
 
 <p>其中 &mu; 是某个宽泛的动作分布（通常是均匀分布或当前策略的采样），&alpha; 是一个超参数。第一项 E[Q(s, a)] for a~&mu; 试图压低所有动作（包括 OOD 动作）的 Q 值，第二项 E[Q(s, a)] for (s,a)~D 试图抬升数据集中动作的 Q 值。这两项相互对抗，最终的效果是：<strong>对数据集中出现过的动作，Q 值被抬升到合理水平；对未出现过的动作，Q 值则被压低</strong>。策略在选择动作时自然就会倾向于数据集内的动作。</p>
 
@@ -189,7 +256,7 @@ L<sub>CQL</sub> = L<sub>TD</sub> + &alpha; (E<sub>s~D, a~&mu;</sub>[Q(s, a)] &mi
 <p>CQL 的美妙之处在于它<strong>几乎不需要修改策略网络</strong>——只需要在 Q 函数的损失函数上加一项正则项。这使得 CQL 可以作为"插件"轻松集成到任何基于 Q 函数的离线 RL 算法中（如 SAC、DDPG、TD3 的离线版本）。</p>
 
 <!-- ============ 20.4 ============ -->
-<h3>20.4 IQL 与 Decision Transformer：不同的路线</h3>
+<h2>20.4 IQL 与 Decision Transformer：不同的路线</h2>
 
 <p>CQL 的思路是"让 Q 函数变得保守"。但这不是唯一的方法。这一节介绍两条完全不同的技术路线。</p>
 
@@ -222,7 +289,7 @@ L<sub>CQL</sub> = L<sub>TD</sub> + &alpha; (E<sub>s~D, a~&mu;</sub>[Q(s, a)] &mi
 <p>这三种方法各有优劣。CQL 最通用、最鲁棒，适合各种场景。IQL 实现简单、计算效率高，但在数据质量差时可能不够稳定。Decision Transformer 在大数据量下表现惊艳，但对数据量需求大，且对 Return-to-Go 的设定值敏感。</p>
 
 <!-- ============ 20.5 ============ -->
-<h3>20.5 离线 RL 的实际应用</h3>
+<h2>20.5 离线 RL 的实际应用</h2>
 
 <p>讲了这么多理论，离线 RL 到底在哪些地方真正落地了？我们来盘点几个关键领域。</p>
 
@@ -254,7 +321,7 @@ L<sub>CQL</sub> = L<sub>TD</sub> + &alpha; (E<sub>s~D, a~&mu;</sub>[Q(s, a)] &mi
 </div>
 
 <!-- ============ 通往多智能体 ============ -->
-<h3>知识延伸：从离线到多智能体</h3>
+<h2>知识延伸：从离线到多智能体</h2>
 
 <p>到目前为止，我们的教程中讨论的场景都是<strong>单智能体</strong>——一个 agent 在一个环境中独自学习。离线 RL 的范式进一步缩小了交互范围：连环境都不需要了，只有一个静态的数据集。</p>
 
@@ -265,7 +332,7 @@ L<sub>CQL</sub> = L<sub>TD</sub> + &alpha; (E<sub>s~D, a~&mu;</sub>[Q(s, a)] &mi
 <p>下一章我们将正式进入<strong>多智能体强化学习（Multi-Agent Reinforcement Learning, MARL）</strong>的世界。你会看到，当多个 agent 同时学习时，那些在单智能体场景下好用的算法（如 Q-Learning、策略梯度）会面临怎样的新挑战，以及 MARL 领域的经典算法（如 MADDPG、QMIX）是如何应对这些挑战的。</p>
 
 <!-- ============ 本章小结 ============ -->
-<h3>本章小结</h3>
+<h2>本章小结</h2>
 
 <ol style="margin-left:20px; line-height:1.8;">
 <li><strong>离线强化学习</strong> 从固定的数据集中学习策略，不需要与环境交互。这在医疗、自动驾驶、机器人等高风险领域是必须的。</li>
@@ -276,12 +343,14 @@ L<sub>CQL</sub> = L<sub>TD</sub> + &alpha; (E<sub>s~D, a~&mu;</sub>[Q(s, a)] &mi
 </ol>
 
 <!-- ==================== 页脚导航 ==================== -->
+<p class="source-note">本章的分布偏移与外推误差分析参照 Fujimoto et al., “Off-Policy Deep Reinforcement Learning without Exploration”, <a href="https://arxiv.org/abs/1812.02900">arXiv:1812.02900</a> (2019)；CQL 见 Kumar et al., “Conservative Q-Learning for Offline Reinforcement Learning”, <a href="https://arxiv.org/abs/2006.04779">arXiv:2006.04779</a> (2020)；IQL（expectile regression）见 Kostrikov et al., “Offline Reinforcement Learning with Implicit Q-Learning”, <a href="https://arxiv.org/abs/2110.06169">arXiv:2110.06169</a> (2021)；Decision Transformer 见 Chen et al., “Decision Transformer: Reinforcement Learning via Sequence Modeling”, <a href="https://arxiv.org/abs/2106.01345">arXiv:2106.01345</a> (2021)；离线 RL 基准 D4RL 见 Fu et al., <a href="https://arxiv.org/abs/2004.07219">arXiv:2004.07219</a> (2020)；机器人基础模型 RT-1/RT-2 见 Brohan et al., <a href="https://arxiv.org/abs/2212.06817">arXiv:2212.06817</a> (2022) 与 <a href="https://arxiv.org/abs/2307.15818">arXiv:2307.15818</a> (2023)。文中“机器人开门”踩坑故事、图 20-1、图 20-2 与文中两张对比表为教学示意（表内数据区间未逐列引自单篇论文）。</p>
+
 <div class="footer-nav">
 <a href="19.html">&larr; 上一章：逆向强化学习</a>
 <a href="21.html">下一章：多智能体强化学习 &rarr;</a>
 </div>
 
-</div><!-- /main-content -->
+</main><!-- /main-content -->
 </div><!-- /container -->
 </div><!-- /double-border -->
 
