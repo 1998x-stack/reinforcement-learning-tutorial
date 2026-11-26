@@ -237,7 +237,7 @@ def rlhf_ppo_step(policy, ref_policy, reward_model, prompts, kl_coef=0.04):
 
         <p>如果说 Meta-RL 是让智能体在"同一类任务的不同变体"之间快速适应，那么 <strong>Foundation Agent（基础智能体）</strong> 的野心要大得多：它想要一个智能体，能用同一套参数完成<strong>完全不同类型的任务</strong>——玩雅达利游戏、控制机器人抓取物体、做图像描述、甚至参与对话。</p>
 
-        <p>这个方向最有名的工作是 DeepMind 在 2022 年发布的 <strong>Gato</strong>。Gato 是一个 Transformer 模型，它在 604 个不同的任务上收集了大约 3630 亿个 token 的数据进行训练——这些任务包括 450 个 Atari 游戏、各种机器人操控任务、图像描述、聊天对话等。Gato 的核心创新不在于模型结构（就是标准的 causal Transformer），而在于<strong>将所有的数据都编码成了统一的 token 序列</strong>：</p>
+        <p>这个方向最有名的工作是 DeepMind 在 2022 年发布的 <strong>Gato</strong>。Gato 是一个 Transformer 模型，它在 604 个不同的任务上训练（其中包括 51 个 ALE Atari 环境与 28 个 ALE Atari Extended 环境等），控制类数据集合计约 1.5 万亿个 token（论文 Table 1）——这些任务还涵盖各种机器人操控任务、图像描述、聊天对话等。Gato 的核心创新不在于模型结构（就是标准的 causal Transformer），而在于<strong>将所有的数据都编码成了统一的 token 序列</strong>：</p>
 
         <ul>
             <li>图像帧 → 用 ViT 编码成图像 token</li>
@@ -317,7 +317,7 @@ def rlhf_ppo_step(policy, ref_policy, reward_model, prompts, kl_coef=0.04):
 
         <p>我们下一章见，动手的时刻到了。</p>
 
-        <p class="source-note">本章 RLHF 与奖励建模见 Ouyang et al., “Training language models to follow instructions with human feedback”, <a href="https://arxiv.org/abs/2203.02155">arXiv:2203.02155</a> (2022)，偏好比较的 Bradley-Terry 模型见 Bradley &amp; Terry (1952)；MAML 见 Finn et al., <a href="https://arxiv.org/abs/1703.03400">arXiv:1703.03400</a> (2017)；RL² 见 Duan et al., <a href="https://arxiv.org/abs/1611.02779">arXiv:1611.02779</a> (2016)；Gato 见 Reed et al., <a href="https://arxiv.org/abs/2205.14135">arXiv:2205.14135</a> (2022)；Decision Transformer 见 Chen et al., <a href="https://arxiv.org/abs/2106.01345">arXiv:2106.01345</a> (2021)；The Bitter Lesson 见 Sutton (2019), <a href="http://www.incompleteideas.net/IncIdeas/BitterLesson.html">incompleteideas.net</a>。文中 Gato 的任务数（604）与 token 数（约 3630 亿）来自其论文报告，图 26-1、图 26-2 中的“踩坑故事”与成功率数字均为教学示意。</p>
+        <p class="source-note">本章 RLHF 与奖励建模见 Ouyang et al., “Training language models to follow instructions with human feedback”, <a href="https://arxiv.org/abs/2203.02155">arXiv:2203.02155</a> (2022)，偏好比较的 Bradley-Terry 模型见 Bradley &amp; Terry (1952)；MAML 见 Finn et al., <a href="https://arxiv.org/abs/1703.03400">arXiv:1703.03400</a> (2017)；RL² 见 Duan et al., <a href="https://arxiv.org/abs/1611.02779">arXiv:1611.02779</a> (2016)；Gato 见 Reed et al., <a href="https://arxiv.org/abs/2205.06175">arXiv:2205.06175</a> (2022)；Decision Transformer 见 Chen et al., <a href="https://arxiv.org/abs/2106.01345">arXiv:2106.01345</a> (2021)；The Bitter Lesson 见 Sutton (2019), <a href="http://www.incompleteideas.net/IncIdeas/BitterLesson.html">incompleteideas.net</a>。文中 Gato 的任务数（604）与控制类数据集 token 数（约 1.5 万亿，见其论文 Table 1）来自论文报告；文中“踩坑故事”与其中的成功率数字（23%、67%）均为教学示意。</p>
 
         <div class="footer-nav">
             <a href="25.html">← 上一章</a>
