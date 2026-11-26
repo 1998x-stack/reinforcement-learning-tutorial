@@ -29,6 +29,15 @@ th, td { border: 1px solid #c4b5fd; padding: 10px; text-align: left; } th { back
 .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
 .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
 .highlight { background: #fef9c3; border: 1px solid #facc15; }
+h1 { color: #4c1d95; border-left: 6px solid #06b6d4; padding-left: 15px; margin: 20px 0 15px; font-size: 1.9rem; line-height: 1.35; }
+figure { margin: 24px 0; padding: 16px; background: #faf8ff; border: 1px solid #ddd6fe; border-radius: 16px; }
+figure svg { width: 100%; height: auto; display: block; }
+figcaption { margin-top: 10px; font-size: 0.9rem; color: #5b21b6; line-height: 1.65; }
+.source-note { font-size: 0.85rem; color: #64748b; border-top: 1px dashed #ddd6fe; margin-top: 28px; padding-top: 12px; line-height: 1.7; }
+.math-scroll { max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 6px 2px; }
+.math-scroll:focus-visible { outline: 3px solid #7c3aed; outline-offset: 2px; }
+.math-scroll math[display="block"] { width: max-content; min-width: 100%; font-size: 1.15rem; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
@@ -37,51 +46,50 @@ th, td { border: 1px solid #c4b5fd; padding: 10px; text-align: left; } th { back
 <div class="container">
 
 <!-- ==================== 侧边栏 ==================== -->
-<nav class="sidebar">
-<h3>目录</h3>
+<nav class="sidebar" aria-label="课程目录">
+<h3>🧠 课程目录</h3>
 <ul class="chapter-list">
-<li><a href="index.html">前言</a></li>
-<li><a href="01.html">第1章 引言</a></li>
-<li><a href="02.html">第2章 基础概念</a></li>
+<li><a href="01.html">第1章 强化学习是什么</a></li>
+<li><a href="02.html">第2章 必备数学工具箱</a></li>
 <li><a href="03.html">第3章 马尔可夫决策过程</a></li>
-<li><a href="04.html">第4章 动态规划</a></li>
-<li><a href="05.html">第5章 蒙特卡洛方法</a></li>
-<li><a href="06.html">第6章 时序差分学习</a></li>
-<li><a href="07.html">第7章 SARSA</a></li>
-<li><a href="08.html">第8章 Q学习</a></li>
-<li><a href="09.html">第9章 多臂赌博机</a></li>
-<li><a href="10.html">第10章 策略梯度</a></li>
-<li><a href="11.html">第11章 Actor-Critic</a></li>
-<li><a href="12.html">第12章 深度Q网络(DQN)</a></li>
-<li><a href="13.html">第13章 目标网络</a></li>
-<li><a href="14.html">第14章 经验回放</a></li>
-<li><a href="15.html">第15章 Double DQN</a></li>
-<li><a href="16.html">第16章 Dueling DQN</a></li>
-<li><a href="17.html">第17章 优先经验回放</a></li>
-<li><a href="18.html">第18章 分布式RL</a></li>
-<li><a href="19.html">第19章 Rainbow DQN</a></li>
-<li><a href="20.html">第20章 策略梯度方法</a></li>
-<li><a href="21.html">第21章 PPO</a></li>
-<li><a href="22.html">第22章 SAC</a></li>
-<li><a href="23.html">第23章 TD3</a></li>
-<li><a href="24.html">第24章 模仿学习</a></li>
-<li><a href="25.html">第25章 逆向强化学习</a></li>
-<li><a href="26.html">第26章 多智能体RL</a></li>
+<li><a href="04.html">第4章 贝尔曼方程</a></li>
+<li><a href="05.html">第5章 动态规划</a></li>
+<li><a href="06.html">第6章 蒙特卡洛方法</a></li>
+<li><a href="07.html">第7章 时序差分学习</a></li>
+<li><a href="08.html">第8章 值函数逼近</a></li>
+<li><a href="09.html">第9章 深度Q网络(DQN)</a></li>
+<li><a href="10.html">第10章 DQN改进家族</a></li>
+<li><a href="11.html">第11章 策略梯度方法</a></li>
+<li><a href="12.html">第12章 Actor-Critic方法</a></li>
+<li><a href="13.html">第13章 PPO与TRPO</a></li>
+<li><a href="14.html">第14章 连续动作空间算法</a></li>
+<li><a href="15.html">第15章 探索与利用策略</a></li>
+<li><a href="16.html">第16章 奖励设计与塑形</a></li>
+<li><a href="17.html">第17章 训练稳定性与调参</a></li>
+<li><a href="18.html">第18章 安全强化学习</a></li>
+<li><a href="19.html">第19章 基于模型的强化学习</a></li>
+<li><a href="20.html">第20章 离线强化学习</a></li>
+<li><a href="21.html">第21章 多智能体强化学习</a></li>
+<li><a href="22.html">第22章 逆强化学习与模仿学习</a></li>
+<li><a href="23.html">第23章 Gymnasium环境实战</a></li>
+<li><a href="24.html">第24章 Stable-Baselines3入门</a></li>
+<li><a href="25.html">第25章 调试与可视化</a></li>
+<li><a href="26.html">第26章 强化学习前沿方向</a></li>
 <li><a class="active" href="27.html">第27章 从零实现DQN</a></li>
-<li><a href="28.html">第28章 从零实现PPO</a></li>
+<li><a href="28.html">第28章 综合实战：Atari智能体</a></li>
 </ul>
 </nav>
 
 <!-- ==================== 主内容 ==================== -->
-<main class="main-content">
+<main id="content" class="main-content">
 
-<h2>第二十七章：从零实现DQN</h2>
+<h1>第二十七章：从零实现DQN</h1>
 
 <div class="tip">
 <strong>本章目标：</strong>用 PyTorch 和 Gymnasium 从零实现一个完整的 DQN 智能体，在 CartPole-v1 环境上训练并达到收敛。全程手写，不依赖任何强化学习框架。读完本章你将拥有一个可直接跑通的 DQN 项目模板。
 </div>
 
-<h3>27.1 项目结构</h3>
+<h2>27.1 项目结构</h2>
 
 <p>完整的 DQN 实现包含四个核心模块，我们按功能拆分为以下文件：</p>
 
@@ -99,7 +107,7 @@ th, td { border: 1px solid #c4b5fd; padding: 10px; text-align: left; } th { back
 
 <p>这种拆分的好处是：每一部分职责单一，便于调试和后续替换（例如换一个网络结构或改用优先经验回放时只需修改对应文件）。</p>
 
-<h3>27.2 Q 网络实现</h3>
+<h2>27.2 Q 网络实现</h2>
 
 <p>对于 CartPole-v1，观测是 4 维连续向量（小车位置、速度、杆角度、角速度），动作空间是 2 个离散动作（左、右）。我们用一个三层 MLP 作为 Q 函数逼近器：</p>
 
@@ -123,11 +131,34 @@ class QNetwork(nn.Module):
 
 <p>代码非常简单。输入 <code>state_dim=4</code>，通过两个 128 维的隐藏层和 ReLU 激活，最终输出每个动作对应的 Q 值（维度 2）。这里没有用偏置的特殊设置，全连接层默认带 bias。</p>
 
+<figure>
+  <svg viewBox="0 0 680 190" role="img" aria-labelledby="fig-qnet-t fig-qnet-d">
+    <title id="fig-qnet-t">Q 网络的张量形状</title>
+    <desc id="fig-qnet-d">输入是批量状态向量 (batch,4)，依次通过 4→128、128→128 两个带 ReLU 的全连接层，最后输出 (batch,2) 的每个动作 Q 值。</desc>
+    <defs><marker id="qnetArrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#7c3aed"/></marker></defs>
+    <g font-size="12" text-anchor="middle">
+      <rect x="20" y="60" width="120" height="70" rx="10" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+      <text x="80" y="90" fill="#1e40af">状态输入</text><text x="80" y="110" fill="#1e3a8a" font-size="10">(batch, 4)</text>
+      <rect x="188" y="60" width="130" height="70" rx="10" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/>
+      <text x="253" y="86" fill="#5b21b6">Linear 4→128</text><text x="253" y="106" fill="#6d28d9" font-size="10">ReLU</text>
+      <rect x="366" y="60" width="130" height="70" rx="10" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/>
+      <text x="431" y="86" fill="#5b21b6">Linear 128→128</text><text x="431" y="106" fill="#6d28d9" font-size="10">ReLU</text>
+      <rect x="544" y="60" width="120" height="70" rx="10" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+      <text x="604" y="90" fill="#15803d">Q 值输出</text><text x="604" y="110" fill="#166534" font-size="10">(batch, 2)</text>
+    </g>
+    <g stroke="#7c3aed" stroke-width="2.5" marker-end="url(#qnetArrow)">
+      <line x1="140" y1="95" x2="184" y2="95"/><line x1="318" y1="95" x2="362" y2="95"/><line x1="496" y1="95" x2="540" y2="95"/>
+    </g>
+    <text x="340" y="162" text-anchor="middle" font-size="11" fill="#5b21b6">输出两个动作的 Q 值，argmax 即贪心动作；CartPole 的动作数为 2</text>
+  </svg>
+  <figcaption>图 27-1：Q 网络的张量形状。输入是 (batch, 4) 的状态向量，经两层 128 维隐藏层（ReLU）后输出 (batch, 2) 的动作价值。示意图。</figcaption>
+</figure>
+
 <div class="highlight">
 <strong>踩坑记录：</strong>我在第一次实现时把第二个隐藏层忘掉了——直接把第一个隐藏层的输出接到输出层，心想"两个隐藏层多此一举"。结果训练了 500 回合始终无法收敛，平均回报只有 40 左右。后来加回第二个隐藏层，不到 150 回合就解决了 CartPole。对于 DQN，表达能力不足是最容易忽视的坑，而对于 CartPole 这个看似简单的问题，一层隐藏层就是不够。记住：<strong>欠拟合比过拟合更常见</strong>。
 </div>
 
-<h3>27.3 经验回放缓冲区</h3>
+<h2>27.3 经验回放缓冲区</h2>
 
 <p>经验回放是 DQN 稳定训练的基石。它存储智能体与环境交互产生的转移元组，训练时从中随机采样，打破数据的时间相关性。</p>
 
@@ -162,9 +193,41 @@ class ReplayBuffer:
 <strong>设计选择：</strong>很多实现会把张量转换放在 ReplayBuffer 内部。我的建议是保持缓冲区与深度学习框架无关。原因是：当你迁移到 TensorFlow 或 JAX 时，经验回放的逻辑完全相同，无需重写。框架相关的操作只在训练循环中处理即可。
 </div>
 
-<h3>27.4 DQN 智能体与训练循环</h3>
+<h2>27.4 DQN 智能体与训练循环</h2>
+
+<div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="DQN 的 TD 目标公式，可横向滚动">
+  <math display="block" aria-label="DQN 的 TD 目标：即时奖励加上折扣因子乘 1 减终止标志，再乘目标网络在下一状态所有动作上的最大 Q 值">
+    <mi>y</mi><mo>=</mo><mi>r</mi><mo>+</mo><mi>γ</mi><mo>(</mo><mn>1</mn><mo>−</mo><mi>d</mi><mo>)</mo><msub><mo>max</mo><msup><mi>a</mi><mo>′</mo></msup></msub><msub><mi>Q</mi><msup><mi>θ</mi><mo>−</mo></msup></msub><mo>(</mo><msup><mi>s</mi><mo>′</mo></msup><mo>,</mo><msup><mi>a</mi><mo>′</mo></msup><mo>)</mo>
+  </math>
+</div>
 
 <p>下面给出完整的 DQNAgent 类和训练脚本。其中包含策略网络 <code>q_net</code>、目标网络 <code>target_net</code>、<code>epsilon-greedy</code> 策略和软/硬更新机制。</p>
+
+<figure>
+  <svg viewBox="0 0 680 210" role="img" aria-labelledby="fig-dqnflow-t fig-dqnflow-d">
+    <title id="fig-dqnflow-t">DQN 训练流程五步</title>
+    <desc id="fig-dqnflow-d">与环境交互把转移存入经验回放；随机采样一个批；目标网络计算 TD 目标；在线网络给出当前 Q 值并计算损失；反向传播更新在线网络，目标网络定期同步。</desc>
+    <defs><marker id="dqnFlowArrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#7c3aed"/></marker></defs>
+    <g font-size="12" text-anchor="middle">
+      <rect x="15" y="50" width="118" height="92" rx="12" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+      <text x="74" y="80" fill="#15803d" font-weight="bold">① 交互</text><text x="74" y="104" fill="#166534" font-size="10">env.step</text><text x="74" y="122" fill="#166534" font-size="10">push 转移</text>
+      <rect x="148" y="50" width="118" height="92" rx="12" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+      <text x="207" y="80" fill="#1e40af" font-weight="bold">② 采样</text><text x="207" y="104" fill="#1e3a8a" font-size="10">random batch</text><text x="207" y="122" fill="#1e3a8a" font-size="10">打破相关性</text>
+      <rect x="281" y="50" width="118" height="92" rx="12" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+      <text x="340" y="80" fill="#b91c1c" font-weight="bold">③ 算目标</text><text x="340" y="104" fill="#991b1b" font-size="10">Q_θ⁻ 求 max</text><text x="340" y="122" fill="#991b1b" font-size="10">y = r + γ max</text>
+      <rect x="414" y="50" width="118" height="92" rx="12" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/>
+      <text x="473" y="80" fill="#5b21b6" font-weight="bold">④ 算损失</text><text x="473" y="104" fill="#6d28d9" font-size="10">Q_θ(s, a)</text><text x="473" y="122" fill="#6d28d9" font-size="10">L = (y − Q)²</text>
+      <rect x="547" y="50" width="118" height="92" rx="12" fill="#fef9c3" stroke="#eab308" stroke-width="2"/>
+      <text x="606" y="80" fill="#854d0e" font-weight="bold">⑤ 更新</text><text x="606" y="104" fill="#713f12" font-size="10">反向传播</text><text x="606" y="122" fill="#713f12" font-size="10">Adam</text>
+    </g>
+    <g stroke="#7c3aed" stroke-width="2.5" marker-end="url(#dqnFlowArrow)">
+      <line x1="133" y1="96" x2="144" y2="96"/><line x1="266" y1="96" x2="277" y2="96"/>
+      <line x1="399" y1="96" x2="410" y2="96"/><line x1="532" y1="96" x2="543" y2="96"/>
+    </g>
+    <text x="340" y="178" text-anchor="middle" font-size="11" fill="#5b21b6">目标网络 Q_θ⁻ 每隔 C 步（或软更新 τ）从在线网络 Q_θ 同步 —— 稳定 TD 目标</text>
+  </svg>
+  <figcaption>图 27-2：DQN 的一次训练迭代。①与②解决样本相关性，③与④构成 TD 学习目标，⑤更新在线网络；目标网络从在线网络同步是稳定 TD 目标的关键。示意图。</figcaption>
+</figure>
 
 <pre># agent.py
 import torch
@@ -281,7 +344,7 @@ if __name__ == "__main__":
 <strong>第二个踩坑提醒：</strong>初始化时千万别忘了把目标网络的权重拷贝给策略网络！我第一次写时只初始化了 <code>self.target_net = QNetwork(...)</code> 就跳过了 <code>load_state_dict</code> 这一步，结果目标网络和策略网络从不同的随机初始化开始，TD 目标一直在漂，损失根本不下降。这个 bug 查了我整整两个小时——看一眼代码、拍一下脑袋、叹一口气，循环往复。请一定记住：<strong>目标网络在开始时必须与策略网络拥有完全相同的参数</strong>。
 </div>
 
-<h3>27.5 评估与改进</h3>
+<h2>27.5 评估与改进</h2>
 
 <p>为了让训练更稳健，我们在每 20 个 episode 后运行一次评估：关闭 epsilon 探索（设 <code>epsilon=0</code>），用当前策略网络跑 5 个 episode 取平均回报。CartPole-v1 的"已解决"标准是过去 100 个 episode 的平均回报 ≥ 500（新版 Gym 中的阈值），但在实际中如果能稳定达到 195 以上（旧版阈值）就已经说明 Q 函数学到了不错的策略。</p>
 
@@ -322,9 +385,11 @@ if __name__ == "__main__":
 <p>至此，你已经从零实现了 DQN 的完整流程。可以在 <a href="28.html">下一章</a> 中学习从零实现 PPO，将视野从值函数方法扩展到策略梯度方法，构建更全面的强化学习工具箱。</p>
 
 <!-- ============ 页脚导航 ============ -->
+<p class="source-note">本章 DQN 见 Mnih et al., “Human-level control through deep reinforcement learning”, <a href="https://www.nature.com/articles/nature14236">Nature 518</a> (2015)，以及 2013 年预印本 <a href="https://arxiv.org/abs/1312.5602">arXiv:1312.5602</a>；经验回放见 Lin, “Self-Improving Reactive Agents Based on Reinforcement Learning, Planning and Teaching”, Machine Learning 8 (1992)；Huber 损失见 Huber (1964)；CartPole-v1 的回合回报上限为 500，历史上常用的“已解决”阈值是 195（见 <a href="https://gymnasium.farama.org/">Gymnasium 文档</a>）；Atari 超参数（1M buffer、FrameSkip=4、lr=1e-4）来自 Mnih et al. (2015)。文中学习曲线的回合区间与数值、“踩坑记录”均为教学示意，实际结果会随实现与随机种子而异。</p>
+
 <div class="footer-nav">
-<a href="26.html">&laquo; 第26章 多智能体RL</a>
-<a href="28.html">第28章 从零实现PPO &raquo;</a>
+<a href="26.html">&laquo; 第26章 强化学习前沿方向</a>
+<a href="28.html">第28章 综合实战：Atari智能体 &raquo;</a>
 </div>
 
 </main>
