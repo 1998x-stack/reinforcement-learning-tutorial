@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>第21章 多智能体强化学习</title>
     <link rel="stylesheet" href="theme.css">
     <style>
@@ -28,12 +29,21 @@
         .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
         .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
         .highlight { background: #fef9c3; border: 1px solid #facc15; }
+        h1 { color: #4c1d95; border-left: 6px solid #06b6d4; padding-left: 15px; margin: 20px 0 15px; font-size: 1.9rem; line-height: 1.35; }
+        figure { margin: 24px 0; padding: 16px; background: #faf8ff; border: 1px solid #ddd6fe; border-radius: 16px; }
+        figure svg { width: 100%; height: auto; display: block; }
+        figcaption { margin-top: 10px; font-size: 0.9rem; color: #5b21b6; line-height: 1.65; }
+        .source-note { font-size: 0.85rem; color: #64748b; border-top: 1px dashed #ddd6fe; margin-top: 28px; padding-top: 12px; line-height: 1.7; }
+        .math-scroll { max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 6px 2px; }
+        .math-scroll:focus-visible { outline: 3px solid #7c3aed; outline-offset: 2px; }
+        .math-scroll math[display="block"] { width: max-content; min-width: 100%; font-size: 1.15rem; }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
     </style>
 </head>
 <body>
 <div class="double-border">
 <div class="container">
-    <div class="sidebar">
+    <nav class="sidebar" aria-label="课程目录">
         <h3>🧠 课程目录</h3>
         <ul class="chapter-list">
             <li><a href="01.html">第1章 强化学习是什么</a></li>
@@ -65,9 +75,9 @@
             <li><a href="27.html">第27章 从零实现DQN</a></li>
             <li><a href="28.html">第28章 综合实战：Atari智能体</a></li>
         </ul>
-    </div>
-    <div class="main-content">
-        <h2>第二十一章：多智能体强化学习</h2>
+    </nav>
+    <main id="content" class="main-content">
+        <h1>第二十一章：多智能体强化学习</h1>
 
         <p>同学们好，欢迎来到第二十一章。从这一章开始，我们的视野要从"单个智能体独自学习"拓展到"多个智能体同时学习、互相影响"的世界。前面二十章我们都在讨论一个智能体面对一个环境——它做决策，环境反馈奖励，它更新策略，如此循环。这个框架虽然强大，但它有一个隐含假设：<strong>环境是平稳的</strong>。也就是说，环境的转移概率不会随着时间变化。</p>
 
@@ -79,7 +89,7 @@
             <p><strong>先讲一个"踩坑"故事</strong>：几年前我带学生做一个多机器人协作搬运的项目。我们用标准的DQN分别训练每个机器人——结果让人崩溃。第一次训练，两个机器人配合得天衣无缝，完美把箱子搬到了目标点。第二次训练（同样的代码！），两个机器人直接撞在一起打转，箱子丢在半路。第三次，一个机器人全程不动，另一个自己完成了全部工作。同一个代码，三次不同的结果。后来我们才意识到问题所在：每个机器人的策略都在变，A的策略变化意味着B的环境发生了变化，B的变化又反过来影响A。整个系统是一个"移动的目标"，DQN那条平稳性假设被完全打破了。这个"踩坑"经历，刚好引出了MARL最核心的挑战——非平稳性。</p>
         </div>
 
-        <h3>21.1 MARL的核心挑战</h3>
+        <h2>21.1 MARL的核心挑战</h2>
 
         <p>单智能体强化学习建立在马尔可夫决策过程（MDP）之上，其核心假设是环境转移概率 <code>P(s' | s, a)</code> 是固定的。但在多智能体场景中，每个智能体 i 的转移不仅取决于它自己的动作，还取决于所有其他智能体的动作：</p>
 
@@ -124,13 +134,45 @@
             <p><strong>理解要点</strong>：合作场景的核心难题是如何让多个智能体协同，避免"搭便车"行为；竞争场景的核心难题是如何对抗一个不断进化的对手；混合场景则两者兼具，是最难也最接近现实的一类。</p>
         </div>
 
-        <h3>21.2 集中训练分散执行（CTDE）</h3>
+        <h2>21.2 集中训练分散执行（CTDE）</h2>
 
         <p>面对非平稳性挑战，研究者们提出了一种优雅的思路——<strong>集中训练分散执行（Centralized Training with Decentralized Execution, CTDE）</strong>。这个想法概括起来就是：训练的时候让大家"共享视野"，执行的时候每个人"各管各的"。</p>
 
         <p>具体来说：训练阶段，智能体可以访问全局信息（所有智能体的观测、动作甚至奖励），从而做出更准确的梯度更新；执行阶段，每个智能体只能基于自己的局部观测来做决策，不依赖任何通信。这个范式之所以强大，是因为它避开了"执行时需要通信"这个工程瓶颈，同时利用训练阶段的信息优势缓解非平稳性问题。</p>
 
-        <p>CTDE最经典的算法是<strong>MADDPG（Multi-Agent Deep Deterministic Policy Gradient）</strong>。MADDPG是DDPG在多智能体场景的扩展，核心贡献是"集中式评论家，分布式演员"：</p>
+        <figure>
+  <svg viewBox="0 0 640 250" role="img" aria-labelledby="fig-ctde-title fig-ctde-desc">
+    <title id="fig-ctde-title">CTDE：集中训练、分散执行</title>
+    <desc id="fig-ctde-desc">左栏训练阶段：各智能体的观测与动作汇总到一个集中式评论家，仅训练时使用；右栏执行阶段：每个智能体只根据自己的局部观测选择动作，不依赖通信。</desc>
+    <defs><marker id="ctdeArrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#7c3aed"/></marker></defs>
+    <rect x="15" y="40" width="290" height="195" rx="14" fill="#ede9fe" fill-opacity="0.5" stroke="#8b5cf6" stroke-width="2"/>
+    <text x="160" y="65" text-anchor="middle" font-size="13" fill="#5b21b6">训练阶段：集中式评论家</text>
+    <rect x="35" y="85" width="80" height="34" rx="8" fill="#ffffff" stroke="#8b5cf6"/><text x="75" y="107" text-anchor="middle" font-size="11" fill="#4c1d95">智能体 1</text>
+    <rect x="35" y="130" width="80" height="34" rx="8" fill="#ffffff" stroke="#8b5cf6"/><text x="75" y="152" text-anchor="middle" font-size="11" fill="#4c1d95">智能体 2</text>
+    <rect x="35" y="175" width="80" height="34" rx="8" fill="#ffffff" stroke="#8b5cf6"/><text x="75" y="197" text-anchor="middle" font-size="11" fill="#4c1d95">智能体 n</text>
+    <rect x="165" y="110" width="120" height="74" rx="10" fill="#ddd6fe" stroke="#7c3aed" stroke-width="2"/>
+    <text x="225" y="140" text-anchor="middle" font-size="11" fill="#5b21b6">中央评论家</text>
+    <text x="225" y="160" text-anchor="middle" font-size="11" fill="#5b21b6">Q(s, a₁, …, aₙ)</text>
+    <g stroke="#7c3aed" stroke-width="2" marker-end="url(#ctdeArrow)">
+      <line x1="115" y1="102" x2="161" y2="135"/><line x1="115" y1="147" x2="161" y2="147"/><line x1="115" y1="192" x2="161" y2="160"/>
+    </g>
+    <rect x="335" y="40" width="290" height="195" rx="14" fill="#dcfce7" fill-opacity="0.5" stroke="#22c55e" stroke-width="2"/>
+    <text x="480" y="65" text-anchor="middle" font-size="13" fill="#15803d">执行阶段：分散式演员</text>
+    <g font-size="11">
+      <rect x="360" y="95" width="80" height="30" rx="8" fill="#ffffff" stroke="#22c55e"/><text x="400" y="115" text-anchor="middle" fill="#166534">演员 π₁(o₁)</text>
+      <rect x="360" y="145" width="80" height="30" rx="8" fill="#ffffff" stroke="#22c55e"/><text x="400" y="165" text-anchor="middle" fill="#166534">演员 π₂(o₂)</text>
+      <rect x="360" y="195" width="80" height="30" rx="8" fill="#ffffff" stroke="#22c55e"/><text x="400" y="215" text-anchor="middle" fill="#166534">演员 πₙ(oₙ)</text>
+    </g>
+    <g stroke="#22c55e" stroke-width="2" marker-end="url(#ctdeArrow)">
+      <line x1="440" y1="110" x2="520" y2="110"/><line x1="440" y1="160" x2="520" y2="160"/><line x1="440" y1="210" x2="520" y2="210"/>
+    </g>
+    <g font-size="11" fill="#166534"><text x="530" y="114">a₁</text><text x="530" y="164">a₂</text><text x="530" y="214">aₙ</text></g>
+    <text x="480" y="240" text-anchor="middle" font-size="11" fill="#64748b">只用局部观测，不通信</text>
+  </svg>
+  <figcaption>图 21-1：CTDE 的两阶段视图。训练时评论家可“共享视野”访问全局状态与所有动作，从而缓解非平稳性；部署执行时每个演员只依赖自己的局部观测 o_i，不需要通信。示意图。</figcaption>
+</figure>
+
+<p>CTDE最经典的算法是<strong>MADDPG（Multi-Agent Deep Deterministic Policy Gradient）</strong>。MADDPG是DDPG在多智能体场景的扩展，核心贡献是"集中式评论家，分布式演员"：</p>
 
         <ul>
             <li><strong>演员（Actor）</strong>：每个智能体有自己的策略网络 <code>π_i(o_i)</code>，只依赖自己的观测 o_i，在分布式执行时做决策。</li>
@@ -139,7 +181,21 @@
 
         <p>MADDPG的评论家更新公式为：</p>
 
-        <p><code>L(θ_i^Q) = E[ (Q_i(s, a_1, ..., a_n) - (r_i + γ · Q_i'(s', a_1', ..., a_n')))^2 ]</code></p>
+        <p style="margin:10px 0 2px;color:#64748b;font-size:0.85rem;">式 (21.1) MADDPG 集中式评论家的损失</p>
+<div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="MADDPG 评论家损失公式，可横向滚动">
+  <math display="block" aria-label="MADDPG 评论家损失：对 Q_i 全局输入 减 （r_i 加 gamma 乘目标 Q_i） 的平方取期望">
+    <mrow>
+      <mi>L</mi><mo>(</mo><msubsup><mi>θ</mi><mi>i</mi><mi>Q</mi></msubsup><mo>)</mo><mo>=</mo>
+      <mi>E</mi><mrow><mo>[</mo>
+        <msup><mrow><mo>(</mo>
+          <msub><mi>Q</mi><mi>i</mi></msub><mo>(</mo><mi>s</mi><mo>,</mo><msub><mi>a</mi><mn>1</mn></msub><mo>,</mo><mo>…</mo><mo>,</mo><msub><mi>a</mi><mi>n</mi></msub><mo>)</mo>
+          <mo>−</mo>
+          <mrow><mo>(</mo><msub><mi>r</mi><mi>i</mi></msub><mo>+</mo><mi>γ</mi><msubsup><mi>Q</mi><mi>i</mi><mo>′</mo></msubsup><mo>(</mo><msup><mi>s</mi><mo>′</mo></msup><mo>,</mo><msubsup><mi>a</mi><mn>1</mn><mo>′</mo></msubsup><mo>,</mo><mo>…</mo><mo>,</mo><msubsup><mi>a</mi><mi>n</mi><mo>′</mo></msubsup><mo>)</mo></mrow>
+        <mo>)</mo></mrow><mn>2</mn></msup>
+      <mo>]</mo></mrow>
+    </mrow>
+  </math>
+</div>
 
         <p>其中 a_j' 来自目标策略网络 π_j'。注意，即使智能体 i 只能控制自己的动作，它的Q函数也知道了所有其他智能体的动作。这就缓解了非平稳性问题——因为评论家知道了"别人在做什么"，就可以更准确地判断当前状态值。</p>
 
@@ -147,25 +203,69 @@
             <p><strong>CTDE的关键洞察</strong>：评论家需要知道的"上下文"比演员多得多。评论家可以奢侈地使用全局信息，因为它的参数只在训练时更新，不需要在部署时使用。这是一种"花训练时的计算，换取执行时的稳健性"的trade-off。</p>
         </div>
 
-        <h3>21.3 值分解方法</h3>
+        <h2>21.3 值分解方法</h2>
 
         <p>在完全合作场景中，所有智能体共享一个团队奖励。这时候我们面对的问题是：如何把<strong>团队的总Q值</strong>分配给每个智能体？值分解方法（Value Decomposition）就是回答这个问题的技术家族。</p>
 
         <p><strong>VDN（Value Decomposition Networks）</strong> 是2017年提出的最早的方法，想法极其简单：团队的总Q值等于每个智能体Q值的和。</p>
 
-        <p><code>Q_tot(τ, a) = Σ_i Q_i(τ_i, a_i)</code></p>
+        <p style="margin:10px 0 2px;color:#64748b;font-size:0.85rem;">式 (21.2) VDN：团队 Q 值等于个体 Q 值之和</p>
+<div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="VDN 公式，可横向滚动">
+  <math display="block" aria-label="VDN：团队 Q_tot 等于对所有智能体 Q_i 求和">
+    <mrow>
+      <msub><mi>Q</mi><mtext>tot</mtext></msub><mo>(</mo><mi>τ</mi><mo>,</mo><mi>a</mi><mo>)</mo><mo>=</mo>
+      <munder><mo>Σ</mo><mi>i</mi></munder>
+      <msub><mi>Q</mi><mi>i</mi></msub><mo>(</mo><msub><mi>τ</mi><mi>i</mi></msub><mo>,</mo><msub><mi>a</mi><mi>i</mi></msub><mo>)</mo>
+    </mrow>
+  </math>
+</div>
 
         <p>其中 τ_i 是智能体 i 的历史轨迹。VDN假设各智能体的贡献是可加性分离的——这显然太强了。很多任务中，智能体之间的相互作用不是简单的加法关系。</p>
 
         <p><strong>QMIX</strong> 是VDN的升级版，2018年发表在ICML上，至今仍是合作MARL的标杆算法。QMIX的核心创新是：团队总Q值由<strong>混合网络（Mixing Network）</strong>计算，这个网络以所有智能体的个体Q值为输入，以全局状态s为条件，输出Q_tot。更重要的是，QMIX施加了一个<strong>单调性约束</strong>：</p>
 
-        <p><code>∂Q_tot / ∂Q_i ≥ 0,  ∀i</code></p>
+        <p style="margin:10px 0 2px;color:#64748b;font-size:0.85rem;">式 (21.3) QMIX 的单调性约束</p>
+<div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="QMIX 单调性约束公式，可横向滚动">
+  <math display="block" aria-label="QMIX 单调性约束：Q_tot 对每个智能体 Q_i 的偏导数不小于 0">
+    <mrow>
+      <mfrac><mrow><mo>∂</mo><msub><mi>Q</mi><mtext>tot</mtext></msub></mrow><mrow><mo>∂</mo><msub><mi>Q</mi><mi>i</mi></msub></mrow></mfrac>
+      <mo>≥</mo><mn>0</mn><mo>,</mo><mspace width="0.5em"></mspace><mo>∀</mo><mi>i</mi>
+    </mrow>
+  </math>
+</div>
 
         <p>这意味着任何一个智能体的Q_i增大，团队总Q_tot要么增大要么不变，但不会减小。这个约束保证了团队最优和个体最优方向一致，同时比VDN的加法分离灵活得多——混合网络可以是任意复杂的单调函数（通常用绝对值激活来保证正权重，或者用神经网络加约束）。</p>
 
         <p>下面是一个简化的QMIX混合网络伪代码：</p>
 
-        <pre>class QMIX:
+        <figure>
+  <svg viewBox="0 0 640 250" role="img" aria-labelledby="fig-qmix-title fig-qmix-desc">
+    <title id="fig-qmix-title">QMIX 的混合网络与单调性约束</title>
+    <desc id="fig-qmix-desc">各智能体的个体 Q 值输入到以全局状态为条件的混合网络，网络权重保持非负，输出团队值 Q_tot，从而保证个体 Q 值增大不会使 Q_tot 减小。</desc>
+    <defs><marker id="qmixArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#7c3aed"/></marker></defs>
+    <g font-size="12">
+      <rect x="30" y="55" width="100" height="34" rx="8" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/><text x="80" y="77" text-anchor="middle" fill="#5b21b6">Q₁(τ₁, a₁)</text>
+      <rect x="30" y="105" width="100" height="34" rx="8" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/><text x="80" y="127" text-anchor="middle" fill="#5b21b6">Q₂(τ₂, a₂)</text>
+      <rect x="30" y="155" width="100" height="34" rx="8" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/><text x="80" y="177" text-anchor="middle" fill="#5b21b6">Qₙ(τₙ, aₙ)</text>
+    </g>
+    <rect x="230" y="55" width="170" height="134" rx="12" fill="#fef9c3" stroke="#eab308" stroke-width="2"/>
+    <text x="315" y="110" text-anchor="middle" font-size="13" fill="#854d0e">混合网络</text>
+    <text x="315" y="132" text-anchor="middle" font-size="11" fill="#854d0e">权重非负（保证单调）</text>
+    <rect x="250" y="12" width="130" height="30" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+    <text x="315" y="32" text-anchor="middle" font-size="11" fill="#15803d">全局状态 s（条件）</text>
+    <line x1="315" y1="42" x2="315" y2="53" stroke="#22c55e" stroke-width="2" marker-end="url(#qmixArrow)"/>
+    <rect x="480" y="95" width="120" height="54" rx="10" fill="#ddd6fe" stroke="#7c3aed" stroke-width="2"/>
+    <text x="540" y="128" text-anchor="middle" font-size="13" fill="#5b21b6">Q_tot</text>
+    <g stroke="#7c3aed" stroke-width="2" marker-end="url(#qmixArrow)">
+      <line x1="130" y1="72" x2="226" y2="105"/><line x1="130" y1="122" x2="226" y2="122"/><line x1="130" y1="172" x2="226" y2="140"/>
+      <line x1="400" y1="122" x2="476" y2="122"/>
+    </g>
+    <text x="315" y="225" text-anchor="middle" font-size="12" fill="#4c1d95">∂Q_tot / ∂Qᵢ ≥ 0：个体变好，团队不会变差</text>
+  </svg>
+  <figcaption>图 21-2：QMIX 的混合网络。各智能体的个体 Q 值经一个以全局状态 s 为条件的混合网络汇总为 Q_tot，网络权重保持非负，实现式 (21.3) 的单调性约束。相比 VDN 的加法求和，混合网络能表达更丰富的非线性信用分配。示意图。</figcaption>
+</figure>
+
+<pre>class QMIX:
     def __init__(self, n_agents, state_dim, hidden_dim):
         # 每个智能体一个DRQN（深度循环Q网络）
         self.agents = [DRQN(state_dim, hidden_dim) for _ in range(n_agents)]
@@ -192,7 +292,7 @@
             <p><strong>技术洞察</strong>：QMIX的单调性约束是"结构化的先验知识"——它告诉模型智能体之间是协作关系而非对抗关系。如果你在非合作场景强行用QMIX，单调性反而会变成限制。这也说明了一个重要原则：选择算法时一定要匹配问题的结构。</p>
         </div>
 
-        <h3>21.4 自博弈（Self-Play）</h3>
+        <h2>21.4 自博弈（Self-Play）</h2>
 
         <p>在完全竞争场景中，一个优雅的想法横空出世：<strong>让智能体和自己的副本对抗训练</strong>。这就是自博弈（Self-Play）。</p>
 
@@ -214,7 +314,7 @@
             <p><strong>踩坑延续</strong>：回到开头那个机器人搬运的故事。我们后来的解决方案就是用CTDE框架——训练时每个机器人的网络可以看到全局状态，执行时只用自己的局部观测。这就像两个搬运工在训练时可以用对讲机协调（CTDE的集中训练），但实际干活时各自凭经验配合（分散执行）。训练稳定性大幅提升，两个机器人终于学会了稳定协作，而不是时好时坏。这个教训让我明白了：<strong>MARL不是"单智能体RL+n个副本"</strong>，它有自己独特的理论框架和工程挑战。</p>
         </div>
 
-        <h3>21.5 MARL标志性应用</h3>
+        <h2>21.5 MARL标志性应用</h2>
 
         <p>MARL虽然学术上充满挑战，但它已经产出了一系列震撼世界的应用。我们来看看几个标志性的项目：</p>
 
@@ -234,13 +334,15 @@
 
         <p>下一章我们将进入一个与MARL密切相关但视角完全不同的领域——<strong>逆强化学习（Inverse Reinforcement Learning, IRL）和模仿学习</strong>。如果说MARL关注的是"多个智能体如何同时学习"，那么逆强化学习关注的是"我们如何从人类专家的示范中推断出奖励函数"。当你不清楚奖励函数怎么设计时，就让专家做给你看——这个思路和MARL中的模仿学习、对手建模有着千丝万缕的联系。让我们在第22章继续探索。</p>
 
+<p class="source-note">本章的 CTDE 与 MADDPG 见 Lowe et al., “Multi-Agent Actor-Critic for Mixed Cooperative-Competitive Environments”, <a href="https://arxiv.org/abs/1706.02275">arXiv:1706.02275</a> (2017)；VDN 见 Sunehag et al., <a href="https://arxiv.org/abs/1705.08926">arXiv:1705.08926</a> (2017)；QMIX 见 Rashid et al., “QMIX: Monotonic Value Function Factorisation for Deep Multi-Agent Reinforcement Learning”, ICML 2018, <a href="https://arxiv.org/abs/1803.11485">arXiv:1803.11485</a>；AlphaZero 见 Silver et al., <a href="https://arxiv.org/abs/1712.01815">arXiv:1712.01815</a> (2017)；AlphaStar 见 Vinyals et al., “Grandmaster level in StarCraft II using multi-agent reinforcement learning”, <a href="https://www.nature.com/articles/s41586-019-1724-z">Nature 575</a> (2019)；OpenAI Five 见 Berner et al., <a href="https://arxiv.org/abs/1912.06680">arXiv:1912.06680</a> (2019)（其训练规模见原文/官方发布）；Hide-and-Seek 见 Baker et al., <a href="https://arxiv.org/abs/1909.07528">arXiv:1909.07528</a> (2019)；SMAC 基准见 Samvelyan et al., <a href="https://arxiv.org/abs/1902.04043">arXiv:1902.04043</a> (2019)。文中多机器人搬运踩坑故事、图 21-1、图 21-2 及式 21.1–21.3 中的数值与比例均为教学示意。</p>
+
         <div class="footer-nav">
             <a href="20.html">← 上一章</a>
             <a href="index.html">📖 返回目录</a>
             <a href="22.html">下一章 →</a>
         </div>
 
-    </div>
+    </main>
 </div>
 </div>
 </body>
