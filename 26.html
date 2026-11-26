@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>第26章 强化学习前沿方向</title>
     <link rel="stylesheet" href="theme.css">
     <style>
@@ -31,12 +32,21 @@
         p { line-height: 1.8; margin: 10px 0; color: #2d3748; }
         ul, ol { margin: 10px 0; padding-left: 25px; line-height: 1.8; color: #2d3748; }
         li { margin: 5px 0; }
+        h1 { color: #4c1d95; border-left: 6px solid #06b6d4; padding-left: 15px; margin: 20px 0 15px; font-size: 1.9rem; line-height: 1.35; }
+        figure { margin: 24px 0; padding: 16px; background: #faf8ff; border: 1px solid #ddd6fe; border-radius: 16px; }
+        figure svg { width: 100%; height: auto; display: block; }
+        figcaption { margin-top: 10px; font-size: 0.9rem; color: #5b21b6; line-height: 1.65; }
+        .source-note { font-size: 0.85rem; color: #64748b; border-top: 1px dashed #ddd6fe; margin-top: 28px; padding-top: 12px; line-height: 1.7; }
+        .math-scroll { max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 6px 2px; }
+        .math-scroll:focus-visible { outline: 3px solid #7c3aed; outline-offset: 2px; }
+        .math-scroll math[display="block"] { width: max-content; min-width: 100%; font-size: 1.15rem; }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
     </style>
 </head>
 <body>
 <div class="double-border">
 <div class="container">
-    <div class="sidebar">
+    <nav class="sidebar" aria-label="课程目录">
         <h3>🧠 课程目录</h3>
         <ul class="chapter-list">
             <li><a href="01.html">第1章 强化学习是什么</a></li>
@@ -68,9 +78,9 @@
             <li><a href="27.html">第27章 从零实现DQN</a></li>
             <li><a href="28.html">第28章 综合实战：Atari智能体</a></li>
         </ul>
-    </div>
-    <div class="main-content">
-        <h2>第二十六章：强化学习前沿方向</h2>
+    </nav>
+    <main id="content" class="main-content">
+        <h1>第二十六章：强化学习前沿方向</h1>
 
         <p>同学们好，欢迎来到第二十六章。</p>
 
@@ -78,7 +88,7 @@
 
         <p>这一章我们就来聊聊这些最前沿的方向。这一章没有冗长的数学推导，我会更多地跟你讲清楚"为什么这些方向重要"以及"它们解决了什么问题"。</p>
 
-        <h3>26.1 RLHF：从人类反馈中学习</h3>
+        <h2>26.1 RLHF：从人类反馈中学习</h2>
 
         <p>如果你问 2023–2024 年 AI 领域最重要的技术是什么，绝大多数人会说：RLHF（Reinforcement Learning from Human Feedback）。ChatGPT 之所以能从"一个还不错的聊天模型"变成"让全世界疯狂的产品"，RLHF 功不可没。</p>
 
@@ -91,6 +101,38 @@
             <li><strong>第二步：训练奖励模型（Reward Model, RM）</strong>。收集大量人类偏好比较数据——给定同一个提示，让模型生成两个回答 A 和 B，标注员选择哪个更好。然后用这些数据训练一个奖励模型 R_φ(x, y)，它的任务是输入 (提示, 回答) 并输出一个标量分数，分数越高表示人类越喜欢。数学上通常采用 <strong>Bradley-Terry 偏好模型</strong>：P(y₁ > y₂ | x) = σ(R_φ(x, y₁) - R_φ(x, y₂))，即两个回答的相对好坏可以通过分数之差经过 sigmoid 来建模。</li>
             <li><strong>第三步：用 PPO 优化策略</strong>。把训练好的奖励模型当作"奖励函数"，用它给策略（语言模型）生成的回答打分，然后通过 PPO 算法来更新策略参数，让模型产生更高奖励的回答。但这里有一个关键技巧——<strong>KL 惩罚项</strong>。</li>
         </ul>
+
+        <div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="Bradley-Terry 偏好模型公式，可横向滚动">
+          <math display="block" aria-label="Bradley-Terry 偏好模型：给定提示 x，回答 y1 优于 y2 的概率等于两者奖励分数之差经过 sigmoid 后的值">
+            <mi>P</mi><mo>(</mo><msub><mi>y</mi><mn>1</mn></msub><mo>≻</mo><msub><mi>y</mi><mn>2</mn></msub><mo>∣</mo><mi>x</mi><mo>)</mo><mo>=</mo><mi>σ</mi><mo>(</mo><msub><mi>r</mi><mi>φ</mi></msub><mo>(</mo><mi>x</mi><mo>,</mo><msub><mi>y</mi><mn>1</mn></msub><mo>)</mo><mo>−</mo><msub><mi>r</mi><mi>φ</mi></msub><mo>(</mo><mi>x</mi><mo>,</mo><msub><mi>y</mi><mn>2</mn></msub><mo>)</mo><mo>)</mo>
+          </math>
+        </div>
+
+        <figure>
+          <svg viewBox="0 0 680 230" role="img" aria-labelledby="fig-rlhf-t fig-rlhf-d">
+            <title id="fig-rlhf-t">RLHF 三阶段流程</title>
+            <desc id="fig-rlhf-d">第一阶段用人类示范对预训练模型做监督微调；第二阶段用人类偏好比较数据训练奖励模型；第三阶段把奖励模型当奖励、并用 KL 惩罚约束策略，通过 PPO 更新语言模型。</desc>
+            <defs><marker id="rlhfArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#7c3aed"/></marker></defs>
+            <rect x="20" y="40" width="190" height="90" rx="12" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+            <text x="115" y="68" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e40af">① SFT</text>
+            <text x="115" y="92" text-anchor="middle" font-size="11" fill="#1e3a8a">人类示范数据</text>
+            <text x="115" y="110" text-anchor="middle" font-size="11" fill="#1e3a8a">监督微调基座模型</text>
+            <rect x="245" y="40" width="190" height="90" rx="12" fill="#fef9c3" stroke="#eab308" stroke-width="2"/>
+            <text x="340" y="68" text-anchor="middle" font-size="13" font-weight="bold" fill="#854d0e">② 奖励模型</text>
+            <text x="340" y="92" text-anchor="middle" font-size="11" fill="#713f12">人类两两偏好比较</text>
+            <text x="340" y="110" text-anchor="middle" font-size="11" fill="#713f12">Bradley-Terry 打分</text>
+            <rect x="470" y="40" width="190" height="90" rx="12" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+            <text x="565" y="68" text-anchor="middle" font-size="13" font-weight="bold" fill="#15803d">③ PPO + KL</text>
+            <text x="565" y="92" text-anchor="middle" font-size="11" fill="#166534">奖励模型当奖励</text>
+            <text x="565" y="110" text-anchor="middle" font-size="11" fill="#166534">KL 约束不偏离基座</text>
+            <g stroke="#7c3aed" stroke-width="2.5" marker-end="url(#rlhfArrow)">
+              <line x1="210" y1="85" x2="241" y2="85"/>
+              <line x1="435" y1="85" x2="466" y2="85"/>
+            </g>
+            <text x="340" y="175" text-anchor="middle" font-size="11" fill="#5b21b6">目标：让模型输出更符合人类偏好，而非仅拟合示范样本</text>
+          </svg>
+          <figcaption>图 26-1：RLHF 的三阶段流程。① 先让模型学会“怎么正常回答”（SFT）；② 再用人类的两两比较训练一个能打分的奖励模型；③ 最后用 PPO 最大化奖励，同时用 KL 惩罚把策略拉在基座模型附近。示意图。</figcaption>
+        </figure>
 
         <pre># RLHF 第三阶段的核心 PPO 训练伪代码（简化版）
 import torch
@@ -142,7 +184,7 @@ def rlhf_ppo_step(policy, ref_policy, reward_model, prompts, kl_coef=0.04):
             <p><strong>理解关键：</strong>RLHF 的伟大之处不在于 PPO 本身（PPO 2017 年就提出来了），而在于它建立了一个完整的"<strong>通过人类偏好来定义目标</strong>"的框架。这个框架可以用在任何<strong>没有明确奖励函数但人能判断好坏</strong>的任务上，比如文章摘要评价、代码质量评估、对话自然度判断。RLHF 把强化学习的应用边界从"有明确规则的封闭环境"拓展到了"有模糊人类价值观的开放世界"。</p>
         </div>
 
-        <h3>26.2 元强化学习（Meta-RL）</h3>
+        <h2>26.2 元强化学习（Meta-RL）</h2>
 
         <p>我们之前学到的所有 RL 算法都有一个问题：<strong>它们是为解决一个特定 MDP 而设计的</strong>。训练好的智能体换一个环境就得从头训练。或者你可以说，传统 RL 智能体的"泛化能力"很差——它学到的不是"如何快速适应新任务"的能力，而是"在某个任务上做到最优"的单一技能。</p>
 
@@ -164,7 +206,34 @@ def rlhf_ppo_step(policy, ref_policy, reward_model, prompts, kl_coef=0.04):
 
         <p>慢权重存储的是"如何快速学习"的通用能力，快权重存储的是"当前任务的具体知识"。这个二分法对所有理解 RL 的泛化和适应性问题都很有启发。</p>
 
-        <h3>26.3 Foundation Agent：通用智能体的雏形</h3>
+        <figure>
+          <svg viewBox="0 0 680 250" role="img" aria-labelledby="fig-meta-t fig-meta-d">
+            <title id="fig-meta-t">Meta-RL 的快权重与慢权重</title>
+            <desc id="fig-meta-d">外层循环在大量任务上缓慢更新共享初始参数即慢权重；内层循环面对新任务只用少量梯度步或 RNN 隐藏状态快速适应即快权重。</desc>
+            <defs><marker id="metaArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#7c3aed"/></marker></defs>
+            <rect x="40" y="20" width="600" height="60" rx="12" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/>
+            <text x="60" y="45" font-size="12" font-weight="bold" fill="#5b21b6">外层循环（慢权重）：跨任务元训练共享初始参数 θ</text>
+            <text x="60" y="66" font-size="11" fill="#6d28d9">minθ E_T[ L_T( θ − α ∇L_T(θ) ) ] —— 让初始参数“容易被微调”</text>
+            <rect x="40" y="134" width="180" height="64" rx="10" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+            <text x="130" y="160" text-anchor="middle" font-size="12" fill="#1e40af">任务 T1（MAML）</text>
+            <text x="130" y="180" text-anchor="middle" font-size="10" fill="#1e3a8a">几步梯度 → 快权重</text>
+            <rect x="250" y="134" width="180" height="64" rx="10" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+            <text x="340" y="160" text-anchor="middle" font-size="12" fill="#1e40af">任务 T2（RL²）</text>
+            <text x="340" y="180" text-anchor="middle" font-size="10" fill="#1e3a8a">RNN 隐状态 → 快权重</text>
+            <rect x="460" y="134" width="180" height="64" rx="10" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+            <text x="550" y="160" text-anchor="middle" font-size="12" fill="#1e40af">任务 T3（MAML）</text>
+            <text x="550" y="180" text-anchor="middle" font-size="10" fill="#1e3a8a">几步梯度 → 快权重</text>
+            <g stroke="#7c3aed" stroke-width="2" marker-end="url(#metaArrow)">
+              <line x1="130" y1="132" x2="130" y2="84"/>
+              <line x1="340" y1="132" x2="340" y2="84"/>
+              <line x1="550" y1="132" x2="550" y2="84"/>
+            </g>
+            <text x="340" y="230" text-anchor="middle" font-size="11" fill="#5b21b6">内层循环（快权重）：面对新任务，少量交互即可适应</text>
+          </svg>
+          <figcaption>图 26-2：Meta-RL 的“快权重 vs 慢权重”。外层循环在大量任务上缓慢打磨一份共享的初始参数（慢权重），内层循环则在新任务上用几步梯度（MAML）或 RNN 隐状态（RL²）快速产生适应当前任务的快权重。示意图。</figcaption>
+        </figure>
+
+        <h2>26.3 Foundation Agent：通用智能体的雏形</h2>
 
         <p>如果说 Meta-RL 是让智能体在"同一类任务的不同变体"之间快速适应，那么 <strong>Foundation Agent（基础智能体）</strong> 的野心要大得多：它想要一个智能体，能用同一套参数完成<strong>完全不同类型的任务</strong>——玩雅达利游戏、控制机器人抓取物体、做图像描述、甚至参与对话。</p>
 
@@ -185,7 +254,7 @@ def rlhf_ppo_step(policy, ref_policy, reward_model, prompts, kl_coef=0.04):
             <p><strong>一句话总结：</strong>Gato 和 Decision Transformer 代表了 RL 领域的一个重大范式转变——从"通过奖惩信号训练一个智能体"到"从大量跨领域数据中端到端地学习一个通用行动者"。这与 NLP 领域的 GPT 路线惊人地相似：先用大规模数据预训练一个基础模型，然后在下游任务上微调。也许通用人工智能的路径，就是"大语言模型 + 大决策模型"的融合。</p>
         </div>
 
-        <h3>26.4 开放问题与未来方向</h3>
+        <h2>26.4 开放问题与未来方向</h2>
 
         <p>看到这里，你可能会觉得 RL 的大方向已经非常清晰了。但我必须负责任地告诉你：前方还有很多没有解决的核心问题。我会用一个表格来总结当前 RL 面临的五大挑战：</p>
 
@@ -248,13 +317,15 @@ def rlhf_ppo_step(policy, ref_policy, reward_model, prompts, kl_coef=0.04):
 
         <p>我们下一章见，动手的时刻到了。</p>
 
+        <p class="source-note">本章 RLHF 与奖励建模见 Ouyang et al., “Training language models to follow instructions with human feedback”, <a href="https://arxiv.org/abs/2203.02155">arXiv:2203.02155</a> (2022)，偏好比较的 Bradley-Terry 模型见 Bradley &amp; Terry (1952)；MAML 见 Finn et al., <a href="https://arxiv.org/abs/1703.03400">arXiv:1703.03400</a> (2017)；RL² 见 Duan et al., <a href="https://arxiv.org/abs/1611.02779">arXiv:1611.02779</a> (2016)；Gato 见 Reed et al., <a href="https://arxiv.org/abs/2205.14135">arXiv:2205.14135</a> (2022)；Decision Transformer 见 Chen et al., <a href="https://arxiv.org/abs/2106.01345">arXiv:2106.01345</a> (2021)；The Bitter Lesson 见 Sutton (2019), <a href="http://www.incompleteideas.net/IncIdeas/BitterLesson.html">incompleteideas.net</a>。文中 Gato 的任务数（604）与 token 数（约 3630 亿）来自其论文报告，图 26-1、图 26-2 中的“踩坑故事”与成功率数字均为教学示意。</p>
+
         <div class="footer-nav">
             <a href="25.html">← 上一章</a>
             <a href="index.html">📖 返回目录</a>
             <a href="27.html">下一章 →</a>
         </div>
 
-    </div>
+    </main>
 </div>
 </div>
 </body>
