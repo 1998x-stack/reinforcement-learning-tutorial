@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>第22章 逆强化学习与模仿学习</title>
     <link rel="stylesheet" href="theme.css">
     <style>
@@ -31,12 +32,21 @@
         p { line-height: 1.8; margin: 10px 0; color: #2d3748; }
         ul, ol { margin: 10px 0; padding-left: 25px; line-height: 1.8; color: #2d3748; }
         li { margin: 5px 0; }
+        h1 { color: #4c1d95; border-left: 6px solid #06b6d4; padding-left: 15px; margin: 20px 0 15px; font-size: 1.9rem; line-height: 1.35; }
+        figure { margin: 24px 0; padding: 16px; background: #faf8ff; border: 1px solid #ddd6fe; border-radius: 16px; }
+        figure svg { width: 100%; height: auto; display: block; }
+        figcaption { margin-top: 10px; font-size: 0.9rem; color: #5b21b6; line-height: 1.65; }
+        .source-note { font-size: 0.85rem; color: #64748b; border-top: 1px dashed #ddd6fe; margin-top: 28px; padding-top: 12px; line-height: 1.7; }
+        .math-scroll { max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 6px 2px; }
+        .math-scroll:focus-visible { outline: 3px solid #7c3aed; outline-offset: 2px; }
+        .math-scroll math[display="block"] { width: max-content; min-width: 100%; font-size: 1.15rem; }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
     </style>
 </head>
 <body>
 <div class="double-border">
 <div class="container">
-    <div class="sidebar">
+    <nav class="sidebar" aria-label="课程目录">
         <h3>🧠 课程目录</h3>
         <ul class="chapter-list">
             <li><a href="01.html">第1章 强化学习是什么</a></li>
@@ -68,9 +78,9 @@
             <li><a href="27.html">第27章 从零实现DQN</a></li>
             <li><a href="28.html">第28章 综合实战：Atari智能体</a></li>
         </ul>
-    </div>
-    <div class="main-content">
-        <h2>第二十二章：逆强化学习与模仿学习</h2>
+    </nav>
+    <main id="content" class="main-content">
+        <h1>第二十二章：逆强化学习与模仿学习</h1>
 
         <p>同学们好，欢迎来到第二十二章。</p>
 
@@ -80,7 +90,7 @@
 
         <p>那有没有办法绕过这个噩梦呢？有。既然我们很难定义"什么是好的驾驶"，但我们有大量人类驾驶数据——那我就<strong>从人类驾驶数据中直接学习</strong>，要么学策略本身（模仿学习），要么学人类在优化什么（逆强化学习）。这就是本章要讲的核心内容。</p>
 
-        <h3>22.1 从演示中学习</h3>
+        <h2>22.1 从演示中学习</h2>
 
         <p>想像一下这个场景：你是一个机器人工程师，想让一个机械臂学会拧瓶盖。传统做法是：写一个奖励函数，给"旋转变大角度"正奖励，给"抓握不稳"负惩罚，然后跑几百轮PPO。但人拧瓶盖的方式非常自然——抓、转、提——你能不能直接录一段人手拧瓶盖的视频，让机器人"看会"？</p>
 
@@ -93,13 +103,24 @@
 
         <p>这两种思路各有优劣，下面我们逐一说清楚。</p>
 
-        <h3>22.2 行为克隆（Behavioral Cloning）</h3>
+        <h2>22.2 行为克隆（Behavioral Cloning）</h2>
 
         <p>行为克隆（BC）是模仿学习里最简单直接的方法。它的思路朴素得令人发指：把专家的 (状态, 动作) 对当作监督学习的训练数据，直接用最大似然估计来学习策略 π_θ(a|s)。</p>
 
         <p>具体来说，给定专家轨迹数据集 D = {(s_i, a_i)}，BC的训练目标就是最小化交叉熵损失（对离散动作）或 MSE（对连续动作）：</p>
 
-        <pre># 离散动作空间的 Behavioral Cloning 训练伪代码
+        <p style="margin:10px 0 2px;color:#64748b;font-size:0.85rem;">式 (22.5) 行为克隆的监督目标（最大似然 / 交叉熵）</p>
+<div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="行为克隆目标公式，可横向滚动">
+  <math display="block" aria-label="行为克隆损失：负的、在数据集中 log 策略在 a 下取 s 的期望">
+    <mrow>
+      <msub><mi>L</mi><mtext>BC</mtext></msub><mo>(</mo><mi>θ</mi><mo>)</mo><mo>=</mo><mo>−</mo>
+      <munder><mi>E</mi><mrow><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>)</mo><mo>∼</mo><mi>D</mi></mrow></munder>
+      <mrow><mo>[</mo><mi>log</mi><msub><mi>π</mi><mi>θ</mi></msub><mo>(</mo><mi>a</mi><mo>|</mo><mi>s</mi><mo>)</mo><mo>]</mo></mrow>
+    </mrow>
+  </math>
+</div>
+
+<pre># 离散动作空间的 Behavioral Cloning 训练伪代码
 import torch
 import torch.nn as nn
 
@@ -139,9 +160,28 @@ class BehavioralCloning:
             <p><strong>教训：</strong>BC 只适合专家数据能完美覆盖所有可能状态的场景——这在现实中几乎不存在。如果你必须用 BC，一定要配合 DAgger 或类似方法来收集 learner 轨迹上的专家标注。</p>
         </div>
 
-        <p>DAgger（Dataset Aggregation）的改进思路非常巧妙：让 learner 策略在环境中跑，把遇到的"陌生"状态记录下来，然后去问专家在这些状态下应该怎么做，把这些新数据加入训练集重新训练。这样策略就能学会在自己会犯错的地方纠正回来。DAgger 在实践中效果显著，但代价是需要专家在线提供服务——对人来说成本很高。</p>
+        <figure>
+  <svg viewBox="0 0 620 250" role="img" aria-labelledby="fig-bc-title fig-bc-desc">
+    <title id="fig-bc-title">行为克隆的复合错误（Compounding Error）</title>
+    <desc id="fig-bc-desc">车道内专家轨迹始终居中；学习者起初居中，遇到一个分布外状态后产生小偏差，偏差逐步放大直到冲出车道。</desc>
+    <defs><marker id="bcArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#ef4444"/></marker></defs>
+    <line x1="30" y1="95" x2="590" y2="95" stroke="#94a3b8" stroke-width="2"/>
+    <line x1="30" y1="185" x2="590" y2="185" stroke="#94a3b8" stroke-width="2"/>
+    <line x1="30" y1="140" x2="590" y2="140" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="10 10"/>
+    <polyline fill="none" stroke="#22c55e" stroke-width="3" points="40,140 140,140 260,140 380,140 500,140 580,140"/>
+    <polyline fill="none" stroke="#ef4444" stroke-width="3" points="40,140 120,140 180,138 230,130 280,116 330,100 380,86 430,78 470,74" marker-end="url(#bcArrow)"/>
+    <text x="470" y="140" font-size="12" fill="#15803d" text-anchor="end">专家轨迹：始终在分布内</text>
+    <circle cx="230" cy="130" r="6" fill="#ef4444"/>
+    <text x="235" y="112" font-size="11" fill="#b91c1c">微小错误</text>
+    <text x="330" y="70" font-size="11" fill="#b91c1c">进入未见过状态 → 误差放大</text>
+    <text x="310" y="30" text-anchor="middle" font-size="13" fill="#4c1d95">策略偏离车道中心 → 分布外状态 → 复合错误</text>
+  </svg>
+  <figcaption>图 22-1：行为克隆的复合错误。专家数据总在车道中央，学习者的微小偏差会把它带入数据未覆盖的状态，哪里的预测不可靠，错误逐帧放大。这正是 DAgger 等方法试图修复的分布偏移问题。示意图。</figcaption>
+</figure>
 
-        <h3>22.3 逆强化学习原理</h3>
+<p>DAgger（Dataset Aggregation）的改进思路非常巧妙：让 learner 策略在环境中跑，把遇到的"陌生"状态记录下来，然后去问专家在这些状态下应该怎么做，把这些新数据加入训练集重新训练。这样策略就能学会在自己会犯错的地方纠正回来。DAgger 在实践中效果显著，但代价是需要专家在线提供服务——对人来说成本很高。</p>
+
+        <h2>22.3 逆强化学习原理</h2>
 
         <p>行为克隆有一个更深层的问题：它只复制了专家的动作，但没有理解专家<strong>为什么</strong>这么做。比如人类驾驶员在路口减速，是因为"看到黄灯"还是"感觉路面湿滑"？如果没有理解背后的<strong>意图</strong>，一旦环境稍有变化，克隆的策略就会失灵。</p>
 
@@ -158,15 +198,35 @@ class BehavioralCloning:
 
         <p>为了解决这个问题，Ziebart 等人在 2008 年提出了<strong>最大熵逆强化学习（MaxEnt IRL）</strong>。核心思想是：在能解释专家行为的所有奖励函数中，选择那个使得轨迹分布<strong>熵最大</strong>的——即最不偏不倚、不做额外假设的那个。这个框架假设专家行为服从玻尔兹曼分布：</p>
 
-        <pre>P(τ) ∝ exp( Σ R(s_t, a_t) )    —— 累积奖励越高的轨迹，概率越大
-                                  —— 专家以"软最大化"的方式选择轨迹，而非绝对最优
-
-MaxEnt IRL 优化目标:
-  max R   L(R) = E_{τ ~ expert}[ Σ R(s_t, a_t) ] - log Z(R)
-
-其中 Z(R) = Σ_τ exp( Σ R(s_t, a_t) ) 是配分函数，
-第一项让专家轨迹的累积奖励尽量高，
-第二项让其他轨迹的奖励不要太高——即保持随机性。</pre>
+        <p>这个框架假设专家行为服从玻尔兹曼分布——累积奖励越高的轨迹概率越大（专家以“软最大化”的方式选择轨迹，而非绝对最优）：</p>
+<p style="margin:10px 0 2px;color:#64748b;font-size:0.85rem;">式 (22.1) MaxEnt IRL 的轨迹分布</p>
+<div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="MaxEnt 轨迹分布公式，可横向滚动">
+  <math display="block" aria-label="MaxEnt 轨迹分布 P(tau) 正比于 exp 累积奖励">
+    <mrow>
+      <mi>P</mi><mo>(</mo><mi>τ</mi><mo>)</mo><mo>∝</mo>
+      <mi>exp</mi><mrow><mo>(</mo>
+        <munder><mo>Σ</mo><mi>t</mi></munder>
+        <mi>R</mi><mo>(</mo><msub><mi>s</mi><mi>t</mi></msub><mo>,</mo><msub><mi>a</mi><mi>t</mi></msub><mo>)</mo>
+      <mo>)</mo></mrow>
+    </mrow>
+  </math>
+</div>
+<p style="margin:10px 0 2px;color:#64748b;font-size:0.85rem;">式 (22.2) MaxEnt IRL 的优化目标</p>
+<div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="MaxEnt IRL 目标公式，可横向滚动">
+  <math display="block" aria-label="MaxEnt IRL 目标：最大化专家累计奖励期望减去配分函数的对数">
+    <mrow>
+      <munder><mo>max</mo><mi>R</mi></munder>
+      <mi>L</mi><mo>(</mo><mi>R</mi><mo>)</mo><mo>=</mo>
+      <munder><mi>E</mi><mrow><mi>τ</mi><mo>∼</mo><mtext>expert</mtext></mrow></munder>
+      <mrow><mo>[</mo>
+        <munder><mo>Σ</mo><mi>t</mi></munder>
+        <mi>R</mi><mo>(</mo><msub><mi>s</mi><mi>t</mi></msub><mo>,</mo><msub><mi>a</mi><mi>t</mi></msub><mo>)</mo>
+      <mo>]</mo></mrow>
+      <mo>−</mo><mi>log</mi><mi>Z</mi><mo>(</mo><mi>R</mi><mo>)</mo>
+    </mrow>
+  </math>
+</div>
+<p>其中配分函数为 <em>Z</em>(R) = Σ<sub>τ</sub> exp( Σ<sub>t</sub> R(s<sub>t</sub>, a<sub>t</sub>) )。第一项让专家轨迹的累积奖励尽量高，第二项让其他轨迹的奖励不要太高——即保持随机性。</p>
 
         <p>MaxEnt IRL 的美妙之处在于，它自动处理了"专家的行为不是绝对最优，而是接近最优"这一现实情况。而且它的梯度有直观的解释：沿着梯度更新时，奖励函数会推高专家轨迹上的奖励，压低非专家轨迹上的奖励——直到专家和其他轨迹的"期望特征计数"一致。</p>
 
@@ -174,13 +234,25 @@ MaxEnt IRL 优化目标:
             <p><strong>理解关键：</strong>IRL 解决的不是"怎么做好动作"，而是"专家到底在优化什么目标"。一旦你理解了目标（奖励函数），学策略就是标准 RL 的事了。这就像你不需要照搬棋王每一步的走法——如果你理解了他的<strong>战略意图</strong>，你可以用你自己的风格走出同样高水平的棋。</p>
         </div>
 
-        <h3>22.4 学徒学习（Apprenticeship Learning）</h3>
+        <h2>22.4 学徒学习（Apprenticeship Learning）</h2>
 
         <p>在 MaxEnt IRL 之前，Abbeel 和 Ng 在 2004 年提出了一个更直觉的方法——<strong>学徒学习（Apprenticeship Learning）</strong>。它的思想是：如果专家策略的"特征期望"和我学到的策略的"特征期望"一致，那我的策略就和专家一样好了。</p>
 
         <p>所谓<strong>特征期望（Feature Expectation）</strong>，就是对轨迹上每个状态的特征函数 φ(s) 求折扣累积和的期望：</p>
 
-        <pre>μ(π) = E[ Σ γᵗ · φ(s_t) | π ]    —— 策略 π 下的特征期望向量</pre>
+        <p style="margin:10px 0 2px;color:#64748b;font-size:0.85rem;">式 (22.3) 策略 π 的特征期望（折扣特征累计）</p>
+<div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="特征期望公式，可横向滚动">
+  <math display="block" aria-label="特征期望 μ(π) 等于在策略 π 下 对 gamma 的 t 次方乘特征 phi(s_t) 的求和取期望">
+    <mrow>
+      <mi>μ</mi><mo>(</mo><mi>π</mi><mo>)</mo><mo>=</mo>
+      <mi>E</mi><mrow><mo>[</mo>
+        <munder><mo>Σ</mo><mi>t</mi></munder>
+        <msup><mi>γ</mi><mi>t</mi></msup><mi>φ</mi><mo>(</mo><msub><mi>s</mi><mi>t</mi></msub><mo>)</mo>
+        <mo>|</mo><mi>π</mi>
+      <mo>]</mo></mrow>
+    </mrow>
+  </math>
+</div>
 
         <p>如果奖励函数是特征的线性组合 R(s) = w·φ(s)，那特征期望匹配就保证了值函数匹配。算法的核心是一个迭代过程：</p>
 
@@ -195,7 +267,7 @@ MaxEnt IRL 优化目标:
 
         <p>不过学徒学习假设奖励函数是特征的线性组合，这个假设在复杂环境中往往不够灵活。接下来的 GAIL 就完全抛弃了这个假设。</p>
 
-        <h3>22.5 GAIL（Generative Adversarial Imitation Learning）</h3>
+        <h2>22.5 GAIL（Generative Adversarial Imitation Learning）</h2>
 
         <p>2016 年，Ho 和 Ermon 提出 GAIL，把生成对抗网络（GAN）引入模仿学习，效果惊艳。在 GAIL 中：</p>
 
@@ -213,10 +285,54 @@ MaxEnt IRL 优化目标:
 
         <p>这个游戏的目标函数是：</p>
 
-        <pre>判别器损失:  L_D = E_{τ~expert}[ log D(s,a) ] + E_{τ~learner}[ log(1 - D(s,a)) ]
-策略（生成器）损失:  L_π = E_{τ~learner}[ -log D(s,a) ]    —— 等价于最大化判别器的"置信度"
+        <p style="margin:10px 0 2px;color:#64748b;font-size:0.85rem;">式 (22.4) GAIL 的对抗目标</p>
+<div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="GAIL 判别器损失公式，可横向滚动">
+  <math display="block" aria-label="判别器损失：专家轨迹 log D 的期望加 learner 轨迹 log(1-D) 的期望">
+    <mrow>
+      <msub><mi>L</mi><mi>D</mi></msub><mo>=</mo>
+      <munder><mi>E</mi><mrow><mi>τ</mi><mo>∼</mo><mtext>expert</mtext></mrow></munder>
+      <mrow><mo>[</mo><mi>log</mi><mi>D</mi><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>)</mo><mo>]</mo></mrow>
+      <mo>+</mo>
+      <munder><mi>E</mi><mrow><mi>τ</mi><mo>∼</mo><mtext>learner</mtext></mrow></munder>
+      <mrow><mo>[</mo><mi>log</mi><mo>(</mo><mn>1</mn><mo>−</mo><mi>D</mi><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>)</mo><mo>)</mo><mo>]</mo></mrow>
+    </mrow>
+  </math>
+</div>
+<div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="GAIL 策略损失公式，可横向滚动">
+  <math display="block" aria-label="策略损失：对 learner 轨迹负 log D 取期望，等价于最大化判别器置信度">
+    <mrow>
+      <msub><mi>L</mi><mi>π</mi></msub><mo>=</mo>
+      <munder><mi>E</mi><mrow><mi>τ</mi><mo>∼</mo><mtext>learner</mtext></mrow></munder>
+      <mrow><mo>[</mo><mo>−</mo><mi>log</mi><mi>D</mi><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>)</mo><mo>]</mo></mrow>
+    </mrow>
+  </math>
+</div>
+<figure>
+  <svg viewBox="0 0 640 250" role="img" aria-labelledby="fig-gail-title fig-gail-desc">
+    <title id="fig-gail-title">GAIL 的对抗训练回路</title>
+    <desc id="fig-gail-desc">策略（生成器）采样 learner 轨迹，判别器同时接收专家轨迹与 learner 轨迹并区分二者；判别器输出又被当作奖励信号反哺策略更新，循环往复。</desc>
+    <defs><marker id="gailArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#7c3aed"/></marker></defs>
+    <rect x="40" y="95" width="150" height="60" rx="12" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/>
+    <text x="115" y="120" text-anchor="middle" font-size="13" fill="#5b21b6">策略 π_θ</text>
+    <text x="115" y="140" text-anchor="middle" font-size="11" fill="#6d28d9">= 生成器</text>
+    <rect x="440" y="95" width="160" height="60" rx="12" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+    <text x="520" y="120" text-anchor="middle" font-size="13" fill="#b91c1c">判别器 D_ω(s,a)</text>
+    <text x="520" y="140" text-anchor="middle" font-size="11" fill="#b91c1c">区分专家 / learner</text>
+    <rect x="40" y="195" width="150" height="42" rx="10" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+    <text x="115" y="221" text-anchor="middle" font-size="12" fill="#15803d">专家轨迹（固定）</text>
+    <g stroke="#7c3aed" stroke-width="2.5" marker-end="url(#gailArrow)">
+      <line x1="190" y1="115" x2="436" y2="115"/>
+      <path d="M436,140 C360,215 220,215 152,200"/>
+    </g>
+    <line x1="115" y1="195" x2="115" y2="159" stroke="#22c55e" stroke-width="2.5" marker-end="url(#gailArrow)"/>
+    <text x="313" y="105" text-anchor="middle" font-size="11" fill="#7c3aed">learner 轨迹</text>
+    <text x="313" y="205" text-anchor="middle" font-size="11" fill="#7c3aed">判别器输出 → 奖励信号 r = −log(1−D)</text>
+    <text x="320" y="35" text-anchor="middle" font-size="13" fill="#4c1d95">策略拼命“骗过”判别器，判别器拼命“抓”策略</text>
+  </svg>
+  <figcaption>图 22-2：GAIL 的对抗回路。策略（生成器）采样轨迹送入判别器，判别器同时看到专家轨迹，输出被当作奖励 r = −log(1−D(s,a)) 反哺策略，等价于式 (22.4) 的博弈目标。示意图。</figcaption>
+</figure>
 
-训练流程伪代码:
+<pre>训练流程伪代码:
 for iteration in range(num_iters):
     # 1. 用当前策略采样一批轨迹
     trajectories = policy.sample(env, num_steps=2048)
@@ -293,13 +409,15 @@ for iteration in range(num_iters):
 
         <p>我们下一章见！</p>
 
+<p class="source-note">本章的行为克隆与 ALVINN 见 Pomerleau, “ALVINN: An Autonomous Land Vehicle in a Neural Network”, NeurIPS (1989)；DAgger 见 Ross et al., “A Reduction of Imitation Learning and Structured Prediction to No-Regret Online Learning”, <a href="https://arxiv.org/abs/1011.0686">arXiv:1011.0686</a> (2011)；最大熵逆强化学习见 Ziebart et al., “Maximum Entropy Inverse Reinforcement Learning”, AAAI (2008)；学徒学习见 Abbeel &amp; Ng, “Apprenticeship Learning via Inverse Reinforcement Learning”, ICML (2004)；GAIL 见 Ho &amp; Ermon, “Generative Adversarial Imitation Learning”, <a href="https://arxiv.org/abs/1606.03476">arXiv:1606.03476</a> (2016)；离线模仿学习可参见 ValueDICE <a href="https://arxiv.org/abs/1912.05032">arXiv:1912.05032</a> (2019) 与 DemoDICE <a href="https://arxiv.org/abs/2102.07988">arXiv:2102.07988</a> (2021)。文中车道保持踩坑故事、图 22-1、图 22-2 及式 22.1–22.5 中的数值均为教学示意。</p>
+
         <div class="footer-nav">
             <a href="21.html">← 上一章</a>
             <a href="index.html">📖 返回目录</a>
             <a href="23.html">下一章 →</a>
         </div>
 
-    </div>
+    </main>
 </div>
 </div>
 </body>
