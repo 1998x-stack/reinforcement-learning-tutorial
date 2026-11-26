@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>第25章 调试与可视化</title>
     <link rel="stylesheet" href="theme.css">
     <style>
@@ -28,12 +29,21 @@
         .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
         .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
         .highlight { background: #fef9c3; border: 1px solid #facc15; }
+        h1 { color: #4c1d95; border-left: 6px solid #06b6d4; padding-left: 15px; margin: 20px 0 15px; font-size: 1.9rem; line-height: 1.35; }
+        figure { margin: 24px 0; padding: 16px; background: #faf8ff; border: 1px solid #ddd6fe; border-radius: 16px; }
+        figure svg { width: 100%; height: auto; display: block; }
+        figcaption { margin-top: 10px; font-size: 0.9rem; color: #5b21b6; line-height: 1.65; }
+        .source-note { font-size: 0.85rem; color: #64748b; border-top: 1px dashed #ddd6fe; margin-top: 28px; padding-top: 12px; line-height: 1.7; }
+        .math-scroll { max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 6px 2px; }
+        .math-scroll:focus-visible { outline: 3px solid #7c3aed; outline-offset: 2px; }
+        .math-scroll math[display="block"] { width: max-content; min-width: 100%; font-size: 1.15rem; }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
     </style>
 </head>
 <body>
 <div class="double-border">
 <div class="container">
-    <div class="sidebar">
+    <nav class="sidebar" aria-label="课程目录">
         <h3>&#x1F9E0; 课程目录</h3>
         <ul class="chapter-list">
             <li><a href="01.html">第1章 强化学习是什么</a></li>
@@ -65,9 +75,9 @@
             <li><a href="27.html">第27章 从零实现DQN</a></li>
             <li><a href="28.html">第28章 综合实战：Atari智能体</a></li>
         </ul>
-    </div>
-    <div class="main-content">
-        <h2>第二十五章：调试与可视化</h2>
+    </nav>
+    <main id="content" class="main-content">
+        <h1>第二十五章：调试与可视化</h1>
 
         <p>同学们好，欢迎来到第二十五章。走到这一步，你们已经掌握了从DQN到PPO再到SAC的一大串算法，也学会了用SB3快速训练智能体。但有一个残酷的现实我必须告诉你们——<strong>RL代码写出来只是第一步，让它真正收敛才是噩梦的开始</strong>。</p>
 
@@ -77,7 +87,7 @@
             <p><strong>踩坑故事</strong>：我曾经花了一整个星期卡在一个Bug上——DQN在CartPole上就是学不会。奖励曲线从头到尾都是平的，不是震荡，是毫无波澜的平线。我检查了网络结构、学习率、epsilon衰减、replay buffer……全部看起来没问题。最后我差点放弃，随手打印了一下状态数据，发现Gymnasium返回的状态是(4,)维度的float64数组，而我定义的第一层网络输入是4，但PyTorch默认的Linear层没有报错——它只是默默地把float64当作一个奇怪的数据类型处理了，导致梯度压根没更新！<strong>一个dtype的问题，浪费了我整整七天。</strong>从那以后我学乖了：任何看起来"不该有问题"的地方，都是最值得怀疑的地方。</p>
         </div>
 
-        <h3>25.1 TensorBoard集成</h3>
+        <h2>25.1 TensorBoard集成</h2>
 
         <p>SB3最方便的一点就是默认集成了TensorBoard日志。你只需要在训练时指定<code>tensorboard_log</code>参数：</p>
 
@@ -108,7 +118,7 @@ model.learn(total_timesteps=100000)
             <p><strong>怎么看"坏信号"</strong>：reward曲线如果长时间低于随机策略的水平，说明策略根本没学习；value_loss如果突然冲到天际，检查学习率和奖励尺度；entropy如果一步到位降到零，说明你的策略"学会了"但学会的是错的——这是RL里最难debug的场景之一。</p>
         </div>
 
-        <h3>25.2 Weights & Biases (WandB)</h3>
+        <h2>25.2 Weights & Biases (WandB)</h2>
 
         <p>TensorBoard很好，但当你开始跑几十上百个实验时，你就会发现它不够用了——你需要实验追踪、超参数对比、远程看结果、和团队分享。这时候就该上 <strong>Weights & Biases</strong>（简称WandB）了。</p>
 
@@ -153,9 +163,39 @@ model.learn(
 
         <p>长期做RL研究的人都会告诉你：<strong>好记性不如烂记录本，而WandB就是你最完美的实验记录本</strong>。我每跑一个实验之前都会检查——这次实验的hypothesis是什么？我在验证什么？不改记录不清的实验，等于没有做过。</p>
 
-        <h3>25.3 奖励曲线诊断</h3>
+        <h2>25.3 奖励曲线诊断</h2>
 
         <p>在RL调试中，奖励曲线就是你的生命体征监测仪。学会读奖励曲线，你就能在95%的情况下快速定位问题。下面这几种是常见的曲线模式：</p>
+
+        <figure>
+          <svg viewBox="0 0 680 300" role="img" aria-labelledby="fig-curve-t fig-curve-d">
+            <title id="fig-curve-t">四种典型奖励曲线模式</title>
+            <desc id="fig-curve-d">左上为平坦不学习，右上为先升后趋平的正常收敛，左下为先升后崩盘，右下为剧烈震荡。纵轴为平均回报，横轴为训练步数。</desc>
+            <g stroke="#94a3b8" stroke-width="1.2" fill="none">
+              <line x1="40" y1="130" x2="300" y2="130"/>
+              <line x1="40" y1="30" x2="40" y2="130"/>
+              <line x1="360" y1="130" x2="620" y2="130"/>
+              <line x1="360" y1="30" x2="360" y2="130"/>
+              <line x1="40" y1="270" x2="300" y2="270"/>
+              <line x1="40" y1="170" x2="40" y2="270"/>
+              <line x1="360" y1="270" x2="620" y2="270"/>
+              <line x1="360" y1="170" x2="360" y2="270"/>
+            </g>
+            <g fill="none" stroke-width="2.5">
+              <polyline points="40,118 90,120 140,116 190,119 240,115 295,118" stroke="#ef4444"/>
+              <polyline points="360,126 410,108 460,80 510,58 560,52 615,54" stroke="#22c55e"/>
+              <polyline points="40,258 90,238 140,200 190,182 240,232 295,258" stroke="#ef4444"/>
+              <polyline points="360,258 400,210 440,250 470,196 505,244 545,198 580,240 615,206" stroke="#eab308"/>
+            </g>
+            <g font-size="12" fill="#334155">
+              <text x="40" y="22">① 平坦直线：完全不学习</text>
+              <text x="360" y="22">② 先升后趋平：正常收敛</text>
+              <text x="40" y="162">③ 先升后崩：策略崩溃</text>
+              <text x="360" y="162">④ 剧烈震荡：策略不稳定</text>
+            </g>
+          </svg>
+          <figcaption>图 25-1：奖励曲线的四种典型形态。纵轴是平均回报，横轴是训练步数。① 几乎不动的横线说明智能体没有学到东西；② 先快速上升再平稳，是健康收敛；③ 冲高后突然坍塌且无法恢复，多因更新步长过大；④ 上下乱跳，常见于批大小或回放池过小。示意图。</figcaption>
+        </figure>
 
         <ul>
             <li><strong>平坦直线（不学习）</strong>：奖励一直在一个低水平晃动，没有任何上升趋势。原因可能是：探索不够（epsilon衰减太快）、奖励信号太稀疏、网络完全没有在学习（检查梯度）。</li>
@@ -168,7 +208,7 @@ model.learn(
             <p><strong>诊断铁律</strong>：永远先看奖励曲线，再看其他指标。奖励曲线告诉你"有没有问题"，其他指标告诉你"哪里有问题"。不要跳过第一步直接进入第二步。很多同学一上来就看loss曲线，结果loss降得很漂亮，奖励却毫无变化——这是因为网络只是在"拟合自己"而没有真正提升策略。</p>
         </div>
 
-        <h3>25.4 五大常见Bug</h3>
+        <h2>25.4 五大常见Bug</h2>
 
         <p>下面这个表是我多年踩坑和同学们的血泪史总结的。我敢打赌，只要你做RL超过一个月，这五个Bug你至少会遇到三个：</p>
 
@@ -215,11 +255,11 @@ model.learn(
 
         <p>第2个和第3个Bug经常一起出现。奖励归一化做好之后，梯度爆炸的概率也会大幅下降。我把这称为"RL的蝴蝶效应"——一个小疏忽在训练中期放大成灾难。</p>
 
-        <p>第4个Bug是典型的"没想到资源会不够"。Atari的一帧是84x84x4，如果用float32存，1e6帧大概需要1.1GB。如果你设了buffer_size=5e6还要跑并行环境，内存分分钟爆炸。</p>
+        <p>第4个Bug是典型的“没想到资源会不够”。Atari 的一帧是 84×84 的灰度图（uint8 约 7 KB）；1e6 帧约 7 GB。若把 4 帧堆叠后按 float32 保存，单条样本约 110 KB，1e6 条可达上百 GB（按 84×84×4 通道 × 4 字节估算）。设了 buffer_size=5e6 又要跑并行环境，内存分分钟爆炸。</p>
 
         <p>第5个Bug是Atari新手最容易忽略的——原始Atari帧是210x160的RGB图像，直接扔给网络根本学不动。忘记做灰度化和帧堆叠，或者做了但顺序不对，都会导致完全学不会。</p>
 
-        <h3>25.5 性能分析与优化</h3>
+        <h2>25.5 性能分析与优化</h2>
 
         <p>当你的算法终于开始收敛了，下一个问题就是：跑得太慢了。RL训练动辄几千万步，每一步都涉及到环境交互、数据存取样、神经网络前向和反向传播。学会做性能分析非常重要。</p>
 
@@ -246,13 +286,15 @@ sudo py-spy record -o profile.svg --pid &lt;训练进程PID&gt;
 
         <p>好了，掌握了这些调试技巧和可视化方法，你已经从一个"写代码的RL选手"升级成了"会诊断的RL医生"。从下一章开始，我们将离开RL的"经典"世界，进入RL的前沿领域——那些正在改变这个领域的最新研究方向。强化学习还没有走到尽头，恰恰相反，真正激动人心的东西才刚刚开始。</p>
 
+        <p class="source-note">本章的 TensorBoard 见 Abadi et al., “TensorFlow: Large-Scale Machine Learning on Heterogeneous Systems” (2015) 与 <a href="https://www.tensorflow.org/tensorboard">tensorflow.org/tensorboard</a>；Weights &amp; Biases 见 <a href="https://wandb.ai/site">wandb.ai</a>；向量化环境与 PPO 超参数见 Schulman et al., <a href="https://arxiv.org/abs/1707.06347">arXiv:1707.06347</a> (2017) 与 <a href="https://stable-baselines3.readthedocs.io/">SB3 文档</a>；Atari 观测预处理（84×84 灰度、4 帧堆叠）见 Mnih et al., “Human-level control through deep reinforcement learning”, <a href="https://www.nature.com/articles/nature14236">Nature 518</a> (2015)；Gymnasium 见 Towers et al., <a href="https://arxiv.org/abs/2408.08435">arXiv:2408.08435</a> (2024)；性能剖析工具 py-spy 见 <a href="https://github.com/benfred/py-spy">github.com/benfred/py-spy</a>。文中“踩坑故事”、图 25-1 的曲线形态与内存估算均为教学示意，具体数值随环境与实现而异。</p>
+
         <div class="footer-nav">
             <a href="24.html">&larr; 上一章</a>
             <a href="index.html">&#x1F4D6; 返回目录</a>
             <a href="26.html">下一章 &rarr;</a>
         </div>
 
-    </div>
+    </main>
 </div>
 </div>
 </body>
