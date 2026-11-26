@@ -29,49 +29,57 @@ th, td { border: 1px solid #c4b5fd; padding: 10px; text-align: left; } th { back
 .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
 .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
 .highlight { background: #fef9c3; border: 1px solid #facc15; }
+h1 { color: #4c1d95; border-left: 6px solid #06b6d4; padding-left: 15px; margin: 20px 0 15px; font-size: 1.9rem; line-height: 1.35; }
+figure { margin: 24px 0; padding: 16px; background: #faf8ff; border: 1px solid #ddd6fe; border-radius: 16px; }
+figure svg { width: 100%; height: auto; display: block; }
+figcaption { margin-top: 10px; font-size: 0.9rem; color: #5b21b6; line-height: 1.65; }
+.source-note { font-size: 0.85rem; color: #64748b; border-top: 1px dashed #ddd6fe; margin-top: 28px; padding-top: 12px; line-height: 1.7; }
+.math-scroll { max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 6px 2px; }
+.math-scroll:focus-visible { outline: 3px solid #7c3aed; outline-offset: 2px; }
+.math-scroll math[display="block"] { width: max-content; min-width: 100%; font-size: 1.15rem; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
 <div class="double-border">
 <div class="container">
-<div class="sidebar">
-<h3>📚 目录</h3>
+<nav class="sidebar" aria-label="课程目录">
+<h3>🧠 课程目录</h3>
 <ul class="chapter-list">
-<li><a href="index.html">首页</a></li>
-<li><a href="01.html">第1章 强化学习简介</a></li>
-<li><a href="02.html">第2章 MDP与贝尔曼方程</a></li>
-<li><a href="03.html">第3章 动态规划</a></li>
-<li><a href="04.html">第4章 蒙特卡洛方法</a></li>
-<li><a href="05.html">第5章 时序差分学习</a></li>
-<li><a href="06.html">第6章 SARSA与Q学习</a></li>
-<li><a href="07.html">第7章 多臂老虎机</a></li>
-<li><a href="08.html">第8章 策略梯度</a></li>
-<li><a href="09.html">第9章 Actor-Critic</a></li>
-<li><a href="10.html">第10章 深度Q网络(DQN)</a></li>
-<li><a href="11.html">第11章 DQN改进</a></li>
-<li><a href="12.html">第12章 策略梯度进阶</a></li>
-<li><a href="13.html">第13章 PPO</a></li>
-<li><a href="14.html">第14章 SAC</a></li>
-<li><a href="15.html">第15章 TD3</a></li>
-<li><a href="16.html">第16章 模仿学习</a></li>
-<li><a href="17.html">第17章 逆强化学习</a></li>
-<li><a href="18.html">第18章 基于模型的强化学习</a></li>
-<li><a href="19.html">第19章 世界模型</a></li>
-<li><a href="20.html">第20章 分层强化学习</a></li>
+<li><a href="01.html">第1章 强化学习是什么</a></li>
+<li><a href="02.html">第2章 必备数学工具箱</a></li>
+<li><a href="03.html">第3章 马尔可夫决策过程</a></li>
+<li><a href="04.html">第4章 贝尔曼方程</a></li>
+<li><a href="05.html">第5章 动态规划</a></li>
+<li><a href="06.html">第6章 蒙特卡洛方法</a></li>
+<li><a href="07.html">第7章 时序差分学习</a></li>
+<li><a href="08.html">第8章 值函数逼近</a></li>
+<li><a href="09.html">第9章 深度Q网络(DQN)</a></li>
+<li><a href="10.html">第10章 DQN改进家族</a></li>
+<li><a href="11.html">第11章 策略梯度方法</a></li>
+<li><a href="12.html">第12章 Actor-Critic方法</a></li>
+<li><a href="13.html">第13章 PPO与TRPO</a></li>
+<li><a href="14.html">第14章 连续动作空间算法</a></li>
+<li><a href="15.html">第15章 探索与利用策略</a></li>
+<li><a href="16.html">第16章 奖励设计与塑形</a></li>
+<li><a href="17.html">第17章 训练稳定性与调参</a></li>
+<li><a href="18.html">第18章 安全强化学习</a></li>
+<li><a href="19.html">第19章 基于模型的强化学习</a></li>
+<li><a href="20.html">第20章 离线强化学习</a></li>
 <li><a href="21.html">第21章 多智能体强化学习</a></li>
-<li><a href="22.html">第22章 离线强化学习</a></li>
-<li><a href="23.html">第23章 分布式强化学习</a></li>
-<li><a href="24.html">第24章 好奇心与内在动机</a></li>
-<li><a href="25.html">第25章 逆强化学习与生成式AI</a></li>
-<li><a href="26.html">第26章 大模型与强化学习(RLHF)</a></li>
-<li><a href="27.html">第27章 前沿课题</a></li>
+<li><a href="22.html">第22章 逆强化学习与模仿学习</a></li>
+<li><a href="23.html">第23章 Gymnasium环境实战</a></li>
+<li><a href="24.html">第24章 Stable-Baselines3入门</a></li>
+<li><a href="25.html">第25章 调试与可视化</a></li>
+<li><a href="26.html">第26章 强化学习前沿方向</a></li>
+<li><a href="27.html">第27章 从零实现DQN</a></li>
 <li><a href="28.html" class="active">第28章 综合实战：Atari智能体</a></li>
 </ul>
-</div>
-<div class="main-content">
-<h2>第二十八章：综合实战：Atari智能体</h2>
+</nav>
+<main id="content" class="main-content">
+<h1>第二十八章：综合实战：Atari智能体</h1>
 
-<h3>28.1 项目概览</h3>
+<h2>28.1 项目概览</h2>
 <p>欢迎来到本课程的最后一章！在前面的二十七章里，我们从马尔可夫决策过程出发，一路走到策略梯度、PPO、SAC甚至RLHF。今天，我们要把所学的一切汇聚到一个经典项目上——训练一个深度Q网络（DQN）智能体，让它在Atari游戏（Pong或Breakout）中达到超人水平。</p>
 
 <p>为什么要选Atari作为毕业项目？因为Atari是强化学习的"ImageNet时刻"。2013年DeepMind首次用DQN在Atari上超越人类水平，开启了深度强化学习的时代。Atari环境兼具多样性、视觉丰富性和明确的奖励信号——从乒乓球到打砖块，每一帧画面都蕴含着需要智能体去理解的结构。在这个项目中，你将亲手搭建一条从原始像素到游戏智能体的完整训练管线。</p>
@@ -80,7 +88,7 @@ th, td { border: 1px solid #c4b5fd; padding: 10px; text-align: left; } th { back
 <strong>项目目标：</strong> 实现一个端到端的DQN训练管线，包含环境包装、CNN网络、经验回放与评估模块。最终得到一个能在Pong中稳定击败内置AI的智能体。
 </div>
 
-<h3>28.2 环境配置</h3>
+<h2>28.2 环境配置</h2>
 <p>首先安装必要的依赖。Atari环境在Gymnasium生态中使用ale-py作为底层模拟器。安装指令如下：</p>
 <pre>pip install gymnasium[atari] gymnasium[accept-rom-license] ale-py</pre>
 
@@ -94,6 +102,34 @@ th, td { border: 1px solid #c4b5fd; padding: 10px; text-align: left; } th { back
 <li><strong>WarpFrame</strong>：将画面缩放为84×84灰度图，极大减少输入维度。</li>
 <li><strong>FrameStack</strong>：将连续4帧堆叠成一个状态，让网络能够感知运动信息。没有这个步骤，智能体连球往哪个方向飞都判断不了。</li>
 </ul>
+
+<figure>
+  <svg viewBox="0 0 680 240" role="img" aria-labelledby="fig-wrap-t fig-wrap-d">
+    <title id="fig-wrap-t">Atari 环境包装器栈</title>
+    <desc id="fig-wrap-d">原始 210×160 的 RGB 画面依次经过 NoopReset、MaxAndSkip、EpisodicLife、FireReset、WarpFrame 与 FrameStack，最终变成 4×84×84 的堆叠灰度状态。</desc>
+    <defs><marker id="wrapArrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#7c3aed"/></marker></defs>
+    <g font-size="11" text-anchor="middle">
+      <rect x="10" y="60" width="100" height="110" rx="10" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+      <text x="60" y="88" fill="#1e40af">NoopReset</text><text x="60" y="110" font-size="9" fill="#1e3a8a">随机跳开头</text><text x="60" y="150" font-size="9" fill="#64748b">210×160×3</text>
+      <rect x="116" y="60" width="100" height="110" rx="10" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+      <text x="166" y="88" fill="#1e40af">MaxAndSkip</text><text x="166" y="110" font-size="9" fill="#1e3a8a">每4帧取最大</text><text x="166" y="150" font-size="9" fill="#64748b">降时间分辨率</text>
+      <rect x="222" y="60" width="100" height="110" rx="10" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/>
+      <text x="272" y="88" fill="#5b21b6">EpisodicLife</text><text x="272" y="110" font-size="9" fill="#6d28d9">每条命算一局</text><text x="272" y="150" font-size="9" fill="#64748b">增样本多样性</text>
+      <rect x="328" y="60" width="100" height="110" rx="10" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/>
+      <text x="378" y="88" fill="#5b21b6">FireReset</text><text x="378" y="110" font-size="9" fill="#6d28d9">自动开火开局</text><text x="378" y="150" font-size="9" fill="#64748b">部分游戏必需</text>
+      <rect x="434" y="60" width="100" height="110" rx="10" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+      <text x="484" y="88" fill="#15803d">WarpFrame</text><text x="484" y="110" font-size="9" fill="#166534">缩放 + 灰度化</text><text x="484" y="150" font-size="9" fill="#64748b">84×84×1</text>
+      <rect x="540" y="60" width="100" height="110" rx="10" fill="#fef9c3" stroke="#eab308" stroke-width="2"/>
+      <text x="590" y="88" fill="#854d0e">FrameStack</text><text x="590" y="110" font-size="9" fill="#713f12">堆叠4帧</text><text x="590" y="150" font-size="9" fill="#713f12">输出 4×84×84</text>
+    </g>
+    <g stroke="#7c3aed" stroke-width="2.5" marker-end="url(#wrapArrow)">
+      <line x1="110" y1="115" x2="114" y2="115"/><line x1="216" y1="115" x2="220" y2="115"/><line x1="322" y1="115" x2="326" y2="115"/>
+      <line x1="428" y1="115" x2="432" y2="115"/><line x1="534" y1="115" x2="538" y2="115"/>
+    </g>
+    <text x="340" y="202" text-anchor="middle" font-size="11" fill="#5b21b6">→ 神经网络输入：4 帧 84×84 灰度堆叠，兼顾空间与运动信息</text>
+  </svg>
+  <figcaption>图 28-1：Atari 的环境包装器栈。原始 210×160 的 RGB 画面经过降分辨率、寿命切分、自动开局、灰度缩放与 4 帧堆叠，最终变成便于 CNN 处理的 4×84×84 状态。示意图。</figcaption>
+</figure>
 
 <pre>import gymnasium as gym
 from ale_py import ALEInterface
@@ -117,7 +153,7 @@ def make_atari_env(env_name="PongNoFrameskip-v4"):
 <strong>踩坑实录：</strong> 我第一次训练Atari时，忘了加FrameStack包装器。结果训练了两天，智能体的得分始终在随机水平徘徊。我盯着屏幕看了半天，才意识到：只用单帧画面，网络根本看不见球的速度和方向。就像让一个人闭着一只眼睛接乒乓球一样——不是不努力，是信息不够。加上FrameStack之后，仅仅几万步，得分曲线就开始抬头了。这个教训让我记住：在任何涉及运动的环境里，时间信息比空间信息更重要。
 </div>
 
-<h3>28.3 网络架构</h3>
+<h2>28.3 网络架构</h2>
 <p>Atari DQN的CNN架构经过大量实验验证，已经成为事实标准。其设计哲学是：用较深的卷积层逐步提取空间特征，最后通过全连接层映射到各个动作的Q值。具体的层结构如下：</p>
 
 <pre>import torch
@@ -144,7 +180,35 @@ class AtariDQN(nn.Module):
 
 <p>输入维度为 <code>(batch, 4, 84, 84)</code>，其中4是堆叠帧数，84是缩放后的画面尺寸。第三层卷积输出是64通道、7×7的空间尺寸，展平后得到 64×7×7 = 3136 维向量，依次经过512维隐藏层后输出动作数目的Q值。这个结构在Pong（6个动作）和Breakout（4个动作）上都有出色的表现。</p>
 
-<h3>28.4 完整训练流程</h3>
+<figure>
+  <svg viewBox="0 0 680 200" role="img" aria-labelledby="fig-cnn-t fig-cnn-d">
+    <title id="fig-cnn-t">Atari DQN 的卷积网络形状</title>
+    <desc id="fig-cnn-d">输入 4×84×84，依次经过 8×8、步长4 的卷积到 32×20×20，4×4、步长2 的卷积到 64×9×9，3×3、步长1 的卷积到 64×7×7，展平为 3136 维，经 512 维全连接层输出每个动作的 Q 值。</desc>
+    <defs><marker id="annArrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#7c3aed"/></marker></defs>
+    <g font-size="11" text-anchor="middle">
+      <rect x="12" y="60" width="96" height="80" rx="10" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+      <text x="60" y="92" fill="#1e40af">输入</text><text x="60" y="114" font-size="10" fill="#1e3a8a">4×84×84</text>
+      <rect x="124" y="60" width="96" height="80" rx="10" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/>
+      <text x="172" y="84" fill="#5b21b6">conv1</text><text x="172" y="104" font-size="9" fill="#6d28d9">8×8, s4</text><text x="172" y="124" font-size="9" fill="#6d28d9">32×20×20</text>
+      <rect x="236" y="60" width="96" height="80" rx="10" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/>
+      <text x="284" y="84" fill="#5b21b6">conv2</text><text x="284" y="104" font-size="9" fill="#6d28d9">4×4, s2</text><text x="284" y="124" font-size="9" fill="#6d28d9">64×9×9</text>
+      <rect x="348" y="60" width="96" height="80" rx="10" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/>
+      <text x="396" y="84" fill="#5b21b6">conv3</text><text x="396" y="104" font-size="9" fill="#6d28d9">3×3, s1</text><text x="396" y="124" font-size="9" fill="#6d28d9">64×7×7</text>
+      <rect x="460" y="60" width="96" height="80" rx="10" fill="#fef9c3" stroke="#eab308" stroke-width="2"/>
+      <text x="508" y="84" fill="#854d0e">展平 + fc1</text><text x="508" y="104" font-size="9" fill="#713f12">3136 → 512</text><text x="508" y="124" font-size="9" fill="#713f12">ReLU</text>
+      <rect x="572" y="60" width="96" height="80" rx="10" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+      <text x="620" y="92" fill="#15803d">输出</text><text x="620" y="114" font-size="10" fill="#166534">n_actions</text>
+    </g>
+    <g stroke="#7c3aed" stroke-width="2.5" marker-end="url(#annArrow)">
+      <line x1="108" y1="100" x2="122" y2="100"/><line x1="220" y1="100" x2="234" y2="100"/><line x1="332" y1="100" x2="346" y2="100"/>
+      <line x1="444" y1="100" x2="458" y2="100"/><line x1="556" y1="100" x2="570" y2="100"/>
+    </g>
+    <text x="340" y="172" text-anchor="middle" font-size="11" fill="#5b21b6">卷积逐层提取空间特征，最后全连接映射到每个动作的 Q 值；尺寸按 Mnih et al. (2015) 报告</text>
+  </svg>
+  <figcaption>图 28-2：Atari DQN 的卷积网络形状。4×84×84 的堆叠帧经三层卷积（8×8/s4、4×4/s2、3×3/s1）逐步降到 64×7×7，展平为 3136 维后经 512 维全连接层输出每个动作的 Q 值。示意图。</figcaption>
+</figure>
+
+<h2>28.4 完整训练流程</h2>
 <p>训练超参数直接沿用Nature DQN论文的配置。下表列出了最关键的超参数及其取值依据：</p>
 
 <table>
@@ -223,7 +287,7 @@ class AtariDQN(nn.Module):
 <strong>注意：</strong> 完整训练需要10M~50M步。在单张RTX 3090上运行Pong需要大约24小时。建议先用1M步快速验证损失函数是否正确下降，再启动长时间训练。提前关掉训练是最大的浪费——一定要先做小规模验证。
 </div>
 
-<h3>28.5 结果分析与课程总结</h3>
+<h2>28.5 结果分析与课程总结</h2>
 <p>训练完成后，最重要的环节是评估。不要只看最终得分——建议从三个维度观察：</p>
 <ul>
 <li><strong>多episode平均回报</strong>：冻结网络，在不加探索的情况下运行至少100个episode，计算平均得分。Pong的得分范围是[-21, +21]，人类水平大约在+9左右，优秀的DQN可以达到+18以上。</li>
@@ -232,6 +296,31 @@ class AtariDQN(nn.Module):
 </ul>
 
 <p>一条健康的训练曲线应该是：前期收益徘徊在最低水平（智能体还在随机试探），中期有一个陡峭的上升段（Q网络开始学到有用的策略），后期逐渐收敛到稳定水平。如果曲线剧烈震荡，检查学习率是否过高或buffer size是否太小。</p>
+
+<figure>
+  <svg viewBox="0 0 680 250" role="img" aria-labelledby="fig-curve-t fig-curve-d">
+    <title id="fig-curve-t">Pong 得分的典型学习曲线</title>
+    <desc id="fig-curve-d">横轴是训练步数，纵轴是评估平均得分。前期在随机水平附近徘徊，中期陡峭上升，后期收敛到稳定高位；一条虚线标出人类水平。</desc>
+    <g stroke="#94a3b8" stroke-width="1.2" fill="none">
+      <line x1="70" y1="200" x2="630" y2="200"/>
+      <line x1="70" y1="40" x2="70" y2="200"/>
+    </g>
+    <line x1="70" y1="80" x2="630" y2="80" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="6 5"/>
+    <polyline points="70,190 150,192 230,186 300,170 360,110 420,72 500,60 630,58" fill="none" stroke="#7c3aed" stroke-width="2.5"/>
+    <text x="636" y="78" font-size="10" fill="#b91c1c">人类水平</text>
+    <g font-size="10" fill="#334155">
+      <text x="120" y="222">随机水平</text>
+      <text x="330" y="222">开始学习</text>
+      <text x="530" y="222">收敛</text>
+      <text x="28" y="48">得分</text>
+      <text x="330" y="242">训练步数 →</text>
+    </g>
+    <g stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 4">
+      <line x1="120" y1="200" x2="120" y2="186"/><line x1="360" y1="200" x2="360" y2="110"/><line x1="560" y1="200" x2="560" y2="58"/>
+    </g>
+  </svg>
+  <figcaption>图 28-3：Pong 得分的典型学习曲线。前期在随机水平徘徊，中期陡峭上升，后期收敛到稳定高位，并逐渐越过人类水平参考线。仅展示形状，不含具体数值。示意图。</figcaption>
+</figure>
 
 <div class="tip">
 <strong>扩展阅读：</strong> Rainbow DQN将在本章的DQN基础上融合Double DQN、Dueling DQN、优先经验回放、多步学习、分布式Q学习和噪声网络六大改进。如果你想让Atari智能体更上一层楼，Rainbow是最好的起点。
@@ -247,11 +336,13 @@ class AtariDQN(nn.Module):
 <strong>给每一位同学的话：</strong> 算法和数学是工具，真正驱动进步的，是你提出问题、设计实验、从失败中学习的能力。不要害怕在GitHub上读别人的代码，不要害怕自己的模型不收敛。强化学习的每一个"bug"都是一次深入理解算法的机会。拿起代码，去训练你的第一个Atari智能体吧——游戏的胜负只是结果，真正重要的是你在过程中学到的东西。祝你在强化学习的道路上一路顺风！
 </div>
 
+<p class="source-note">本章 Atari DQN 见 Mnih et al., “Human-level control through deep reinforcement learning”, <a href="https://www.nature.com/articles/nature14236">Nature 518</a> (2015)；Atari 学习环境（ALE）见 Bellemare et al., <a href="https://arxiv.org/abs/1207.4708">arXiv:1207.4708</a> (2013)；Gymnasium/ale-py 包装器与 RecordVideo 见 <a href="https://gymnasium.farama.org/">Gymnasium 文档</a>。Pong 的人类水平（约 +9）与 DQN 报告成绩（约 +18.9）来自 Mnih et al. (2015) 的对比表；复现所需计算量（单卡约 1~2 天）与“踩坑实录”为教学示意，实际耗时随硬件与实现差异很大。</p>
+
 <div class="footer-nav">
-<a href="27.html">&larr; 第27章 前沿课题</a>
+<a href="27.html">&larr; 第27章 从零实现DQN</a>
 <a href="index.html">返回首页 &rarr;</a>
 </div>
-</div>
+</main>
 </div>
 </div>
 </body>
