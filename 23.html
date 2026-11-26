@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>第23章 Gymnasium环境实战</title>
     <link rel="stylesheet" href="theme.css">
     <style>
@@ -31,13 +32,22 @@
         p { line-height: 1.8; margin: 10px 0; color: #2d3748; }
         ul, ol { margin: 10px 0; padding-left: 25px; line-height: 1.8; color: #2d3748; }
         li { margin: 5px 0; }
+        h1 { color: #4c1d95; border-left: 6px solid #06b6d4; padding-left: 15px; margin: 20px 0 15px; font-size: 1.9rem; line-height: 1.35; }
+        figure { margin: 24px 0; padding: 16px; background: #faf8ff; border: 1px solid #ddd6fe; border-radius: 16px; }
+        figure svg { width: 100%; height: auto; display: block; }
+        figcaption { margin-top: 10px; font-size: 0.9rem; color: #5b21b6; line-height: 1.65; }
+        .source-note { font-size: 0.85rem; color: #64748b; border-top: 1px dashed #ddd6fe; margin-top: 28px; padding-top: 12px; line-height: 1.7; }
+        .math-scroll { max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 6px 2px; }
+        .math-scroll:focus-visible { outline: 3px solid #7c3aed; outline-offset: 2px; }
+        .math-scroll math[display="block"] { width: max-content; min-width: 100%; font-size: 1.15rem; }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
     </style>
 </head>
 <body>
 <div class="double-border">
 <div class="container">
-    <div class="sidebar">
-        <h3>课程目录</h3>
+    <nav class="sidebar" aria-label="课程目录">
+        <h3>🧠 课程目录</h3>
         <ul class="chapter-list">
             <li><a href="01.html">第1章 强化学习是什么</a></li>
             <li><a href="02.html">第2章 必备数学工具箱</a></li>
@@ -68,9 +78,9 @@
             <li><a href="27.html">第27章 从零实现DQN</a></li>
             <li><a href="28.html">第28章 综合实战：Atari智能体</a></li>
         </ul>
-    </div>
-    <div class="main-content">
-        <h2>第二十三章：Gymnasium环境实战</h2>
+    </nav>
+    <main id="content" class="main-content">
+        <h1>第二十三章：Gymnasium环境实战</h1>
 
         <p>同学们好，欢迎来到第二十三章。</p>
 
@@ -80,7 +90,7 @@
 
         <p>学完本章，你将掌握 Gymnasium 的完整用法，包括经典环境的使用、自定义环境的编写、包装器的组合，以及如何为自己的问题选择最合适的环境。更重要的是，这是通往下一章 <strong>Stable-Baselines3</strong> 的必经之路——SB3 的全部示例都基于 Gymnasium 接口。</p>
 
-        <h3>23.1 Gymnasium 简介与安装</h3>
+        <h2>23.1 Gymnasium 简介与安装</h2>
 
         <p>说起强化学习的环境库，老读者一定听过 <strong>OpenAI Gym</strong>。它诞生于 2016 年，在长达七年的时间里一直是 RL 社区的事实标准。2022 年底，Gym 的维护权从 OpenAI 移交到了 <strong>Farama Foundation</strong>，并更名为 <strong>Gymnasium</strong>。</p>
 
@@ -141,7 +151,42 @@ env.close()   # 记得关闭环境释放资源</pre>
 
         <p>这就是 Gymnasium 的核心工作流：<strong>make → reset → step(循环) → close</strong>。所有环境，无论简单还是复杂，都用这同一个接口。你学会了这一个，就学会了所有。</p>
 
-        <h3>23.2 经典环境详解</h3>
+        <figure>
+  <svg viewBox="0 0 640 235" role="img" aria-labelledby="fig-gym-title fig-gym-desc">
+    <title id="fig-gym-title">Gymnasium 的智能体–环境交互回路</title>
+    <desc id="fig-gym-desc">智能体根据当前观测输出动作，环境返回下一观测、奖励、终止与截断标志以及 info；整个流程由 make、reset、step 循环、close 四个调用串起。</desc>
+    <defs><marker id="gymArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#7c3aed"/></marker></defs>
+    <rect x="35" y="75" width="160" height="64" rx="12" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/>
+    <text x="115" y="102" text-anchor="middle" font-size="13" fill="#5b21b6">智能体 / 策略</text>
+    <text x="115" y="122" text-anchor="middle" font-size="11" fill="#6d28d9">π_θ(a | o)</text>
+    <rect x="445" y="75" width="160" height="64" rx="12" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+    <text x="525" y="102" text-anchor="middle" font-size="13" fill="#15803d">环境 env</text>
+    <text x="525" y="122" text-anchor="middle" font-size="11" fill="#166534">P, R（固定）</text>
+    <g stroke="#7c3aed" stroke-width="2.5" marker-end="url(#gymArrow)">
+      <line x1="195" y1="95" x2="441" y2="95"/>
+      <line x1="445" y1="125" x2="199" y2="125"/>
+    </g>
+    <text x="320" y="85" text-anchor="middle" font-size="11" fill="#7c3aed">动作 a_t = env.step(action)</text>
+    <text x="320" y="145" text-anchor="middle" font-size="11" fill="#7c3aed">o_{t+1}, r, terminated, truncated, info</text>
+    <text x="320" y="195" text-anchor="middle" font-size="12" fill="#4c1d95">make → reset → step(循环) → close</text>
+    <text x="320" y="35" text-anchor="middle" font-size="13" fill="#4c1d95">同一套接口适配所有环境</text>
+  </svg>
+  <figcaption>图 23-1：Gymnasium 的交互回路。智能体用 <code>env.step(action)</code> 与环境交互，环境返回五元组 <code>(obs, reward, terminated, truncated, info)</code>；所有环境都遵循 <code>make → reset → step → close</code> 的同一套流程。示意图。</figcaption>
+</figure>
+
+<p style="margin:10px 0 2px;color:#64748b;font-size:0.85rem;">式 (23.1) 环境背后的 MDP 转移与奖励（<code>step</code> 的形式化）</p>
+<div class="math-scroll" data-math-scroll tabindex="0" role="region" aria-label="MDP 转移与奖励公式，可横向滚动">
+  <math display="block" aria-label="下一状态由转移概率 P 给出，奖励由奖励函数 R 给出">
+    <mrow>
+      <msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub>
+      <mo>∼</mo><mi>P</mi><mo>(</mo><mo>·</mo><mo>|</mo><msub><mi>s</mi><mi>t</mi></msub><mo>,</mo><msub><mi>a</mi><mi>t</mi></msub><mo>)</mo>
+      <mo>,</mo><mspace width="0.6em"></mspace>
+      <msub><mi>r</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><mi>R</mi><mo>(</mo><msub><mi>s</mi><mi>t</mi></msub><mo>,</mo><msub><mi>a</mi><mi>t</mi></msub><mo>)</mo>
+    </mrow>
+  </math>
+</div>
+
+<h2>23.2 经典环境详解</h2>
 
         <p>Gymnasium 内置了几十个标准环境，按复杂度大致分为三个梯队。我们逐个来看。</p>
 
@@ -197,7 +242,7 @@ ALE/Breakout-v5                  obs: Box(210, 160, 3)                 act: Disc
             <p><strong>动手试试：</strong>建议你把上面这些环境逐个创建出来，随便跑几步看看 <code>obs</code> 的形状和数值范围。这种"亲手摸一摸"的体验比看文档管用十倍。你会发现，HalfCheetah 的观测里大部分值都在 -1 到 1 之间，而 CartPole 的位置和速度的数值范围完全不同——这对后续做观测归一化是个重要线索。</p>
         </div>
 
-        <h3>23.3 自定义环境</h3>
+        <h2>23.3 自定义环境</h2>
 
         <p>内置环境终归是别人设计好的。真正的强化学习项目里，你八成需要自己定义环境。好消息是，Gymnasium 让你可以轻松地继承 <code>gym.Env</code> 来实现自己的环境。</p>
 
@@ -358,7 +403,7 @@ if __name__ == "__main__":
             <li><strong>Terminated 和 Truncated 要分清楚</strong>——"真的赢了/输了"是 terminated，"到了最大步数/timeout"是 truncated。如果你不区分，某些算法（如 GAIL 中的 discriminator 计算）会出错。</li>
         </ul>
 
-        <h3>23.4 环境包装器（Wrappers）</h3>
+        <h2>23.4 环境包装器（Wrappers）</h2>
 
         <p>现实中的强化学习从来不是"创建环境 -> 直接开跑"这么简单。你经常需要对环境做一些预处理，比如：把图像缩放到 84×84、累积最近 4 帧、对奖励做缩放、记录训练日志……如果每次都要修改环境本身的代码，那就乱套了。</p>
 
@@ -413,7 +458,28 @@ env = ScaledRewardWrapper(env, scale=0.1)
 obs, info = env.reset()
 # obs 现在在 [0, 1] 范围内，奖励被缩放到原来的 1/10</pre>
 
-        <p>Gymnasium 还提供了一些非常实用的内置包装器：</p>
+        <figure>
+  <svg viewBox="0 0 620 250" role="img" aria-labelledby="fig-wrap-title fig-wrap-desc">
+    <title id="fig-wrap-title">包装器链式堆叠</title>
+    <desc id="fig-wrap-desc">基础环境被逐层包裹：每层包装器在 reset 与 step 之间插入自己的逻辑，调用自上而下传递、返回值自下而上回传，不修改环境本身。</desc>
+    <defs><marker id="wrapArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#7c3aed"/></marker></defs>
+    <rect x="40" y="55" width="540" height="160" rx="16" fill="#fef9c3" fill-opacity="0.6" stroke="#eab308" stroke-width="2"/>
+    <text x="310" y="78" text-anchor="middle" font-size="12" fill="#854d0e">ScaledRewardWrapper：reward × scale</text>
+    <rect x="90" y="88" width="440" height="112" rx="14" fill="#e0f2fe" fill-opacity="0.6" stroke="#38bdf8" stroke-width="2"/>
+    <text x="310" y="110" text-anchor="middle" font-size="12" fill="#0369a1">NormalizedObsWrapper：obs → [0, 1]</text>
+    <rect x="150" y="122" width="320" height="62" rx="12" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/>
+    <text x="310" y="148" text-anchor="middle" font-size="12" fill="#5b21b6">基础环境 gym.make("CartPole-v1")</text>
+    <text x="310" y="168" text-anchor="middle" font-size="11" fill="#6d28d9">未被修改</text>
+    <line x1="75" y1="215" x2="555" y2="215" stroke="#7c3aed" stroke-width="2" marker-end="url(#wrapArrow)"/>
+    <line x1="555" y1="230" x2="75" y2="230" stroke="#ef4444" stroke-width="2" marker-end="url(#wrapArrow)"/>
+    <text x="315" y="212" text-anchor="middle" font-size="11" fill="#7c3aed">reset / step 调用向内</text>
+    <text x="315" y="245" text-anchor="middle" font-size="11" fill="#b91c1c">观测 / 奖励 向外回传并逐层变换</text>
+    <text x="310" y="35" text-anchor="middle" font-size="13" fill="#4c1d95">不改环境，用包装器堆叠功能</text>
+  </svg>
+  <figcaption>图 23-2：包装器（Wrapper）链式堆叠。观测、动作、奖励可分别由 ObservationWrapper、ActionWrapper、RewardWrapper 逐层改写，每个包装器职责单一、可自由组合，环境本身保持不动。示意图。</figcaption>
+</figure>
+
+<p>Gymnasium 还提供了一些非常实用的内置包装器：</p>
 
         <table>
             <tr>
@@ -482,7 +548,7 @@ print(obs.shape)  # (4, 84, 84)  — 4 张灰度图
             <p><strong>包装器的哲学：</strong>不要修改环境本身，而是用包装器堆叠出你需要的功能。这样每个组件职责单一，可以自由组合，而且可以随时"取下"某个包装器来调试。如果以后 Gymnasium 升级了，你也只需要确认包装器接口是否兼容——不用重写环境代码。</p>
         </div>
 
-        <h3>23.5 环境选择指南</h3>
+        <h2>23.5 环境选择指南</h2>
 
         <p>面对这么多环境，初学者最容易犯的错误就是"一上来就挑最难的环境"。比如刚学会 DQN 就打开 Atari Breakout，结果训练三天不收敛，信心全无。</p>
 
@@ -542,13 +608,15 @@ print(obs.shape)  # (4, 84, 84)  — 4 张灰度图
 
         <p>下一章见！</p>
 
+<p class="source-note">本章的 Gymnasium 项目与 API 参照 Farama Foundation 官方文档 <a href="https://gymnasium.farama.org/">gymnasium.farama.org</a>；其前身 OpenAI Gym 见 Brockman et al., <a href="https://arxiv.org/abs/1606.01540">arXiv:1606.01540</a> (2016)；Atari 环境（ALE）见 Bellemare et al., <a href="https://arxiv.org/abs/1207.4708">arXiv:1207.4708</a> (2013)；MuJoCo 物理引擎见 Todorov et al., “MuJoCo: A physics engine for model-based control”, IROS (2012)。文中各环境的具体奖励区间（如 CartPole 随机策略约 20、LunarLander 随机策略约 −100）为教学示意/经验值，会随环境版本而变；图 23-1、图 23-2 与式 (23.1) 为教学示意。</p>
+
         <div class="footer-nav">
             <a href="22.html">← 上一章</a>
             <a href="index.html">返回目录</a>
             <a href="24.html">下一章 →</a>
         </div>
 
-    </div>
+    </main>
 </div>
 </div>
 </body>
