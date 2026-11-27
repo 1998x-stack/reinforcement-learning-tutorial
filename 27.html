@@ -382,7 +382,7 @@ if __name__ == "__main__":
 <strong>向 Atari 迁移的注意事项：</strong>CartPole 和 Atari 最大的区别是观测空间。Atari 的输入是 (84, 84, 4) 的堆叠灰度帧，你需要用 CNN 替换 MLP，并添加帧预处理（降采样、灰度化、裁剪得分栏）。训练时通常使用 FrameSkip=4，学习率降至 1e-4，batch_size 升至 32，replay buffer 容量扩大到 1,000,000。这些参数来自 Mnih 2015 年的 Nature 论文，至今仍是 Atari DQN 实验的默认配置。
 </div>
 
-<p>至此，你已经从零实现了 DQN 的完整流程。可以在 <a href="28.html">下一章</a> 中学习从零实现 PPO，将视野从值函数方法扩展到策略梯度方法，构建更全面的强化学习工具箱。</p>
+<p>至此，你已经从零实现了 DQN 的完整流程：经验回放、目标网络与训练循环都已在 CartPole-v1 上跑通。接下来，我们将把这条流水线扩展到 <a href="28.html">下一章</a> 的 Atari 实战——换用卷积特征提取网络，并补齐环境包装、训练与评估的完整闭环。</p>
 
 <!-- ============ 页脚导航 ============ -->
 <p class="source-note">本章 DQN 见 Mnih et al., “Human-level control through deep reinforcement learning”, <a href="https://www.nature.com/articles/nature14236">Nature 518</a> (2015)，以及 2013 年预印本 <a href="https://arxiv.org/abs/1312.5602">arXiv:1312.5602</a>；经验回放见 Lin, “Self-Improving Reactive Agents Based on Reinforcement Learning, Planning and Teaching”, Machine Learning 8 (1992)；Huber 损失见 Huber (1964)；CartPole-v1 的回合回报上限为 500，历史上常用的“已解决”阈值是 195（见 <a href="https://gymnasium.farama.org/">Gymnasium 文档</a>）；Atari 超参数（1M buffer、FrameSkip=4、lr=1e-4）来自 Mnih et al. (2015)。文中学习曲线的回合区间与数值、“踩坑记录”均为教学示意，实际结果会随实现与随机种子而异。</p>

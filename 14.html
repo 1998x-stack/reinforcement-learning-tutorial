@@ -90,7 +90,7 @@ figcaption { margin-top: 10px; font-size: 0.9rem; color: #5b21b6; line-height: 1
 
 <h1>第十四章：连续动作空间算法</h1>
 
-<p>同学们好！上一章我们讲了Dueling DQN，它把Q函数拆成价值流和优势流，在离散动作上表现亮眼。但细心的人可能已经注意到了——从DQN到Double DQN再到Dueling DQN，所有这些算法都有一个共同的隐含假设：<strong>动作空间是离散且有限的</strong>。它们依靠 <code>argmax<sub>a</sub> Q(s,a)</code> 来选择动作，这在围棋（19&times;19个落子点）或Atari游戏（几个到几十个按键组合）上没有问题。但如果动作本身就是连续的实数向量呢？</p>
+<p>同学们好！前面几章我们先后学了 DQN、Double DQN 与 Dueling DQN 这些基于价值的算法，也看过 PPO 与 TRPO 这类策略优化方法。但细心的人可能已经注意到了——从 DQN 到 Double DQN 再到 Dueling DQN，这一类算法都有一个共同的隐含假设：<strong>动作空间是离散且有限的</strong>。它们依靠 <code>argmax<sub>a</sub> Q(s,a)</code> 来选择动作，这在围棋（19&times;19个落子点）或Atari游戏（几个到几十个按键组合）上没有问题。但如果动作本身就是连续的实数向量呢？</p>
 
 <p>这就引出了本章的主题——<strong>连续动作空间算法</strong>。我们会深入讲解三个里程碑式的方法：DDPG、TD3和SAC。</p>
 
