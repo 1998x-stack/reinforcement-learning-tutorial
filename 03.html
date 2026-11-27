@@ -365,7 +365,7 @@ R(s, a) = E[ r<sub>t</sub> | s<sub>t</sub> = s, a<sub>t</sub> = a ]
 
 <p>下一章，我们将进入强化学习最优雅的数学结果之一——<strong>贝尔曼方程</strong>。这个方程揭示了 V、Q 与 P、R 之间的递归关系，它将为后续所有算法（从动态规划到深度 Q 网络）提供统一的数学基础。敬请期待！</p>
 
-<p class="source-note">本章的 MDP 五元组、马尔可夫性质与值函数定义参照 Sutton &amp; Barto《<a href="http://incompleteideas.net/book/the-book-2nd.html">Reinforcement Learning: An Introduction</a>》(第 2 版, 2018, MIT Press) 第 3 章。GridWorld 的 5×5 网格布局与奖励数值（到达 +50、每步 -1、γ = 0.9）为本教程为教学自设的示意参数，不是某个标准环境的官方配置。</p>
+<p class="source-note">本章的 MDP 五元组、马尔可夫性质与值函数定义参照 Sutton &amp; Barto《<a href="http://incompleteideas.net/book/the-book-2nd.html">Reinforcement Learning: An Introduction</a>》(第 2 版, 2018, MIT Press) 第 3 章；马尔可夫决策过程这一概念最早由 Bellman (1957), “A Markovian Decision Process”, <em>Indiana University Mathematics Journal</em> 6(5) 提出，DOI <a href="https://doi.org/10.1512/iumj.1957.6.56038">10.1512/iumj.1957.6.56038</a>（本章 5 元组写法与记号仍以 Sutton &amp; Barto 的统一约定为准）。GridWorld 的 5×5 网格布局与奖励数值（到达 +50、每步 -1、γ = 0.9）为本教程为教学自设的示意参数，不是某个标准环境的官方配置。</p>
 
 <!-- ==================== 页脚导航 ==================== -->
 <div class="footer-nav">
